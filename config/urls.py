@@ -8,6 +8,8 @@ urlpatterns = [
     path('', include('base.urls')),
     path('', include('discapacidad.urls')),
     path('', include('discapacidad.padron_urls')),
+    path('', include('paquete_neonatal.urls')),
+    path('', include('paquete_gestante.urls')),
 ]
 
 if settings.DEBUG:

@@ -1,0 +1,440 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body %}
+<div class="row">
+    <!-- RANKING -->
+    <div class="col-md-4">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">RANKING POR REDES DE SALUD</h3>
+            </div>
+
+            <div class="card-body">
+                <div class="form-group">
+                    <div class="row">
+                        <!-- Sección para seleccionar el mes -->
+                        <div class="col-md-3 mb-3">
+                            <select class="form-control" id="anio-select">
+                                <option value = '2024' selected="true" disabled="disabled">2024</option>
+                                <!-- Agrega más opciones de meses según sea necesario -->
+                            </select>
+                        </div>
+                        <!-- Sección para seleccionar el mes -->
+                        <div class="col-md-5 mb-3">
+                            <select class="form-control" id="mes-select">
+                                <option value = '1'>ENERO</option>
+                                <option value = '2'>FEBRERO</option>
+                                <option value = '3'>MARZO</option>
+                                <option value = '4'>ABRIL</option>
+                                <option value = '5'>MAYO</option>
+                                <option value = '6'>JUNIO</option>
+                                <option value = '7'>JULIO</option>
+                                <option value = '8'>AGOSTO</option>
+                                <option value = '9' selected="true">SETIEMBRE</option>
+                                <option value = '10'>OCTUBRE</option>
+                                <option value = '11'>NOVIEMBRE</option>
+                                <option value = '12'>DICIEMBRE</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <!-- Botón para obtener los datos -->
+                            <button class="btn btn-success" id="obtener-datos"><i class="fas fa-eye"></i>  Obtener datos</button>
+                        </div>
+                    </div>
+                </div> 
+
+                <div class="form-group">
+                    <div class="row">            <!-- Sección para mostrar la tabla de resultados -->
+                        <div class="table-responsive">
+                            <table id="datos-table" class="table table-bordered table-hover table-striped">
+                                <thead class="text-center" style="font-size: 13px;">
+                                    <tr class="text-center">
+                                        <th>RED DE SALUD</th>
+                                        <th>DEN</th>
+                                        <th>NUM</th>
+                                        <th>%</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="datos-table" class="text-center" style="font-size: 14px;">
+                                    <!-- Los datos se cargarán aquí mediante JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            
+            </div> 
+        </div>
+    </div>
+    <!-- GRAFICO -->
+    <div class="col-md-8">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">MC-01 MUJERES CON PARTO INSTITUCIONAL, QUE DURANTE SU GESTACIÓN RECIBIERON EL PAQUETE INTEGRADO DE SERVICIOS</h3>
+            </div>
+    
+            <div class="card-body">
+                <div class="form-group">
+                    <form id="filtroForm">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>RED DE SALUD :</label>
+                                <!-- Selector de provincia -->
+                                <select name="red" id="red" class="form-control select2bs4" style="width: 100%;">
+                                    <option value="">Todas redes de salud</option>
+                                    {% for r in red %}
+                                    <option value="{{ r }}">{{ r }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>        
+                    
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label style="color:white;">FILTRAR :</label>
+                                <button class="btn btn-success col" type="submit"><i class="fa fa-search"></i>  Filtrar</button>
+                            </div>
+                        </div>
+                    </div>    
+                    </form>
+                </div>
+
+                </br>
+                <div class="container">
+                    <!-- Contenedor para el gráfico -->
+                    <div id="chart" style="width: 100%; height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- SEPERADOR SEGUIMIENTO NOMINAL-->
+    <div class="col-md-12">
+        <div class="alert alert-secondary text-center py-3" role="alert">
+            <h4><i class="fa fa-running"></i> SEGUIMIENTO NOMINAL</h4>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <!-- SEGUIMIENTO NOMINAL POR FILTRO -->
+    <div class="col-md-3">
+        <section class="card card-body shadow mb-2">
+            <div hx-target="#content_1" hx-swap="innerHTML" hx-indicator="#loading_1">
+                <ul class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action active">TIPO DE REPORTE</a>
+                    <a href="#" class="list-group-item list-group-item-action" hx-get="{% url 'get_redes_paquete_gestante' 1 %}" hx-swap="innerHTML" hx-trigger="click">POR RED</a>
+                    <a href="#" class="list-group-item list-group-item-action" hx-get="{% url 'sello_get_distritos' 1 %}" hx-swap="innerHTML" hx-trigger="click">POR MICRORED</a>
+                    <a href="#" class="list-group-item list-group-item-action" hx-get="{% url 'sello_get_distritos' 1 %}" hx-swap="innerHTML" hx-trigger="click">POR ESTABLECIMIENTO</a>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="col-md-9"> 
+        <div id="loading_1" style="display:none;">Cargando...
+            <section class="card card-body shadow mb-2">
+            </section>
+        </div>
+        <div id="content_1">
+            <section class="card card-body shadow mb-2">
+            </section>
+        </div>
+    </div>
+</div>
+<!-- FIN DE SEGUIMIENTO -->
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.2/dist/echarts.min.js"></script>
+<script>
+let dataTableInstance; // Definir globalmente
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Obtener referencias a los elementos HTML
+    const mesAnio = document.getElementById('anio-select');
+    const mesSelect = document.getElementById('mes-select');
+    const obtenerDatosButton = document.getElementById('obtener-datos');
+    const datosTable = document.getElementById('datos-table');
+    
+    const redSelect = document.getElementById('red');
+    const filtroForm = document.getElementById('filtroForm');
+
+    // Inicialización del gráfico
+    var chartContainer = document.getElementById('chart');
+    var myChart = echarts.init(chartContainer);  // Inicializar el gráfico ECharts
+    
+    // Función para determinar el color del avance
+    function getAvanceColor(avance) {
+        if (avance  >= 96 && avance <= 100) return 'green';
+        if (avance >= 70 && avance <= 95) return 'orange';
+        if (avance < 70) return 'red';
+        return 'black'; // color por defecto para otros casos
+    }
+
+    // Función para mostrar una ventana flotante de depuración
+    function showDebugPopup(message) {
+        const popup = document.createElement('div');
+        popup.style.position = 'fixed';
+        popup.style.top = '10px';
+        popup.style.right = '10px';
+        popup.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        popup.style.color = 'white';
+        popup.style.padding = '10px';
+        popup.style.borderRadius = '5px';
+        popup.style.zIndex = '9999';
+        popup.textContent = message;
+        document.body.appendChild(popup);
+
+        setTimeout(() => {
+            document.body.removeChild(popup);
+        }, 5000);  // La ventana desaparece después de 5 segundos
+    }
+    
+    // RANKING REDES obtenerDatosButton
+    // Evento para obtener datos basado en el mes seleccionado
+    // Agrega un evento de clic al botón con id 'obtener-datos'
+    document.getElementById('obtener-datos').addEventListener('click', function() {
+        // Obtiene los valores seleccionados de año y mes
+        const anio = document.getElementById('anio-select').value;
+        const mes = document.getElementById('mes-select').value;
+        // Realiza una petición AJAX al servidor
+        fetch(`{% url "index_paquete_gestante" %}?anio=${encodeURIComponent(anio)}&mes=${encodeURIComponent(mes)}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json()) // Convierte la respuesta a JSON
+        .then(data => { 
+            // Si ya existe una instancia de DataTable, la destruye
+            if (dataTableInstance) {
+                dataTableInstance.destroy();
+            }
+            
+            // Debug: Verificar si hay datos para mostrar
+            if (data.red && data.red.length > 0) {
+                showDebugPopup(`Datos recibidos: ${data.red.length} registros`);
+            } else {
+                showDebugPopup('No se recibieron datos');
+            }
+        
+            // Verifica si hay datos para mostrar
+            if (data.red && data.red.length > 0) {
+                 // Construye el contenido de la tabla
+                let tableContent = '<thead class="text-center" style="font-size: 13px;"><tr><th>RED DE SALUD</th><th>DEN</th><th>NUM</th><th>%</th></tr></thead><tbody>';
+                data.red.forEach((red, index) => {
+                    // Obtiene el color para el porcentaje de avance
+                    const avanceColor = getAvanceColor(data.avance_r[index]);
+                    // Agrega una fila por cada elemento en data.red
+                    tableContent += `
+                        <tr>
+                            <td style="font-size: 14px;">${data.red[index]}</td>
+                            <td class="text-center" style="font-size: 14px;">${data.num_r[index]}</td>
+                            <td class="text-center" style="font-size: 14px;">${data.den_r[index]}</td>
+                            <td class="text-center" style="font-size: 14px; color: ${avanceColor}; font-weight: bold;">${data.avance_r[index]}%</td>
+                        </tr>
+                    `;
+                });
+                tableContent += '</tbody>';
+                // Inserta el contenido en la tabla
+                datosTable.innerHTML = tableContent;
+    
+                try {
+                    // Inicializa DataTables con la tabla creada
+                    dataTableInstance = $('#datos-table').DataTable({
+                        // Configuración de la estructura del DOM para DataTables
+                        dom: "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                            "<'row'<'col-sm-12'tr>>" +
+                            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                        // Configuración del idioma para DataTables
+                        language: {
+                            "decimal": "",
+                            "emptyTable": "No hay información",
+                            "info": "Mostrando _START_ a _END_ de _TOTAL_ ",
+                            "infoEmpty": "Mostrando 0 to 0 of 0 ",
+                            "infoFiltered": "(Filtrado de _MAX_ total )",
+                            "infoPostFix": "",
+                            "thousands": ",",
+                            "lengthMenu": "Mostrar _MENU_ ",
+                            "loadingRecords": "Cargando...",
+                            "processing": "Procesando...",
+                            "search": "Buscar:",
+                            "zeroRecords": "Sin resultados encontrados",
+                            "paginate": {
+                                "first": "Primero",
+                                "last": "Último",
+                                "next": "Siguiente",
+                                "previous": "Anterior"
+                            }
+                        },
+                        // Establecer el número de filas a mostrar por página a 20
+                        pageLength: 20,
+                        // Ordena por defecto por la cuarta columna (índice 3) de forma descendente
+                        order: [[3, 'desc']],
+                        // Permite ordenar todas las columnas
+                        columnDefs: [
+                            { targets: '_all', sortable: true }
+                        ]
+                    });
+                } catch (error) {
+                    // Si no hay datos, muestra un mensaje de error
+                    console.error('Error al inicializar DataTables:', error);
+                }
+            } else {
+                console.error('Datos de ranking no válidos:', data);
+                datosTable.innerHTML = '<tr><td colspan="4">No hay datos disponibles</td></tr>';
+            }
+        })
+        .catch(error => {
+            // Maneja errores en la petición
+            console.error('Error al obtener los datos:', error);
+            datosTable.innerHTML = '<tr><td colspan="4">Error al cargar los datos</td></tr>';
+        });
+    });
+
+    // GRAFICO POR MESES REDES filtroForm
+    // Evento de envío del formulario
+    filtroForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+
+        // Solicitud AJAX para obtener datos de avance
+        fetch('{% url "index_paquete_gestante" %}?' + new URLSearchParams(formData), {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error('Error:', data.error);
+                return;
+            }
+
+            // Diccionario para mapear los números de mes a nombres
+            const meses = {
+                1: 'ENE',
+                2: 'FEB',
+                3: 'MAR',
+                4: 'ABR',
+                5: 'MAY',
+                6: 'JUN',
+                7: 'JUL',
+                8: 'AGO',
+                9: 'SEP',
+                10: 'OCT',
+                11: 'NOV',
+                12: 'DIC'
+            };
+            // Convierte los números de mes en nombres usando el diccionario
+            const nombresMeses = data.mes.map(mesNumero => meses[mesNumero]);
+
+            // Configuración y actualización del gráfico
+            var option = {
+                title: {
+                    text: 'EVALUACION MENSUAL'
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['Denominador', 'Numerador', 'Avance']
+                },
+                // Configuración de la gráfica con los nombres de los meses en el eje X
+                xAxis: [
+                    {
+                        type: 'category',
+                        // data: data.mes,
+                        data: nombresMeses, // Aquí usamos los nombres de los meses
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: 'Cantidad',
+                        min: 0,
+                        axisLabel: {
+                            formatter: '{value}'
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: 'Avance (%)',
+                        min: 0,
+                        max: 100,
+                        interval: 20,
+                        axisLabel: {
+                            formatter: '{value}%'
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: 'Denominador',
+                        type: 'bar',
+                        data: data.den,
+                        label: {
+                            show: true,
+                            position: 'top',
+                            formatter: '{c}',
+                            fontSize: 12,
+                            fontWeight: 'bold'
+                        },
+                        itemStyle: {
+                            color: '#91cc75'
+                        }
+                    },
+                    {
+                        name: 'Numerador',
+                        type: 'bar',
+                        data: data.num,
+                        label: {
+                            show: true,
+                            position: 'top',
+                            formatter: '{c}',
+                            fontSize: 12,
+                            fontWeight: 'bold'
+                        },
+                        itemStyle: {
+                            color: '#fac858'
+                        }
+                    },
+                    {
+                        name: 'Avance',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        data: data.avance,
+                        itemStyle: {
+                            color: '#5470c6'
+                        },
+                        label: {
+                            show: true,
+                            position: 'top',
+                            formatter: '{c}%',
+                            fontSize: 12,
+                            fontWeight: 'bold'
+                        }
+                    }
+                ]
+            };
+            myChart.setOption(option);
+        })
+        .catch(error => {
+            console.error('Error al obtener los datos:', error);
+        });
+    });
+
+});
+</script>
+
+{% endblock %}

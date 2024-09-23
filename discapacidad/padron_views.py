@@ -160,7 +160,6 @@ def obtener_avance(provincia, distrito):
         )
         return cursor.fetchall()
 
-
 def obtener_ranking(mes):
     with connection.cursor() as cursor:
         cursor.execute(
@@ -168,12 +167,12 @@ def obtener_ranking(mes):
         )
         return cursor.fetchall()
 
-
 def index_sello(request):
+    # MES DE RANKING
     mes_seleccionado = request.GET.get('mes', 'SETIEMBRE')
+    # AVANCE GRAFICO
     provincia_seleccionada = request.GET.get('provincia')
     distrito_seleccionado = request.GET.get('distrito')
-
     provincias = MAESTRO_HIS_ESTABLECIMIENTO.objects.values_list('Provincia', flat=True).distinct().order_by('Provincia')
 
     # Si la solicitud es AJAX

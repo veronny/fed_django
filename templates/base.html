@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PADRON NOMINAL | REGION JUNIN</title>
+  <title>INDICADORES | REGION JUNIN</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -86,7 +86,7 @@
     <!-- Brand Logo -->
       <a href="#" class="brand-link">
         <img src="{% static 'assets/dist/img/logo_2.png' %}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">Padron Nominal Junin</span>
+        <span class="brand-text font-weight-light">INDICADORES FED</span>
       </a>
 
     <!-- Sidebar -->
@@ -95,13 +95,44 @@
       <!-- Sidebar Menu -->
       <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-              <!-- Padron Nominal -->
-              <li class="nav-header">PADRON NOMINAL</li>  
-              <li class="nav-item">
+            <!-- INDICADORES FED -->
+            <li class="nav-header">SEGUIMIENTO</li>  
+            <!-- MATERNO -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fa fa-female"></i>
+                <p>
+                  MATERNO
+                  <i class="fas fa-angle-left right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'municipio-list' %}" class="nav-link">
+                      <i class="fa fa-id-card nav-icon"></i>
+                      <p>Atención Prenatal</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'salud-list' %}" class="nav-link">
+                      <i class="fa fa-hospital nav-icon"></i>
+                      <p>Examenes Auxiliares</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'municipio-public' %}" class="nav-link">
+                      <i class="fa fa-tint nav-icon"></i>
+                      <p>Diagnostico Anemia</p>
+                    </a>
+                  </li>
+              </ul>
+            </li>
+            <!-- DIT -->
+            <li class="nav-item">
                 <a href="#" class="nav-link">
-                  <i class="nav-icon fa fa-folder-open"></i>
+                  <i class="nav-icon fa fa-child"></i>
                   <p>
-                    GESTION ADMIN
+                    DIT
                     <i class="fas fa-angle-left right"></i>
                   </p>
                 </a>
@@ -109,121 +140,121 @@
                     <li class="nav-item">
                       <a href="{% url 'municipio-list' %}" class="nav-link">
                         <i class="fa fa-id-card nav-icon"></i>
-                        <p>Respons Municipio</p>
+                        <p>Gotas de Hierro 04 Meses</p>
                       </a>
                     </li>
                     <li class="nav-item">
                       <a href="{% url 'salud-list' %}" class="nav-link">
                         <i class="fa fa-hospital nav-icon"></i>
-                        <p>Respons Salud</p>
+                        <p>Gotas de Hierro Prematuro</p>
                       </a>
                     </li>
                     <li class="nav-item">
                       <a href="{% url 'municipio-public' %}" class="nav-link">
                         <i class="fa fa-book nav-icon"></i>
-                        <p>Directorio Municipio</p>
+                        <p>Dosaje de Hb,Tx o supl 06 Meses</p>
                       </a>
                     </li>
                     <li class="nav-item">
                       <a href="{% url 'salud-public' %}" class="nav-link">
                         <i class="fa fa-book nav-icon"></i>
-                        <p>Directorio Salud</p>
+                        <p>CRED 12 Meses</p>
                       </a>
                     </li>
                 </ul>
-              </li>
-              <!-- PADRON NOMINAL -->
-              <li class="nav-item">
+            </li>
+            <!-- ADOLESCENTE -->
+            <li class="nav-item">
                 <a href="#" class="nav-link">
-                  <i class="nav-icon fa fa-address-book"></i>
+                  <i class="nav-icon fa fa-male"></i>
                   <p>
-                    PADRON NOMINAL
+                    ADOLESCENTE
                     <i class="fas fa-angle-left right"></i>
                   </p>
                 </a>
                 <ul class="nav nav-treeview">
                     <li class="nav-item">
-                      <a href="#" class="nav-link">
+                      <a href="{% url 'municipio-list' %}" class="nav-link">
                         <i class="fa fa-id-card nav-icon"></i>
-                        <p>Tablero Situacion</p>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a href="#" class="nav-link">
-                        <i class="fa fa-hospital nav-icon"></i>
-                        <p>Rpt General PN</p>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a href="#" class="nav-link">
-                        <i class="fa fa-address-card nav-icon"></i>
-                        <p>Seguimiento Nominal</p>
+                        <p>Dosaje de Hb</p>
                       </a>
                     </li>
                 </ul>
-              </li>
-              <!-- Compomiso 1 -->
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon fa fa-tint"></i>
-                  <p>
-                    COMPROMISO 1
-                    <i class="fas fa-angle-left right"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                    <li class="nav-item">
-                      <a href="#" class="nav-link">
-                        <i class="fa fa-id-card nav-icon"></i>
-                        <p>Tablero </p>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a href="#" class="nav-link">
-                        <i class="fa fa-id-card nav-icon"></i>
-                        <p>Indicador 1</p>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a href="#" class="nav-link">
-                        <i class="fa fa-hospital nav-icon"></i>
-                        <p>Indicador 2</p>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a href="#" class="nav-link">
-                        <i class="fa fa-address-card nav-icon"></i>
-                        <p>Indicador 3</p>
-                      </a>
-                    </li>
-                </ul>
-              </li>
-              <!-- Sello Municipal -->
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon fa fa-bullseye"></i>
-                  <p>
-                    SELLO MUNICIPAL
-                    <i class="fas fa-angle-left right"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
+            </li>
+            <!-- VIOLENCIA -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fa fa-crosshairs"></i>
+                <p>
+                  VIOLENCIA
+                  <i class="fas fa-angle-left right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="{% url 'index-sello' %}" class="nav-link">
+                    <a href="{% url 'municipio-list' %}" class="nav-link">
                       <i class="fa fa-id-card nav-icon"></i>
-                      <p>Indicador 1</p>
+                      <p>Gestante con Test</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="https://docs.google.com/spreadsheets/d/15o3IQBYFsgOdhEuFsReKy1Ir7q1LvHBg/edit?gid=1207725638#gid=1207725638" class="nav-link" target="_blank">
+                    <a href="{% url 'salud-list' %}" class="nav-link">
                       <i class="fa fa-hospital nav-icon"></i>
-                      <p>Indicador 2</p>
+                      <p>Deteccion Positiva</p>
                     </a>
                   </li>
-                </ul>
-              </li>
-              <!-- Consulta HIS MINSA -->
-              <li class="nav-header">HISTORIAL HIS MINSA</li>
+                  <li class="nav-item">
+                    <a href="{% url 'municipio-public' %}" class="nav-link">
+                      <i class="fa fa-book nav-icon"></i>
+                      <p>Dx y TX Oportuno</p>
+                    </a>
+                  </li>
+              </ul>
+            </li>
+            <!-- PAQUETES INTEGRADO -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fa fa-medkit"></i>
+                <p>
+                  PAQUETE INTEGRADO
+                  <i class="fas fa-angle-left right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'index_paquete_gestante' %}" class="nav-link">
+                      <i class="fa fa-id-card nav-icon"></i>
+                      <p>Gestante</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'salud-list' %}" class="nav-link">
+                      <i class="fa fa-hospital nav-icon"></i>
+                      <p>Niños menores 12</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'index_paquete_neonatal' %}" class="nav-link">
+                      <i class="fa fa-book nav-icon"></i>
+                      <p>Recien Nacido</p>
+                    </a>
+                  </li>
+              </ul>
+            </li>
+            <!-- RESULTADOS -->
+            <li class="nav-header">RESULTADOS MENSUAL</li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon fas fa-file-upload"></i>
+                  <p>
+                    REPOSITORIO
+                  </p>
+                </a>
+            </li>
+            
+            
+            <!-- Consulta HIS MINSA -->
+            <li class="nav-header">HISTORIAL HIS MINSA</li>
               <li class="nav-item">
                 <a href="#" class="nav-link">
                   <i class="nav-icon fas fa-copy"></i>
@@ -231,7 +262,7 @@
                     Consulta HIS MINSA
                   </p>
                 </a>
-              </li>
+            </li>
           </ul>
       </nav>
       <!-- /.sidebar-menu -->
