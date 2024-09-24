@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 # Replace {YOUR_PROJECT_MAIN_DIR_NAME} with your actual project directory name
-PROJECT_MAIN_DIR_NAME="padron_nominal_django"
+PROJECT_MAIN_DIR_NAME="fed_django"
 
 # Copy gunicorn socket and service files
 sudo cp "/home/ubuntu/$PROJECT_MAIN_DIR_NAME/gunicorn/gunicorn.socket" "/etc/systemd/system/gunicorn.socket"
