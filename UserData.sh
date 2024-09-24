@@ -2,13 +2,13 @@
 set -e
 
 # Replace {YOUR_GIT_REOPO_URL} with your actual Git repository URL
-GIT_REPO_URL="https://github.com/veronny/padron_nominal_django.git"
+GIT_REPO_URL="https://github.com/veronny/fed_django.git"
 
 # If using Private Repo
 #GIT_REPO_URL="https://<your_username>:<your_PAT>@github.com/codewithmuh/django-aws-ec2-autoscaling.git"
 
 # Replace {YOUR_PROJECT_MAIN_DIR_NAME} with your actual project directory name
-PROJECT_MAIN_DIR_NAME="padron_nominal_django"
+PROJECT_MAIN_DIR_NAME="fed_django"
 
 # Clone repository
 git clone "$GIT_REPO_URL" "/home/ubuntu/$PROJECT_MAIN_DIR_NAME"
