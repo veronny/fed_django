@@ -332,25 +332,25 @@ def fill_worksheet_paquete_gestante(ws, results):
     ws['G8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
     ws['G8'].fill = yellow_fill
     ws['G8'].border = border
-    ws['G8'] = 'I TRIM'    
+    ws['G8'] = 'SEM 14'    
     
     ws['H8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['H8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
     ws['H8'].fill = yellow_fill
     ws['H8'].border = border
-    ws['H8'] = 'II TRIM'    
+    ws['H8'] = 'SEM 28'    
     
     ws['I8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['I8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
     ws['I8'].fill = yellow_fill
     ws['I8'].border = border
-    ws['I8'] = 'III TRIM'    
+    ws['I8'] = 'SEM 33'    
     
     ws['J8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['J8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
     ws['J8'].fill = yellow_fill
     ws['J8'].border = border
-    ws['J8'] = 'Sem 37'  
+    ws['J8'] = 'SEM 37'  
     
     ws['K8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['K8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')

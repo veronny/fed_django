@@ -10,6 +10,7 @@ urlpatterns = [
     path('', include('discapacidad.padron_urls')),
     path('', include('paquete_neonatal.urls')),
     path('', include('paquete_gestante.urls')),
+    path('', include('paquete_nino.urls')),
 ]
 
 if settings.DEBUG:

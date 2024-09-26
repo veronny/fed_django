@@ -44,7 +44,7 @@ def obtener_ranking_paquete_neonatal(anio, mes):
             "SELECT * FROM public.obtener_ranking_paquete_neonatal(%s, %s)",
             [anio, mes]
         )
-        result = cursor.fetchall()
+        result = cursor.fetchall() # Agrega esta línea
         return result
     
 def index_paquete_neonatal(request):
@@ -138,7 +138,6 @@ def get_redes_paquete_neonatal(request,redes_id):
             .annotate(codigo_red_filtrado=Substr('Codigo_Red', 1, 4))
             .values('Red','codigo_red_filtrado')
             .distinct()
-            .order_by('Red')
     )
     mes_inicio = (
                 DimPeriodo
