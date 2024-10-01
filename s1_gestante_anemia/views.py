@@ -228,13 +228,13 @@ def fill_worksheet_s1_gestante_anemia(ws, results):
     ws.column_dimensions['J'].width = 9
     ws.column_dimensions['K'].width = 10
     ws.column_dimensions['L'].width = 9
-    ws.column_dimensions['M'].width = 9
+    ws.column_dimensions['M'].width = 16
     ws.column_dimensions['N'].width = 16
     ws.column_dimensions['O'].width = 20
     ws.column_dimensions['P'].width = 20
     ws.column_dimensions['Q'].width = 6
     ws.column_dimensions['R'].width = 25
-    ws.column_dimensions['S'].width = 9
+    ws.column_dimensions['S'].width = 6
     
     # linea de division
     ws.freeze_panes = 'E9'
@@ -389,7 +389,7 @@ def fill_worksheet_s1_gestante_anemia(ws, results):
     ws['S8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['S8'].fill = orange_fill
     ws['S8'].border = border
-    ws['S8'] = 'CATEGORIA EST'  
+    ws['S8'] = 'CAT EST'  
     
         
     # Definir estilos
@@ -413,7 +413,7 @@ def fill_worksheet_s1_gestante_anemia(ws, results):
             cell = ws.cell(row=row, column=col, value=value)
 
             # Alinear a la izquierda solo en las columnas 6,14,15,16
-            if col in [13, 14, 15, 16, 18]:
+            if col in [14, 15, 16, 18]:
                 cell.alignment = Alignment(horizontal='left')
             else:
                 cell.alignment = Alignment(horizontal='center')
