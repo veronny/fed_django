@@ -446,6 +446,9 @@ def fill_worksheet_paquete_gestante(ws, results):
             bottom=Side(style='thin', color='A9A9A9'))
     header_fill = PatternFill(patternType='solid', fgColor='00B0F0')
     
+    
+    results.sort(key=lambda x: x[3])
+    
     # Escribir datos
     for row, record in enumerate(results, start=9):
         for col, value in enumerate(record, start=2):
