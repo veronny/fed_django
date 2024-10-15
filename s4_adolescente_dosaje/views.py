@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-# TABLERO PAQUETE NEONATAL 
+# TABLERO Adolescente Hemopglobina 
 from django.db import connection
 from django.http import JsonResponse
 from base.models import MAESTRO_HIS_ESTABLECIMIENTO, DimPeriodo
@@ -30,24 +30,24 @@ def obtener_distritos(provincia):
     distritos = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Provincia=provincia).values('Distrito').distinct().order_by('Distrito')
     return list(distritos)
 
-def obtener_avance_s1_gestante_anemia(red):
+def obtener_avance_s4_adolescente_dosaje(red):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_avance_s1_gestante_anemia(%s)",
+            "SELECT DISTINCT * FROM public.obtener_avance_s4_adolescente_dosaje(%s)",
             [red]
         )
         return cursor.fetchall()
 
-def obtener_ranking_s1_gestante_anemia(anio, mes):
+def obtener_ranking_s4_adolescente_dosaje(anio, mes):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_ranking_s1_gestante_anemia(%s, %s)",
+            "SELECT DISTINCT * FROM public.obtener_ranking_s4_adolescente_dosaje(%s, %s)",
             [anio, mes]
         )
         result = cursor.fetchall()
         return result
     
-def index_s1_gestante_anemia(request):
+def index_s4_adolescente_dosaje(request):
     # RANKING 
     anio = request.GET.get('anio')  # Valor predeterminado# Valor predeterminado
     mes_seleccionado = request.GET.get('mes')
@@ -58,12 +58,12 @@ def index_s1_gestante_anemia(request):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
             # Obtener datos de RANKING 
-            resultados_ranking_obtener_s1_gestante_anemia = obtener_ranking_s1_gestante_anemia(anio,mes_seleccionado)
+            resultados_ranking_obtener_s4_adolescente_dosaje = obtener_ranking_s4_adolescente_dosaje(anio,mes_seleccionado)
             # Obtener datos de AVANCE GRAFICO MESES
-            resultados_avance_obtener_s1_gestante_anemia = obtener_avance_s1_gestante_anemia(red_seleccionada)
+            resultados_avance_obtener_s4_adolescente_dosaje = obtener_avance_s4_adolescente_dosaje(red_seleccionada)
             
             # Procesar los resultados
-            if any(len(row) < 4 for row in resultados_ranking_obtener_s1_gestante_anemia):
+            if any(len(row) < 4 for row in resultados_ranking_obtener_s4_adolescente_dosaje):
                 raise ValueError("Algunas filas del ranking no tienen suficientes elementos")
             
             data = {               
@@ -80,7 +80,7 @@ def index_s1_gestante_anemia(request):
                 'avance': [],
             }
             #RANKING
-            for index, row in enumerate(resultados_ranking_obtener_s1_gestante_anemia):
+            for index, row in enumerate(resultados_ranking_obtener_s4_adolescente_dosaje):
                 try:
                     # Verifica que la tupla tenga exactamente 4 elementos
                     if len(row) != 4:
@@ -100,7 +100,7 @@ def index_s1_gestante_anemia(request):
                     logger.error(f"Error procesando la fila {index}: {str(e)}")
             
             #AVANCE GRAFICO MESES
-            for index, row in enumerate(resultados_avance_obtener_s1_gestante_anemia):
+            for index, row in enumerate(resultados_avance_obtener_s4_adolescente_dosaje):
                 try:
                     # Verifica que la tupla tenga exactamente 4 elementos
                     if len(row) != 5:
@@ -125,13 +125,13 @@ def index_s1_gestante_anemia(request):
             logger.error(f"Error al obtener datos: {str(e)}")
 
     # Si no es una solicitud AJAX, renderiza la página principal
-    return render(request, 's1_gestante_anemia/index_s1_gestante_anemia.html', {
+    return render(request, 's4_adolescente_dosaje/index_s4_adolescente_dosaje.html', {
         'red': red,
         'mes_seleccionado': mes_seleccionado,
     })
 
 ## SEGUIMIENTO
-def get_redes_s1_gestante_anemia(request,redes_id):
+def get_redes_s4_adolescente_dosaje(request,redes_id):
     redes = (
             MAESTRO_HIS_ESTABLECIMIENTO
             .objects.filter(Descripcion_Sector='GOBIERNO REGIONAL',Departamento='JUNIN')
@@ -162,24 +162,24 @@ def get_redes_s1_gestante_anemia(request,redes_id):
                 'mes_fin':mes_fin,
     }
     
-    return render(request, 's1_gestante_anemia/redes.html', context)
+    return render(request, 's4_adolescente_dosaje/redes.html', context)
 
-def obtener_seguimiento_redes_s1_gestante_anemia(p_red,p_inicio,p_fin):
+def obtener_seguimiento_redes_s4_adolescente_dosaje(p_red,p_inicio,p_fin):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.fn_seguimiento_s1_gestante_anemia(%s, %s, %s)",
+            "SELECT DISTINCT * FROM public.fn_seguimiento_s4_adolescente_dosaje(%s, %s, %s)",
             [p_red, p_inicio, p_fin]
         )
         return cursor.fetchall()
 
-class RptS1GestanteAnemiaRed(TemplateView):
+class RptS4AdolescenteDosajeRed(TemplateView):
     def get(self, request, *args, **kwargs):
         # Variables ingresadas
         p_red = request.GET.get('red')
         p_inicio = request.GET.get('fecha_inicio')
         p_fin = request.GET.get('fecha_fin')
         # Creación de la consulta
-        resultado_seguimiento = obtener_seguimiento_redes_s1_gestante_anemia(p_red, p_inicio, p_fin)
+        resultado_seguimiento = obtener_seguimiento_redes_s4_adolescente_dosaje(p_red, p_inicio, p_fin)
         
         wb = Workbook()
         
@@ -194,10 +194,10 @@ class RptS1GestanteAnemiaRed(TemplateView):
             else:
                 ws = wb.create_sheet(title=sheet_name)
         
-            fill_worksheet_s1_gestante_anemia(ws, results)
+            fill_worksheet_s4_adolescente_dosaje(ws, results)
         ##########################################################################          
         # Establecer el nombre del archivo
-        nombre_archivo = "rpt_s1_gestante_anemia.xlsx"
+        nombre_archivo = "rpt_s4_adolescente_gestante.xlsx"
         # Definir el tipo de respuesta que se va a dar
         response = HttpResponse(content_type="application/ms-excel")
         contenido = "attachment; filename={}".format(nombre_archivo)
@@ -206,7 +206,7 @@ class RptS1GestanteAnemiaRed(TemplateView):
 
         return response
 
-def fill_worksheet_s1_gestante_anemia(ws, results): 
+def fill_worksheet_s4_adolescente_dosaje(ws, results): 
     # cambia el alto de la columna
     ws.row_dimensions[1].height = 14
     ws.row_dimensions[2].height = 14
@@ -219,25 +219,20 @@ def fill_worksheet_s1_gestante_anemia(ws, results):
     ws.column_dimensions['A'].width = 2
     ws.column_dimensions['B'].width = 9
     ws.column_dimensions['C'].width = 9
-    ws.column_dimensions['D'].width = 9
+    ws.column_dimensions['D'].width = 5
     ws.column_dimensions['E'].width = 9
     ws.column_dimensions['F'].width = 9
     ws.column_dimensions['G'].width = 9
     ws.column_dimensions['H'].width = 9
-    ws.column_dimensions['I'].width = 8
-    ws.column_dimensions['J'].width = 10
-    ws.column_dimensions['K'].width = 8
-    ws.column_dimensions['L'].width = 9
-    ws.column_dimensions['M'].width = 9
-    ws.column_dimensions['N'].width = 11    
-    ws.column_dimensions['O'].width = 9
-    ws.column_dimensions['P'].width = 16
-    ws.column_dimensions['Q'].width = 16
-    ws.column_dimensions['R'].width = 20
-    ws.column_dimensions['S'].width = 20
-    ws.column_dimensions['T'].width = 6
-    ws.column_dimensions['U'].width = 25
-    ws.column_dimensions['V'].width = 6
+    ws.column_dimensions['I'].width = 11    
+    ws.column_dimensions['J'].width = 9
+    ws.column_dimensions['K'].width = 16
+    ws.column_dimensions['L'].width = 16
+    ws.column_dimensions['M'].width = 20
+    ws.column_dimensions['N'].width = 20
+    ws.column_dimensions['O'].width = 6
+    ws.column_dimensions['P'].width = 25
+
     
     # linea de division
     ws.freeze_panes = 'E9'
@@ -302,115 +297,79 @@ def fill_worksheet_s1_gestante_anemia(ws, results):
     ws['D8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
     ws['D8'].fill = blue_fill
     ws['D8'].border = border
-    ws['D8'] = 'FECHA CORTE' 
+    ws['D8'] = 'EDAD' 
     
     ws['E8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['E8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
     ws['E8'].fill = yellow_fill
     ws['E8'].border = border
-    ws['E8'] = 'APN'     
+    ws['E8'] = 'DOSAJE HB'     
     
     ws['F8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['F8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
     ws['F8'].fill = yellow_fill
     ws['F8'].border = border
-    ws['F8'] = '1° DOSAJE HB'    
+    ws['F8'] = 'RENAES HB'    
     
     ws['G8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['G8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['G8'].fill = green_fill
     ws['G8'].border = border
-    ws['G8'] = 'DX ANEMIA'    
+    ws['G8'] = 'VISITA'    
     
     ws['H8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['H8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['H8'].fill = green_fill
+    ws['H8'].fill = fill
     ws['H8'].border = border
-    ws['H8'] = 'ENTREGA HIERRO'  
+    ws['H8'] = 'MES' 
     
     ws['I8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['I8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['I8'].fill = green_fill
+    ws['I8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['I8'].fill = gray_fill
     ws['I8'].border = border
-    ws['I8'] = 'VAL'  
-
+    ws['I8'] = 'IND' 
+    
     ws['J8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['J8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['J8'].fill = green_fill
+    ws['J8'].fill = orange_fill
     ws['J8'].border = border
-    ws['J8'] = '2° DOSAJE HB'  
+    ws['J8'] = 'UBIGEO'  
     
     ws['K8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['K8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['K8'].fill = green_fill
+    ws['K8'].fill = orange_fill
     ws['K8'].border = border
-    ws['K8'] = 'VAL'  
+    ws['K8'] = 'PROVINCIA'       
     
     ws['L8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['L8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['L8'].fill = green_fill
+    ws['L8'].fill = orange_fill
     ws['L8'].border = border
-    ws['L8'] = 'PERIODO'  
+    ws['L8'] = 'DISTRITO' 
     
     ws['M8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['M8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['M8'].fill = fill
+    ws['M8'].fill = orange_fill
     ws['M8'].border = border
-    ws['M8'] = 'MES' 
+    ws['M8'] = 'RED'  
     
     ws['N8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['N8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['N8'].fill = gray_fill
+    ws['N8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['N8'].fill = orange_fill
     ws['N8'].border = border
-    ws['N8'] = 'IND' 
+    ws['N8'] = 'MICRORED'  
     
     ws['O8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['O8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['O8'].fill = orange_fill
     ws['O8'].border = border
-    ws['O8'] = 'UBIGEO'  
+    ws['O8'] = 'COD EST'  
     
     ws['P8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['P8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['P8'].fill = orange_fill
     ws['P8'].border = border
-    ws['P8'] = 'PROVINCIA'       
-    
-    ws['Q8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['Q8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['Q8'].fill = orange_fill
-    ws['Q8'].border = border
-    ws['Q8'] = 'DISTRITO' 
-    
-    ws['R8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['R8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['R8'].fill = orange_fill
-    ws['R8'].border = border
-    ws['R8'] = 'RED'  
-    
-    ws['S8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['S8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['S8'].fill = orange_fill
-    ws['S8'].border = border
-    ws['S8'] = 'MICRORED'  
-    
-    ws['T8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['T8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['T8'].fill = orange_fill
-    ws['T8'].border = border
-    ws['T8'] = 'COD EST'  
-    
-    ws['U8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['U8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['U8'].fill = orange_fill
-    ws['U8'].border = border
-    ws['U8'] = 'ESTABLECIMIENTO'  
-    
-    ws['V8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['V8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['V8'].fill = orange_fill
-    ws['V8'].border = border
-    ws['V8'] = 'CAT EST'  
+    ws['P8'] = 'ESTABLECIMIENTO'  
     
         
     # Definir estilos
@@ -434,13 +393,13 @@ def fill_worksheet_s1_gestante_anemia(ws, results):
             cell = ws.cell(row=row, column=col, value=value)
 
             # Alinear a la izquierda solo en las columnas 6,14,15,16
-            if col in [15, 16, 18]:
+            if col in [14, 16]:
                 cell.alignment = Alignment(horizontal='left')
             else:
                 cell.alignment = Alignment(horizontal='center')
 
             # Aplicar color en la columna 27
-            if col == 14:
+            if col == 9:
                 if isinstance(value, str):
                     value_upper = value.strip().upper()
                     if value_upper == "NO CUMPLE":
@@ -471,11 +430,11 @@ def fill_worksheet_s1_gestante_anemia(ws, results):
                 cell.font = Font(name='Arial', size=8)  # Fuente normal para otras columnas
 
             # Aplicar caracteres especiales check y X
-            if col in [5, 6, 7, 9, 11]:
-                if value == "1":
+            if col in [7]:
+                if value == 1:
                     cell.value = check_mark  # Insertar check
                     cell.font = Font(name='Arial', size=10, color='00B050')  # Letra verde
-                elif value == "0":
+                elif value == 0:
                     cell.value = x_mark  # Insertar X
                     cell.font = Font(name='Arial', size=10, color='FF0000')  # Letra roja
                 else:

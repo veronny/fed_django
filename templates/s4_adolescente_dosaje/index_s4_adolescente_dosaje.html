@@ -8,9 +8,9 @@
     <div class="col-sm-4">
         <div class="alert alert-info color-palette d-flex align-items-center" role="alert">      
             <div>
-                <strong>Ficha SI-01:</strong>
+                <strong>Ficha SI-04:</strong>
                 <p>
-                Porcentaje de gestantes con <strong>diagnóstico de anemia</strong> atendidas en establecimientos de salud del primer y segundo nivel de atención, que reciben <strong>dosaje de hemoglobina de control y segunda entrega de tratamiento</strong> con hierro con diagnósto de anemia
+                    Porcentaje de <strong>adolescentes mujeres de 12 a 17 años</strong> de edad, con <strong>dosaje de hemoglobina</strong>, en establecimientos de salud del primer y segundo nivel de atención (con población asignada) del Gobierno Regional. 
                 </p>
             </div>
         </div>
@@ -21,7 +21,7 @@
             <div>
                 <strong>Numerador:</strong>
                 <p>
-                N° de gestantes del denominador que reciben un <strong>dosaje de hemoglobina de control y segunda entrega de hierro</strong> al mes de iniciado el tratamiento de anemia, registrados en el HIS.
+                N° de adolescentes mujeres del denominador que cuentan con <strong>dosaje de hemoglobina registrados en HIS</strong>
                 </p>
             </div>
         </div>
@@ -32,7 +32,7 @@
             <div>
                 <strong>Denominador:</strong>
                 <p>
-                    N° de gestantes atendidas en establecimientos de salud del 1er y 2do nivel de atención que cuentan con <strong>diagnóstico de anemia y primera entrega de hierro</strong>, registrados en HIS, en el mes previo
+                N° de adolescentes mujeres de <strong>12 a 17 años de edad que en el mes de medición</strong>, fueron atendidas en establecimientos de salud, por cualquier motivo de consulta, registrados en HIS con DNI.
                 </p>
             </div>
         </div>
@@ -177,7 +177,7 @@
             <div hx-target="#content_1" hx-swap="innerHTML" hx-indicator="#loading_1">
                 <ul class="list-group">
                     <a href="#" class="list-group-item list-group-item-action active">TIPO DE REPORTE</a>
-                    <a href="#" class="list-group-item list-group-item-action" hx-get="{% url 'get_redes_s1_gestante_anemia' 1 %}" hx-swap="innerHTML" hx-trigger="click">POR RED</a>
+                    <a href="#" class="list-group-item list-group-item-action" hx-get="{% url 'get_redes_s4_adolescente_dosaje' 1 %}" hx-swap="innerHTML" hx-trigger="click">POR RED</a>
                     <a href="#" class="list-group-item list-group-item-action" hx-get="{% url 'sello_get_distritos' 1 %}" hx-swap="innerHTML" hx-trigger="click">POR MICRORED</a>
                     <a href="#" class="list-group-item list-group-item-action" hx-get="{% url 'sello_get_distritos' 1 %}" hx-swap="innerHTML" hx-trigger="click">POR ESTABLECIMIENTO</a>
                 </ul>
@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const anio = document.getElementById('anio-select').value;
         const mes = document.getElementById('mes-select').value;
         // Realiza una petición AJAX al servidor
-        fetch(`{% url "index_s1_gestante_anemia" %}?anio=${encodeURIComponent(anio)}&mes=${encodeURIComponent(mes)}`, {
+        fetch(`{% url "index_s4_adolescente_dosaje" %}?anio=${encodeURIComponent(anio)}&mes=${encodeURIComponent(mes)}`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             }
@@ -351,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var formData = new FormData(this);
 
         // Solicitud AJAX para obtener datos de avance
-        fetch('{% url "index_s1_gestante_anemia" %}?' + new URLSearchParams(formData), {
+        fetch('{% url "index_s4_adolescente_dosaje" %}?' + new URLSearchParams(formData), {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             }

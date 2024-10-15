@@ -12,10 +12,9 @@ urlpatterns = [
     path('', include('paquete_gestante.urls')),
     path('', include('paquete_nino.urls')),
     path('', include('s1_gestante_anemia.urls')),
+    path('', include('s4_adolescente_dosaje.urls')),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    
-    
