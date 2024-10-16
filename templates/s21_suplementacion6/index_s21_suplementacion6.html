@@ -2,14 +2,15 @@
 {% load static %}
 
 {% block body %}
+
 <!--- TITULO --->
 <div class="row">
     <div class="col-sm-4">
         <div class="alert alert-info color-palette d-flex align-items-center" role="alert">      
             <div>
-                <strong>Ficha MC-02.01:</strong>
+                <strong>Ficha SI-02.01:</strong>
                 <p>
-                    Niñas y Niños menores de 12 meses de edad procedentes de los quintiles 1 y 2 de pobreza departamental que reciben el paquete integrado de servicios.
+                    Porcentaje de niñas y niños meses de edad del departamento, de seis (06) meses de edad, prematuros y/o bajo peso al nacer, y de cuatro (04) <strong>sin diagnóstico de anemia; que reciben dosajes de hemoglobina y culminan la suplementación preventiva con hierro</strong>
                 </p>
             </div>
         </div>
@@ -20,7 +21,7 @@
             <div>
                 <strong>Numerador:</strong>
                 <p>
-                    N° de niñas y niños del denominador que reciben el paquete integrado de servicios según edad, y que han sido registrados en HIS y cuentan con DNI emitido.
+                    N° de niñas y niños del denominador (con y sin prematuridad y/o bajo peso al nacer), con suplementación preventiva con hierro y dosaje de hemoglobina. 
                 </p>
             </div>
         </div>
@@ -31,7 +32,7 @@
             <div>
                 <strong>Denominador:</strong>
                 <p>
-                    N° de niñas y niños menores de 12 meses de edad en el mes de medición, procedentes de distritos de quintiles 1 y 2 de pobreza departamental, registrados en el padrón nominal con DNI o CNV, con tipo de seguro MINSA.
+                    N° de niñas y niños de 6 meses de edad del departamento, en el mes de medición, registrados en el padrón nominal (con DNI o CNV en línea), y sin diagnóstico de anemia.
                 </p>
             </div>
         </div>
@@ -47,6 +48,7 @@
 
 </div>
 <!------------->
+
 
 <div class="row">
     <!-- RANKING -->
@@ -77,8 +79,8 @@
                                 <option value = '6'>JUNIO</option>
                                 <option value = '7'>JULIO</option>
                                 <option value = '8'>AGOSTO</option>
-                                <option value = '9' selected="true">SETIEMBRE</option>
-                                <option value = '10'>OCTUBRE</option>
+                                <option value = '9'>SETIEMBRE</option>
+                                <option value = '10' selected="true">OCTUBRE</option>
                                 <option value = '11'>NOVIEMBRE</option>
                                 <option value = '12'>DICIEMBRE</option>
                             </select>
@@ -118,7 +120,7 @@
     <div class="col-md-8">
         <div class="card card-primary">
             <div class="card-header">
-                <h3 class="card-title">AVANCE MENSUAL</h3>
+                <h3 class="card-title">AVANCE POR MESES</h3>
             </div>
     
             <div class="card-body">
@@ -175,7 +177,7 @@
             <div hx-target="#content_1" hx-swap="innerHTML" hx-indicator="#loading_1">
                 <ul class="list-group">
                     <a href="#" class="list-group-item list-group-item-action active">TIPO DE REPORTE</a>
-                    <a href="#" class="list-group-item list-group-item-action" hx-get="{% url 'get_redes_paquete_nino' 1 %}" hx-swap="innerHTML" hx-trigger="click">POR RED</a>
+                    <a href="#" class="list-group-item list-group-item-action" hx-get="{% url 'get_redes_s21_suplementacion6' 1 %}" hx-swap="innerHTML" hx-trigger="click">POR RED</a>
                     <a href="#" class="list-group-item list-group-item-action" hx-get="{% url 'sello_get_distritos' 1 %}" hx-swap="innerHTML" hx-trigger="click">POR MICRORED</a>
                     <a href="#" class="list-group-item list-group-item-action" hx-get="{% url 'sello_get_distritos' 1 %}" hx-swap="innerHTML" hx-trigger="click">POR ESTABLECIMIENTO</a>
                 </ul>
@@ -249,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const anio = document.getElementById('anio-select').value;
         const mes = document.getElementById('mes-select').value;
         // Realiza una petición AJAX al servidor
-        fetch(`{% url "index_paquete_nino" %}?anio=${encodeURIComponent(anio)}&mes=${encodeURIComponent(mes)}`, {
+        fetch(`{% url "index_s21_suplementacion6" %}?anio=${encodeURIComponent(anio)}&mes=${encodeURIComponent(mes)}`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             }
@@ -349,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var formData = new FormData(this);
 
         // Solicitud AJAX para obtener datos de avance
-        fetch('{% url "index_paquete_nino" %}?' + new URLSearchParams(formData), {
+        fetch('{% url "index_s21_suplementacion6" %}?' + new URLSearchParams(formData), {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             }
