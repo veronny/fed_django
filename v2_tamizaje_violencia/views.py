@@ -277,7 +277,7 @@ def fill_worksheet_v2_tamizaje_violencia(ws, results):
     
     ws['B4'].alignment = Alignment(horizontal= "left", vertical="center")
     ws['B4'].font = Font(name = 'Arial', size= 12, bold = True)
-    ws['B4'] = 'SEGUIMIENTO NOMINAL DEL INDICADOR SI-01. GESTANTES CON DIAGNÓSTICO DE ANEMIA ATENDIDAS, QUE RECIBEN DOSAJE DE HEMOGLOBINA CONTROL Y SEGUNDA ENTREGA DE TRATAMIENTO CON HIERRO'
+    ws['B4'] = 'SEGUIMIENTO NOMINAL DEL INDICADOR FICHA VI-01.02: PORCENTAJE DE GESTANTES ATENDIDAS EN ESTABLECIMIENTOS DE SALUD DEL PRIMER Y SEGUNDO NIVEL DE ATENCIÓN DEL GOBIERNO REGIONAL, QUE CUENTAN TAMIZAJE POSITIVO DE VIOLENCIA CONTRA LA MUJER'
     
     ws['B6'].alignment = Alignment(horizontal= "left", vertical="center")
     ws['B6'].font = Font(name = 'Arial', size= 7, bold = True, color='0000CC')
