@@ -30,24 +30,24 @@ def obtener_distritos(provincia):
     distritos = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Provincia=provincia).values('Distrito').distinct().order_by('Distrito')
     return list(distritos)
 
-def obtener_avance_v1_condicion_previa(red):
+def obtener_avance_v2_tamizaje_violencia(red):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_avance_v1_condicion_previa(%s)",
+            "SELECT DISTINCT * FROM public.obtener_avance_v2_tamizaje_violencia(%s)",
             [red]
         )
         return cursor.fetchall()
 
-def obtener_ranking_v1_condicion_previa(anio, mes):
+def obtener_ranking_v2_tamizaje_violencia(anio, mes):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_ranking_v1_condicion_previa(%s, %s)",
+            "SELECT DISTINCT * FROM public.obtener_ranking_v2_tamizaje_violencia(%s, %s)",
             [anio, mes]
         )
         result = cursor.fetchall()
         return result
     
-def index_v1_condicion_previa(request):
+def index_v2_tamizaje_violencia(request):
     # RANKING 
     anio = request.GET.get('anio')  # Valor predeterminado# Valor predeterminado
     mes_seleccionado = request.GET.get('mes')
@@ -58,12 +58,12 @@ def index_v1_condicion_previa(request):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
             # Obtener datos de RANKING 
-            resultados_ranking_obtener_v1_condicion_previa = obtener_ranking_v1_condicion_previa(anio,mes_seleccionado)
+            resultados_ranking_obtener_v2_tamizaje_violencia = obtener_ranking_v2_tamizaje_violencia(anio,mes_seleccionado)
             # Obtener datos de AVANCE GRAFICO MESES
-            resultados_avance_obtener_v1_condicion_previa = obtener_avance_v1_condicion_previa(red_seleccionada)
+            resultados_avance_obtener_v2_tamizaje_violencia = obtener_avance_v2_tamizaje_violencia(red_seleccionada)
             
             # Procesar los resultados
-            if any(len(row) < 4 for row in resultados_ranking_obtener_v1_condicion_previa):
+            if any(len(row) < 4 for row in resultados_ranking_obtener_v2_tamizaje_violencia):
                 raise ValueError("Algunas filas del ranking no tienen suficientes elementos")
             
             data = {               
@@ -80,7 +80,7 @@ def index_v1_condicion_previa(request):
                 'avance': [],
             }
             #RANKING
-            for index, row in enumerate(resultados_ranking_obtener_v1_condicion_previa):
+            for index, row in enumerate(resultados_ranking_obtener_v2_tamizaje_violencia):
                 try:
                     # Verifica que la tupla tenga exactamente 4 elementos
                     if len(row) != 4:
@@ -100,7 +100,7 @@ def index_v1_condicion_previa(request):
                     logger.error(f"Error procesando la fila {index}: {str(e)}")
             
             #AVANCE GRAFICO MESES
-            for index, row in enumerate(resultados_avance_obtener_v1_condicion_previa):
+            for index, row in enumerate(resultados_avance_obtener_v2_tamizaje_violencia):
                 try:
                     # Verifica que la tupla tenga exactamente 4 elementos
                     if len(row) != 5:
@@ -125,13 +125,13 @@ def index_v1_condicion_previa(request):
             logger.error(f"Error al obtener datos: {str(e)}")
 
     # Si no es una solicitud AJAX, renderiza la página principal
-    return render(request, 'v1_condicion_previa/index_v1_condicion_previa.html', {
+    return render(request, 'v2_tamizaje_violencia/index_v2_tamizaje_violencia.html', {
         'red': red,
         'mes_seleccionado': mes_seleccionado,
     })
 
 ## SEGUIMIENTO
-def get_redes_v1_condicion_previa(request,redes_id):
+def get_redes_v2_tamizaje_violencia(request,redes_id):
     redes = (
             MAESTRO_HIS_ESTABLECIMIENTO
             .objects.filter(Descripcion_Sector='GOBIERNO REGIONAL',Departamento='JUNIN')
@@ -162,12 +162,12 @@ def get_redes_v1_condicion_previa(request,redes_id):
                 'mes_fin':mes_fin,
     }
     
-    return render(request, 'v1_condicion_previa/redes.html', context)
+    return render(request, 'v2_tamizaje_violencia/redes.html', context)
 
-def obtener_seguimiento_redes_v1_condicion_previa(p_red,p_inicio,p_fin):
+def obtener_seguimiento_redes_v2_tamizaje_violencia(p_red,p_inicio,p_fin):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.fn_seguimiento_v1_condicion_previa(%s, %s, %s)",
+            "SELECT DISTINCT * FROM public.fn_seguimiento_v2_tamizaje_violencia(%s, %s, %s)",
             [p_red, p_inicio, p_fin]
         )
         return cursor.fetchall()
@@ -179,7 +179,7 @@ class RptV1CondicionPreviaRed(TemplateView):
         p_inicio = request.GET.get('fecha_inicio')
         p_fin = request.GET.get('fecha_fin')
         # Creación de la consulta
-        resultado_seguimiento = obtener_seguimiento_redes_v1_condicion_previa(p_red, p_inicio, p_fin)
+        resultado_seguimiento = obtener_seguimiento_redes_v2_tamizaje_violencia(p_red, p_inicio, p_fin)
         
         wb = Workbook()
         
@@ -194,10 +194,10 @@ class RptV1CondicionPreviaRed(TemplateView):
             else:
                 ws = wb.create_sheet(title=sheet_name)
         
-            fill_worksheet_v1_condicion_previa(ws, results)
+            fill_worksheet_v2_tamizaje_violencia(ws, results)
         ##########################################################################          
         # Establecer el nombre del archivo
-        nombre_archivo = "rpt_v1_condicion_previa.xlsx"
+        nombre_archivo = "rpt_v2_tamizaje_violencia.xlsx"
         # Definir el tipo de respuesta que se va a dar
         response = HttpResponse(content_type="application/ms-excel")
         contenido = "attachment; filename={}".format(nombre_archivo)
@@ -206,7 +206,7 @@ class RptV1CondicionPreviaRed(TemplateView):
 
         return response
 
-def fill_worksheet_v1_condicion_previa(ws, results): 
+def fill_worksheet_v2_tamizaje_violencia(ws, results): 
     # cambia el alto de la columna
     ws.row_dimensions[1].height = 14
     ws.row_dimensions[2].height = 14
@@ -219,17 +219,22 @@ def fill_worksheet_v1_condicion_previa(ws, results):
     ws.column_dimensions['A'].width = 2
     ws.column_dimensions['B'].width = 9
     ws.column_dimensions['C'].width = 9
-    ws.column_dimensions['D'].width = 5
-    ws.column_dimensions['E'].width = 5
-    ws.column_dimensions['F'].width = 9
-    ws.column_dimensions['G'].width = 10
-    ws.column_dimensions['H'].width = 9
-    ws.column_dimensions['I'].width = 16    
-    ws.column_dimensions['J'].width = 20
-    ws.column_dimensions['K'].width = 16
-    ws.column_dimensions['L'].width = 20
-    ws.column_dimensions['M'].width = 9
-    ws.column_dimensions['N'].width = 30
+    ws.column_dimensions['D'].width = 6
+    ws.column_dimensions['E'].width = 6
+    ws.column_dimensions['F'].width = 6
+    ws.column_dimensions['G'].width = 6
+    ws.column_dimensions['H'].width = 6
+    ws.column_dimensions['I'].width = 9
+    ws.column_dimensions['J'].width = 10
+    
+    
+    ws.column_dimensions['K'].width = 9
+    ws.column_dimensions['L'].width = 16    
+    ws.column_dimensions['M'].width = 20
+    ws.column_dimensions['N'].width = 16
+    ws.column_dimensions['O'].width = 20
+    ws.column_dimensions['P'].width = 9
+    ws.column_dimensions['Q'].width = 30
 
     # linea de division
     ws.freeze_panes = 'E9'
@@ -294,67 +299,85 @@ def fill_worksheet_v1_condicion_previa(ws, results):
     ws['D8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
     ws['D8'].fill = blue_fill
     ws['D8'].border = border
-    ws['D8'] = 'VAL VIO_1' 
+    ws['D8'] = 'VAL APN' 
     
     ws['E8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['E8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
     ws['E8'].fill = yellow_fill
     ws['E8'].border = border
-    ws['E8'] = 'VAL VIO_2'     
-        
+    ws['E8'] = 'VAL VIO_1'     
+    
     ws['F8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['F8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['F8'].fill = fill
     ws['F8'].border = border
-    ws['F8'] = 'MES' 
+    ws['F8'] = 'VAL VID_2'      
     
     ws['G8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['G8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['G8'].fill = gray_fill
+    ws['G8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['G8'].fill = blue_fill
     ws['G8'].border = border
-    ws['G8'] = 'IND' 
+    ws['G8'] = 'RX VIO_1' 
     
     ws['H8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['H8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['H8'].fill = orange_fill
+    ws['H8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['H8'].fill = yellow_fill
     ws['H8'].border = border
-    ws['H8'] = 'UBIGEO'  
-    
+    ws['H8'] = 'RX VIO_2'     
+        
     ws['I8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['I8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['I8'].fill = orange_fill
+    ws['I8'].fill = fill
     ws['I8'].border = border
-    ws['I8'] = 'PROVINCIA'       
+    ws['I8'] = 'MES' 
     
     ws['J8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['J8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['J8'].fill = orange_fill
+    ws['J8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['J8'].fill = gray_fill
     ws['J8'].border = border
-    ws['J8'] = 'DISTRITO' 
+    ws['J8'] = 'IND' 
     
     ws['K8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['K8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['K8'].fill = orange_fill
     ws['K8'].border = border
-    ws['K8'] = 'RED'  
+    ws['K8'] = 'UBIGEO'  
     
     ws['L8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['L8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['L8'].fill = orange_fill
     ws['L8'].border = border
-    ws['L8'] = 'MICRORED'  
+    ws['L8'] = 'PROVINCIA'       
     
     ws['M8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['M8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['M8'].fill = orange_fill
     ws['M8'].border = border
-    ws['M8'] = 'COD EST'  
+    ws['M8'] = 'DISTRITO' 
     
     ws['N8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['N8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['N8'].fill = orange_fill
     ws['N8'].border = border
-    ws['N8'] = 'ESTABLECIMIENTO'  
+    ws['N8'] = 'RED'  
+    
+    ws['O8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['O8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['O8'].fill = orange_fill
+    ws['O8'].border = border
+    ws['O8'] = 'MICRORED'  
+    
+    ws['P8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['P8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['P8'].fill = orange_fill
+    ws['P8'].border = border
+    ws['P8'] = 'COD EST'  
+    
+    ws['Q8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['Q8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['Q8'].fill = orange_fill
+    ws['Q8'].border = border
+    ws['Q8'] = 'ESTABLECIMIENTO'  
     
         
     # Definir estilos
@@ -384,7 +407,7 @@ def fill_worksheet_v1_condicion_previa(ws, results):
                 cell.alignment = Alignment(horizontal='center')
 
             # Aplicar color en la columna 27
-            if col == 7:
+            if col == 10:
                 if isinstance(value, str):
                     value_upper = value.strip().upper()
                     if value_upper == "NO CUMPLE":
@@ -415,7 +438,7 @@ def fill_worksheet_v1_condicion_previa(ws, results):
                 cell.font = Font(name='Arial', size=8)  # Fuente normal para otras columnas
 
             # Aplicar caracteres especiales check y X
-            if col in [4,5]:
+            if col in [4,5,6,7,8]:
                 if value == 1:
                     cell.value = check_mark  # Insertar check
                     cell.font = Font(name='Arial', size=10, color='00B050')  # Letra verde

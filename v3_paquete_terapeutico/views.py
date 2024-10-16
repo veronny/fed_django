@@ -30,24 +30,24 @@ def obtener_distritos(provincia):
     distritos = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Provincia=provincia).values('Distrito').distinct().order_by('Distrito')
     return list(distritos)
 
-def obtener_avance_v1_condicion_previa(red):
+def obtener_avance_v3_paquete_terapeutico(red):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_avance_v1_condicion_previa(%s)",
+            "SELECT DISTINCT * FROM public.obtener_avance_v3_paquete_terapeutico(%s)",
             [red]
         )
         return cursor.fetchall()
 
-def obtener_ranking_v1_condicion_previa(anio, mes):
+def obtener_ranking_v3_paquete_terapeutico(anio, mes):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_ranking_v1_condicion_previa(%s, %s)",
+            "SELECT DISTINCT * FROM public.obtener_ranking_v3_paquete_terapeutico(%s, %s)",
             [anio, mes]
         )
         result = cursor.fetchall()
         return result
     
-def index_v1_condicion_previa(request):
+def index_v3_paquete_terapeutico(request):
     # RANKING 
     anio = request.GET.get('anio')  # Valor predeterminado# Valor predeterminado
     mes_seleccionado = request.GET.get('mes')
@@ -58,12 +58,12 @@ def index_v1_condicion_previa(request):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
             # Obtener datos de RANKING 
-            resultados_ranking_obtener_v1_condicion_previa = obtener_ranking_v1_condicion_previa(anio,mes_seleccionado)
+            resultados_ranking_obtener_v3_paquete_terapeutico = obtener_ranking_v3_paquete_terapeutico(anio,mes_seleccionado)
             # Obtener datos de AVANCE GRAFICO MESES
-            resultados_avance_obtener_v1_condicion_previa = obtener_avance_v1_condicion_previa(red_seleccionada)
+            resultados_avance_obtener_v3_paquete_terapeutico = obtener_avance_v3_paquete_terapeutico(red_seleccionada)
             
             # Procesar los resultados
-            if any(len(row) < 4 for row in resultados_ranking_obtener_v1_condicion_previa):
+            if any(len(row) < 4 for row in resultados_ranking_obtener_v3_paquete_terapeutico):
                 raise ValueError("Algunas filas del ranking no tienen suficientes elementos")
             
             data = {               
@@ -80,7 +80,7 @@ def index_v1_condicion_previa(request):
                 'avance': [],
             }
             #RANKING
-            for index, row in enumerate(resultados_ranking_obtener_v1_condicion_previa):
+            for index, row in enumerate(resultados_ranking_obtener_v3_paquete_terapeutico):
                 try:
                     # Verifica que la tupla tenga exactamente 4 elementos
                     if len(row) != 4:
@@ -100,7 +100,7 @@ def index_v1_condicion_previa(request):
                     logger.error(f"Error procesando la fila {index}: {str(e)}")
             
             #AVANCE GRAFICO MESES
-            for index, row in enumerate(resultados_avance_obtener_v1_condicion_previa):
+            for index, row in enumerate(resultados_avance_obtener_v3_paquete_terapeutico):
                 try:
                     # Verifica que la tupla tenga exactamente 4 elementos
                     if len(row) != 5:
@@ -125,13 +125,13 @@ def index_v1_condicion_previa(request):
             logger.error(f"Error al obtener datos: {str(e)}")
 
     # Si no es una solicitud AJAX, renderiza la página principal
-    return render(request, 'v1_condicion_previa/index_v1_condicion_previa.html', {
+    return render(request, 'v3_paquete_terapeutico/index_v3_paquete_terapeutico.html', {
         'red': red,
         'mes_seleccionado': mes_seleccionado,
     })
 
 ## SEGUIMIENTO
-def get_redes_v1_condicion_previa(request,redes_id):
+def get_redes_v3_paquete_terapeutico(request,redes_id):
     redes = (
             MAESTRO_HIS_ESTABLECIMIENTO
             .objects.filter(Descripcion_Sector='GOBIERNO REGIONAL',Departamento='JUNIN')
@@ -162,12 +162,12 @@ def get_redes_v1_condicion_previa(request,redes_id):
                 'mes_fin':mes_fin,
     }
     
-    return render(request, 'v1_condicion_previa/redes.html', context)
+    return render(request, 'v3_paquete_terapeutico/redes.html', context)
 
-def obtener_seguimiento_redes_v1_condicion_previa(p_red,p_inicio,p_fin):
+def obtener_seguimiento_redes_v3_paquete_terapeutico(p_red,p_inicio,p_fin):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.fn_seguimiento_v1_condicion_previa(%s, %s, %s)",
+            "SELECT DISTINCT * FROM public.fn_seguimiento_v3_paquete_terapeutico(%s, %s, %s)",
             [p_red, p_inicio, p_fin]
         )
         return cursor.fetchall()
@@ -179,7 +179,7 @@ class RptV1CondicionPreviaRed(TemplateView):
         p_inicio = request.GET.get('fecha_inicio')
         p_fin = request.GET.get('fecha_fin')
         # Creación de la consulta
-        resultado_seguimiento = obtener_seguimiento_redes_v1_condicion_previa(p_red, p_inicio, p_fin)
+        resultado_seguimiento = obtener_seguimiento_redes_v3_paquete_terapeutico(p_red, p_inicio, p_fin)
         
         wb = Workbook()
         
@@ -194,10 +194,10 @@ class RptV1CondicionPreviaRed(TemplateView):
             else:
                 ws = wb.create_sheet(title=sheet_name)
         
-            fill_worksheet_v1_condicion_previa(ws, results)
+            fill_worksheet_v3_paquete_terapeutico(ws, results)
         ##########################################################################          
         # Establecer el nombre del archivo
-        nombre_archivo = "rpt_v1_condicion_previa.xlsx"
+        nombre_archivo = "rpt_v3_paquete_terapeutico.xlsx"
         # Definir el tipo de respuesta que se va a dar
         response = HttpResponse(content_type="application/ms-excel")
         contenido = "attachment; filename={}".format(nombre_archivo)
@@ -206,7 +206,7 @@ class RptV1CondicionPreviaRed(TemplateView):
 
         return response
 
-def fill_worksheet_v1_condicion_previa(ws, results): 
+def fill_worksheet_v3_paquete_terapeutico(ws, results): 
     # cambia el alto de la columna
     ws.row_dimensions[1].height = 14
     ws.row_dimensions[2].height = 14
@@ -219,20 +219,40 @@ def fill_worksheet_v1_condicion_previa(ws, results):
     ws.column_dimensions['A'].width = 2
     ws.column_dimensions['B'].width = 9
     ws.column_dimensions['C'].width = 9
-    ws.column_dimensions['D'].width = 5
-    ws.column_dimensions['E'].width = 5
+    ws.column_dimensions['D'].width = 9
+    ws.column_dimensions['E'].width = 9
+    ws.column_dimensions['E'].width = 9
     ws.column_dimensions['F'].width = 9
-    ws.column_dimensions['G'].width = 10
+    ws.column_dimensions['G'].width = 20
     ws.column_dimensions['H'].width = 9
-    ws.column_dimensions['I'].width = 16    
-    ws.column_dimensions['J'].width = 20
-    ws.column_dimensions['K'].width = 16
-    ws.column_dimensions['L'].width = 20
+    ws.column_dimensions['I'].width = 9
+    ws.column_dimensions['J'].width = 9
+    ws.column_dimensions['K'].width = 9
+    ws.column_dimensions['L'].width = 9
     ws.column_dimensions['M'].width = 9
-    ws.column_dimensions['N'].width = 30
+    ws.column_dimensions['N'].width = 9
+    ws.column_dimensions['O'].width = 9
+    ws.column_dimensions['P'].width = 9
+    ws.column_dimensions['Q'].width = 9
+    ws.column_dimensions['R'].width = 9
+    ws.column_dimensions['S'].width = 9
+    ws.column_dimensions['T'].width = 9
+    ws.column_dimensions['U'].width = 9
+    ws.column_dimensions['V'].width = 9
+    ws.column_dimensions['W'].width = 9
+    ws.column_dimensions['X'].width = 9
+    ws.column_dimensions['Y'].width = 9
+    ws.column_dimensions['Z'].width = 10
+    ws.column_dimensions['AA'].width = 9
+    ws.column_dimensions['AB'].width = 16    
+    ws.column_dimensions['AC'].width = 20
+    ws.column_dimensions['AD'].width = 16
+    ws.column_dimensions['AE'].width = 20
+    ws.column_dimensions['AF'].width = 9
+    ws.column_dimensions['AG'].width = 30
 
     # linea de division
-    ws.freeze_panes = 'E9'
+    ws.freeze_panes = 'F9'
     # Configuración del fondo y el borde
     # Definir el color usando formato aRGB (opacidad completa 'FF' + color RGB)
     fill = PatternFill(start_color='FF60D7E0', end_color='FF60D7E0', fill_type='solid')
@@ -272,7 +292,7 @@ def fill_worksheet_v1_condicion_previa(ws, results):
     
     ws['B4'].alignment = Alignment(horizontal= "left", vertical="center")
     ws['B4'].font = Font(name = 'Arial', size= 12, bold = True)
-    ws['B4'] = 'SEGUIMIENTO NOMINAL DEL INDICADOR SI-01. GESTANTES CON DIAGNÓSTICO DE ANEMIA ATENDIDAS, QUE RECIBEN DOSAJE DE HEMOGLOBINA CONTROL Y SEGUNDA ENTREGA DE TRATAMIENTO CON HIERRO'
+    ws['B4'] = 'SEGUIMIENTO NOMINAL DEL INDICADOR FICHA VII-01: GESTANTES ATENDIDAS EN ESTABLECIMIENTOS DE SALUD, CON DIAGNÓSTICO DE VIOLENCIA, QUE RECIBEN UN PAQUETE MÍNIMO DE INTERVENCIONES TERAPÉUTICAS ESPECIALIZADAS'
     
     ws['B6'].alignment = Alignment(horizontal= "left", vertical="center")
     ws['B6'].font = Font(name = 'Arial', size= 7, bold = True, color='0000CC')
@@ -294,67 +314,181 @@ def fill_worksheet_v1_condicion_previa(ws, results):
     ws['D8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
     ws['D8'].fill = blue_fill
     ws['D8'].border = border
-    ws['D8'] = 'VAL VIO_1' 
+    ws['D8'] = 'DX VIOL' 
     
     ws['E8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['E8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
-    ws['E8'].fill = yellow_fill
+    ws['E8'].fill = blue_fill
     ws['E8'].border = border
-    ws['E8'] = 'VAL VIO_2'     
-        
+    ws['E8'] = 'DX 3M'     
+    
     ws['F8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['F8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['F8'].fill = fill
+    ws['F8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['F8'].fill = blue_fill
     ws['F8'].border = border
-    ws['F8'] = 'MES' 
+    ws['F8'] = 'DX 6M'
     
     ws['G8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['G8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['G8'].fill = gray_fill
+    ws['G8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['G8'].fill = yellow_fill
     ws['G8'].border = border
-    ws['G8'] = 'IND' 
+    ws['G8'] = 'FILTRO'
     
     ws['H8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['H8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['H8'].fill = orange_fill
+    ws['H8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['H8'].fill = yellow_fill
     ws['H8'].border = border
-    ws['H8'] = 'UBIGEO'  
+    ws['H8'] = 'CSM1'         
     
     ws['I8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['I8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['I8'].fill = orange_fill
+    ws['I8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['I8'].fill = yellow_fill
     ws['I8'].border = border
-    ws['I8'] = 'PROVINCIA'       
+    ws['I8'] = 'VAL CSM1'         
     
     ws['J8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['J8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['J8'].fill = orange_fill
+    ws['J8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['J8'].fill = yellow_fill
     ws['J8'].border = border
-    ws['J8'] = 'DISTRITO' 
+    ws['J8'] = 'CSM2'         
     
     ws['K8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['K8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['K8'].fill = orange_fill
+    ws['K8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['K8'].fill = yellow_fill
     ws['K8'].border = border
-    ws['K8'] = 'RED'  
+    ws['K8'] = 'VAL CSM2'         
     
     ws['L8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['L8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['L8'].fill = orange_fill
+    ws['L8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['L8'].fill = yellow_fill
     ws['L8'].border = border
-    ws['L8'] = 'MICRORED'  
+    ws['L8'] = '1° PSICO'    
     
     ws['M8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['M8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['M8'].fill = orange_fill
+    ws['M8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['M8'].fill = yellow_fill
     ws['M8'].border = border
-    ws['M8'] = 'COD EST'  
+    ws['M8'] = 'VAL 1° PS'    
     
     ws['N8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['N8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['N8'].fill = orange_fill
+    ws['N8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['N8'].fill = yellow_fill
     ws['N8'].border = border
-    ws['N8'] = 'ESTABLECIMIENTO'  
+    ws['N8'] = '2° PSICO'    
+    
+    ws['O8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['O8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['O8'].fill = yellow_fill
+    ws['O8'].border = border
+    ws['O8'] = 'VAL 2° PS'    
+
+    ws['P8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['P8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['P8'].fill = yellow_fill
+    ws['P8'].border = border
+    ws['P8'] = '3° PSICO'    
+    
+    ws['Q8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['Q8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['Q8'].fill = yellow_fill
+    ws['Q8'].border = border
+    ws['Q8'] = 'VAL 3° PS'    
+
+    ws['R8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['R8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['R8'].fill = yellow_fill
+    ws['R8'].border = border
+    ws['R8'] = '4° PSICO'    
+    
+    ws['S8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['S8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['S8'].fill = yellow_fill
+    ws['S8'].border = border
+    ws['S8'] = 'VAL 4° PS'    
+
+    ws['T8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['T8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['T8'].fill = yellow_fill
+    ws['T8'].border = border
+    ws['T8'] = '5° PSICO'    
+    
+    ws['U8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['U8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['U8'].fill = yellow_fill
+    ws['U8'].border = border
+    ws['U8'] = 'VAL 5° PS'    
+
+    ws['V8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['V8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['V8'].fill = yellow_fill
+    ws['V8'].border = border
+    ws['V8'] = '6° PSICO'    
+    
+    ws['W8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['W8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['W8'].fill = yellow_fill
+    ws['W8'].border = border
+    ws['W8'] = 'VAL 6° PS'    
+    
+    ws['X8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['X8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
+    ws['X8'].fill = yellow_fill
+    ws['X8'].border = border
+    ws['X8'] = 'NUM 3M'    
+    
+    ws['Y8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['Y8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['Y8'].fill = fill
+    ws['Y8'].border = border
+    ws['Y8'] = 'MES' 
+    
+    ws['Z8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['Z8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['Z8'].fill = gray_fill
+    ws['Z8'].border = border
+    ws['Z8'] = 'IND' 
+    
+    ws['AA8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AA8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['AA8'].fill = orange_fill
+    ws['AA8'].border = border
+    ws['AA8'] = 'UBIGEO'  
+    
+    ws['AB8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AB8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['AB8'].fill = orange_fill
+    ws['AB8'].border = border
+    ws['AB8'] = 'PROVINCIA'       
+    
+    ws['AC8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AC8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['AC8'].fill = orange_fill
+    ws['AC8'].border = border
+    ws['AC8'] = 'DISTRITO' 
+    
+    ws['AD8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AD8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['AD8'].fill = orange_fill
+    ws['AD8'].border = border
+    ws['AD8'] = 'RED'  
+    
+    ws['AE8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AE8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['AE8'].fill = orange_fill
+    ws['AE8'].border = border
+    ws['AE8'] = 'MICRORED'  
+    
+    ws['AF8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AF8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['AF8'].fill = orange_fill
+    ws['AF8'].border = border
+    ws['AF8'] = 'COD EST'  
+    
+    ws['AG8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AG8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['AG8'].fill = orange_fill
+    ws['AG8'].border = border
+    ws['AG8'] = 'ESTABLECIMIENTO'  
     
         
     # Definir estilos
@@ -384,7 +518,7 @@ def fill_worksheet_v1_condicion_previa(ws, results):
                 cell.alignment = Alignment(horizontal='center')
 
             # Aplicar color en la columna 27
-            if col == 7:
+            if col == 26:
                 if isinstance(value, str):
                     value_upper = value.strip().upper()
                     if value_upper == "NO CUMPLE":
@@ -399,7 +533,7 @@ def fill_worksheet_v1_condicion_previa(ws, results):
                     cell.font = Font(name='Arial', size=8)
             
             # Aplicar color de letra en las columnas 7 y 17
-            elif col in [22, 45, 46, 61, 63, 74]:
+            elif col in [24]:
                 if isinstance(value, str):
                     value_upper = value.strip().upper()
                     if value_upper == "NO CUMPLE":
@@ -415,7 +549,7 @@ def fill_worksheet_v1_condicion_previa(ws, results):
                 cell.font = Font(name='Arial', size=8)  # Fuente normal para otras columnas
 
             # Aplicar caracteres especiales check y X
-            if col in [4,5]:
+            if col in [9,11,13,15,17,19,21,23]:
                 if value == 1:
                     cell.value = check_mark  # Insertar check
                     cell.font = Font(name='Arial', size=10, color='00B050')  # Letra verde

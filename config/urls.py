@@ -14,6 +14,8 @@ urlpatterns = [
     path('', include('s1_gestante_anemia.urls')),
     path('', include('s4_adolescente_dosaje.urls')),
     path('', include('v1_condicion_previa.urls')),
+    path('', include('v2_tamizaje_violencia.urls')),
+    path('', include('v3_paquete_terapeutico.urls')),
 ]
 
 if settings.DEBUG:
