@@ -220,27 +220,26 @@ def fill_worksheet_s1_gestante_anemia(ws, results):
     ws.column_dimensions['B'].width = 9
     ws.column_dimensions['C'].width = 9
     ws.column_dimensions['D'].width = 9
-    ws.column_dimensions['E'].width = 9
-    ws.column_dimensions['F'].width = 9
-    ws.column_dimensions['G'].width = 9
+    ws.column_dimensions['E'].width = 5
+    ws.column_dimensions['F'].width = 7
+    ws.column_dimensions['G'].width = 7
     ws.column_dimensions['H'].width = 9
-    ws.column_dimensions['I'].width = 8
-    ws.column_dimensions['J'].width = 10
-    ws.column_dimensions['K'].width = 8
-    ws.column_dimensions['L'].width = 9
-    ws.column_dimensions['M'].width = 9
-    ws.column_dimensions['N'].width = 11    
-    ws.column_dimensions['O'].width = 9
+    ws.column_dimensions['I'].width = 5
+    ws.column_dimensions['J'].width = 9
+    ws.column_dimensions['K'].width = 5
+    ws.column_dimensions['L'].width = 10
+    ws.column_dimensions['M'].width = 11    
+    ws.column_dimensions['N'].width = 9
+    ws.column_dimensions['O'].width = 16    
     ws.column_dimensions['P'].width = 16
-    ws.column_dimensions['Q'].width = 16
+    ws.column_dimensions['Q'].width = 20
     ws.column_dimensions['R'].width = 20
-    ws.column_dimensions['S'].width = 20
-    ws.column_dimensions['T'].width = 6
-    ws.column_dimensions['U'].width = 25
-    ws.column_dimensions['V'].width = 6
+    ws.column_dimensions['S'].width = 6
+    ws.column_dimensions['T'].width = 25    
+    ws.column_dimensions['U'].width = 6
     
     # linea de division
-    ws.freeze_panes = 'E9'
+    ws.freeze_panes = 'F9'
     # Configuración del fondo y el borde
     # Definir el color usando formato aRGB (opacidad completa 'FF' + color RGB)
     fill = PatternFill(start_color='FF60D7E0', end_color='FF60D7E0', fill_type='solid')
@@ -296,23 +295,23 @@ def fill_worksheet_s1_gestante_anemia(ws, results):
     ws['C8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['C8'].fill = fill
     ws['C8'].border = border
-    ws['C8'] = 'FECHA ATENCION'      
+    ws['C8'] = 'AT MES ANTERIOR'      
     
     ws['D8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['D8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
-    ws['D8'].fill = blue_fill
+    ws['D8'].fill = fill
     ws['D8'].border = border
-    ws['D8'] = 'FECHA CORTE' 
+    ws['D8'] = 'MES EVAL' 
     
     ws['E8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['E8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
-    ws['E8'].fill = yellow_fill
+    ws['E8'].fill = fill
     ws['E8'].border = border
     ws['E8'] = 'APN'     
     
     ws['F8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['F8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
-    ws['F8'].fill = yellow_fill
+    ws['F8'].fill = green_fill
     ws['F8'].border = border
     ws['F8'] = '1° DOSAJE HB'    
     
@@ -326,7 +325,7 @@ def fill_worksheet_s1_gestante_anemia(ws, results):
     ws['H8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['H8'].fill = green_fill
     ws['H8'].border = border
-    ws['H8'] = 'ENTREGA HIERRO'  
+    ws['H8'] = '2° ENTREGA '  
     
     ws['I8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['I8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
@@ -348,69 +347,63 @@ def fill_worksheet_s1_gestante_anemia(ws, results):
     
     ws['L8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['L8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['L8'].fill = green_fill
+    ws['L8'].fill = fill
     ws['L8'].border = border
-    ws['L8'] = 'PERIODO'  
+    ws['L8'] = 'MES' 
     
     ws['M8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['M8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['M8'].fill = fill
+    ws['M8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['M8'].fill = gray_fill
     ws['M8'].border = border
-    ws['M8'] = 'MES' 
+    ws['M8'] = 'IND' 
     
     ws['N8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['N8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['N8'].fill = gray_fill
+    ws['N8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['N8'].fill = orange_fill
     ws['N8'].border = border
-    ws['N8'] = 'IND' 
+    ws['N8'] = 'UBIGEO'  
     
     ws['O8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['O8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['O8'].fill = orange_fill
     ws['O8'].border = border
-    ws['O8'] = 'UBIGEO'  
+    ws['O8'] = 'PROVINCIA'       
     
     ws['P8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['P8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['P8'].fill = orange_fill
     ws['P8'].border = border
-    ws['P8'] = 'PROVINCIA'       
+    ws['P8'] = 'DISTRITO' 
     
     ws['Q8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['Q8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['Q8'].fill = orange_fill
     ws['Q8'].border = border
-    ws['Q8'] = 'DISTRITO' 
+    ws['Q8'] = 'RED'  
     
     ws['R8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['R8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['R8'].fill = orange_fill
     ws['R8'].border = border
-    ws['R8'] = 'RED'  
+    ws['R8'] = 'MICRORED'  
     
     ws['S8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['S8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['S8'].fill = orange_fill
     ws['S8'].border = border
-    ws['S8'] = 'MICRORED'  
+    ws['S8'] = 'COD EST'  
     
     ws['T8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['T8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['T8'].fill = orange_fill
     ws['T8'].border = border
-    ws['T8'] = 'COD EST'  
+    ws['T8'] = 'ESTABLECIMIENTO'  
     
     ws['U8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['U8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['U8'].fill = orange_fill
     ws['U8'].border = border
-    ws['U8'] = 'ESTABLECIMIENTO'  
-    
-    ws['V8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['V8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['V8'].fill = orange_fill
-    ws['V8'].border = border
-    ws['V8'] = 'CAT EST'  
+    ws['U8'] = 'CAT EST'  
     
         
     # Definir estilos
@@ -434,13 +427,13 @@ def fill_worksheet_s1_gestante_anemia(ws, results):
             cell = ws.cell(row=row, column=col, value=value)
 
             # Alinear a la izquierda solo en las columnas 6,14,15,16
-            if col in [15, 16, 18]:
+            if col in [16, 18, 20]:
                 cell.alignment = Alignment(horizontal='left')
             else:
                 cell.alignment = Alignment(horizontal='center')
 
             # Aplicar color en la columna 27
-            if col == 14:
+            if col == 13:
                 if isinstance(value, str):
                     value_upper = value.strip().upper()
                     if value_upper == "NO CUMPLE":

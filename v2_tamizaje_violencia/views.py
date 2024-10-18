@@ -220,14 +220,12 @@ def fill_worksheet_v2_tamizaje_violencia(ws, results):
     ws.column_dimensions['B'].width = 9
     ws.column_dimensions['C'].width = 9
     ws.column_dimensions['D'].width = 6
-    ws.column_dimensions['E'].width = 6
-    ws.column_dimensions['F'].width = 6
-    ws.column_dimensions['G'].width = 6
-    ws.column_dimensions['H'].width = 6
+    ws.column_dimensions['E'].width = 9
+    ws.column_dimensions['F'].width = 9
+    ws.column_dimensions['G'].width = 9
+    ws.column_dimensions['H'].width = 10
     ws.column_dimensions['I'].width = 9
     ws.column_dimensions['J'].width = 10
-    
-    
     ws.column_dimensions['K'].width = 9
     ws.column_dimensions['L'].width = 16    
     ws.column_dimensions['M'].width = 20
@@ -297,7 +295,7 @@ def fill_worksheet_v2_tamizaje_violencia(ws, results):
     
     ws['D8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['D8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
-    ws['D8'].fill = blue_fill
+    ws['D8'].fill = fill
     ws['D8'].border = border
     ws['D8'] = 'VAL APN' 
     
@@ -305,25 +303,25 @@ def fill_worksheet_v2_tamizaje_violencia(ws, results):
     ws['E8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
     ws['E8'].fill = yellow_fill
     ws['E8'].border = border
-    ws['E8'] = 'VAL VIO_1'     
+    ws['E8'] = 'DET VIO'     
     
     ws['F8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['F8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['F8'].fill = fill
+    ws['F8'].fill = yellow_fill
     ws['F8'].border = border
-    ws['F8'] = 'VAL VID_2'      
+    ws['F8'] = 'DET VIO (VIF)'      
     
     ws['G8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['G8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
     ws['G8'].fill = blue_fill
     ws['G8'].border = border
-    ws['G8'] = 'RX VIO_1' 
+    ws['G8'] = 'TAMIZ POSIT' 
     
     ws['H8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['H8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
-    ws['H8'].fill = yellow_fill
+    ws['H8'].fill = blue_fill
     ws['H8'].border = border
-    ws['H8'] = 'RX VIO_2'     
+    ws['H8'] = 'TAMIZ POSIT (VIF)'     
         
     ws['I8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['I8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
@@ -401,7 +399,7 @@ def fill_worksheet_v2_tamizaje_violencia(ws, results):
             cell = ws.cell(row=row, column=col, value=value)
 
             # Alinear a la izquierda solo en las columnas 6,14,15,16
-            if col in [12, 14]:
+            if col in [15, 17]:
                 cell.alignment = Alignment(horizontal='left')
             else:
                 cell.alignment = Alignment(horizontal='center')

@@ -197,7 +197,7 @@ class RptS22Anemia12Red(TemplateView):
             fill_worksheet_s22_anemia12(ws, results)
         ##########################################################################          
         # Establecer el nombre del archivo
-        nombre_archivo = "rpt_s4_adolescente_gestante.xlsx"
+        nombre_archivo = "rpt_s22_anemia_12meses.xlsx"
         # Definir el tipo de respuesta que se va a dar
         response = HttpResponse(content_type="application/ms-excel")
         contenido = "attachment; filename={}".format(nombre_archivo)
@@ -222,20 +222,34 @@ def fill_worksheet_s22_anemia12(ws, results):
     ws.column_dimensions['D'].width = 5
     ws.column_dimensions['E'].width = 9
     ws.column_dimensions['F'].width = 9
-    ws.column_dimensions['G'].width = 9
+    ws.column_dimensions['G'].width = 5
     ws.column_dimensions['H'].width = 9
-    ws.column_dimensions['I'].width = 11    
+    ws.column_dimensions['I'].width = 5
     ws.column_dimensions['J'].width = 9
-    ws.column_dimensions['K'].width = 16
-    ws.column_dimensions['L'].width = 16
-    ws.column_dimensions['M'].width = 20
-    ws.column_dimensions['N'].width = 20
+    ws.column_dimensions['K'].width = 5
+    ws.column_dimensions['L'].width = 9
+    ws.column_dimensions['M'].width = 6
+    ws.column_dimensions['N'].width = 9
     ws.column_dimensions['O'].width = 6
-    ws.column_dimensions['P'].width = 25
+    ws.column_dimensions['P'].width = 9
+    ws.column_dimensions['Q'].width = 6
+    ws.column_dimensions['R'].width = 9
+    ws.column_dimensions['S'].width = 6
+    ws.column_dimensions['T'].width = 9
+    ws.column_dimensions['U'].width = 6
+    ws.column_dimensions['V'].width = 9
+    ws.column_dimensions['W'].width = 11    
+    ws.column_dimensions['X'].width = 9
+    ws.column_dimensions['Y'].width = 16
+    ws.column_dimensions['Z'].width = 16
+    ws.column_dimensions['AA'].width = 20
+    ws.column_dimensions['AB'].width = 20
+    ws.column_dimensions['AC'].width = 6
+    ws.column_dimensions['AD'].width = 25
 
     
     # linea de division
-    ws.freeze_panes = 'E9'
+    ws.freeze_panes = 'F9'
     # Configuración del fondo y el borde
     # Definir el color usando formato aRGB (opacidad completa 'FF' + color RGB)
     fill = PatternFill(start_color='FF60D7E0', end_color='FF60D7E0', fill_type='solid')
@@ -275,7 +289,7 @@ def fill_worksheet_s22_anemia12(ws, results):
     
     ws['B4'].alignment = Alignment(horizontal= "left", vertical="center")
     ws['B4'].font = Font(name = 'Arial', size= 12, bold = True)
-    ws['B4'] = 'SEGUIMIENTO NOMINAL DEL INDICADOR SI-04. PORCENTAJE DE ADOLESCENTES MUJERES DE 12 A 17 AÑOS DE EDAD, CON DOSAJE DE HEMOGLOBINA, EN ESTABLECIMIENTOS DE SALUD DEL PRIMER Y SEGUNDO NIVEL DE ATENCIÓN (CON POBLACIÓN ASIGNADA)'
+    ws['B4'] = 'SEGUIMIENTO NOMINAL DEL INDICADOR SI-02.02. PORCENTAJE DE NIÑAS Y NIÑOS DE DOCE (12) MESES DE EDAD DEL DEPARTAMENTO, CON DIAGNÓSTICO DE ANEMIA, QUE RECIBEN TRES (03) DOSAJES DE HEMOGLOBINA Y CULMINAN EL TRATAMIENTO CON HIERRO'
     
     ws['B6'].alignment = Alignment(horizontal= "left", vertical="center")
     ws['B6'].font = Font(name = 'Arial', size= 7, bold = True, color='0000CC')
@@ -291,85 +305,169 @@ def fill_worksheet_s22_anemia12(ws, results):
     ws['C8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['C8'].fill = fill
     ws['C8'].border = border
-    ws['C8'] = 'FECHA ATENCION'      
+    ws['C8'] = 'FECHA NAC'      
     
     ws['D8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['D8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
     ws['D8'].fill = blue_fill
     ws['D8'].border = border
-    ws['D8'] = 'EDAD' 
+    ws['D8'] = 'SEXO' 
     
     ws['E8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['E8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
     ws['E8'].fill = yellow_fill
     ws['E8'].border = border
-    ws['E8'] = 'DOSAJE HB'     
+    ws['E8'] = 'SEGURO'     
     
     ws['F8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['F8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
     ws['F8'].fill = yellow_fill
     ws['F8'].border = border
-    ws['F8'] = 'RENAES HB'    
+    ws['F8'] = 'HB'    
     
     ws['G8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['G8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['G8'].fill = green_fill
     ws['G8'].border = border
-    ws['G8'] = 'VISITA'    
+    ws['G8'] = 'VAL HB'
     
     ws['H8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['H8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['H8'].fill = fill
+    ws['H8'].fill = green_fill
     ws['H8'].border = border
-    ws['H8'] = 'MES' 
+    ws['H8'] = 'DX ANEMIA'    
     
     ws['I8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['I8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['I8'].fill = gray_fill
+    ws['I8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['I8'].fill = green_fill
     ws['I8'].border = border
-    ws['I8'] = 'IND' 
+    ws['I8'] = 'VAL DX '    
     
     ws['J8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['J8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['J8'].fill = orange_fill
+    ws['J8'].fill = green_fill
     ws['J8'].border = border
-    ws['J8'] = 'UBIGEO'  
+    ws['J8'] = '1° TTO'    
     
     ws['K8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['K8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['K8'].fill = orange_fill
+    ws['K8'].fill = green_fill
     ws['K8'].border = border
-    ws['K8'] = 'PROVINCIA'       
+    ws['K8'] = 'VAL TTO'    
     
     ws['L8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['L8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['L8'].fill = orange_fill
+    ws['L8'].fill = green_fill
     ws['L8'].border = border
-    ws['L8'] = 'DISTRITO' 
+    ws['L8'] = '1° TTO 30D'    
     
     ws['M8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['M8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['M8'].fill = orange_fill
+    ws['M8'].fill = green_fill
     ws['M8'].border = border
-    ws['M8'] = 'RED'  
+    ws['M8'] = 'VAL TTO 30D' 
     
     ws['N8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['N8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['N8'].fill = orange_fill
+    ws['N8'].fill = green_fill
     ws['N8'].border = border
-    ws['N8'] = 'MICRORED'  
+    ws['N8'] = '2° TTO '    
     
     ws['O8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['O8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['O8'].fill = orange_fill
+    ws['O8'].fill = green_fill
     ws['O8'].border = border
-    ws['O8'] = 'COD EST'  
-    
+    ws['O8'] = '2° VAL TTO' 
+            
     ws['P8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['P8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['P8'].fill = orange_fill
+    ws['P8'].fill = green_fill
     ws['P8'].border = border
-    ws['P8'] = 'ESTABLECIMIENTO'  
+    ws['P8'] = '3° TTO '    
+    
+    ws['Q8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['Q8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['Q8'].fill = green_fill
+    ws['Q8'].border = border
+    ws['Q8'] = '3° VAL TTO' 
+    
+    ws['R8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['R8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['R8'].fill = green_fill
+    ws['R8'].border = border
+    ws['R8'] = 'TA TTO '    
+    
+    ws['S8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['S8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['S8'].fill = green_fill
+    ws['S8'].border = border
+    ws['S8'] = 'VAL TA' 
+    
+    ws['T8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['T8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['T8'].fill = green_fill
+    ws['T8'].border = border
+    ws['T8'] = 'HB 12M'    
+    
+    ws['U8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['U8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['U8'].fill = green_fill
+    ws['U8'].border = border
+    ws['U8'] = 'VAL HB 12M'
+    
+    ws['V8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['V8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['V8'].fill = fill
+    ws['V8'].border = border
+    ws['V8'] = 'MES' 
+    
+    ws['W8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['W8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['W8'].fill = gray_fill
+    ws['W8'].border = border
+    ws['W8'] = 'IND' 
+    
+    ws['X8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['X8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['X8'].fill = orange_fill
+    ws['X8'].border = border
+    ws['X8'] = 'UBIGEO'  
+    
+    ws['Y8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['Y8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['Y8'].fill = orange_fill
+    ws['Y8'].border = border
+    ws['Y8'] = 'PROVINCIA'       
+    
+    ws['Z8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['Z8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['Z8'].fill = orange_fill
+    ws['Z8'].border = border
+    ws['Z8'] = 'DISTRITO' 
+    
+    ws['AA8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AA8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['AA8'].fill = orange_fill
+    ws['AA8'].border = border
+    ws['AA8'] = 'RED'  
+    
+    ws['AB8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AB8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['AB8'].fill = orange_fill
+    ws['AB8'].border = border
+    ws['AB8'] = 'MICRORED'  
+    
+    ws['AC8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AC8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['AC8'].fill = orange_fill
+    ws['AC8'].border = border
+    ws['AC8'] = 'COD EST'  
+    
+    ws['AD8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AD8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['AD8'].fill = orange_fill
+    ws['AD8'].border = border
+    ws['AD8'] = 'ESTABLECIMIENTO'  
     
         
     # Definir estilos
@@ -399,7 +497,7 @@ def fill_worksheet_s22_anemia12(ws, results):
                 cell.alignment = Alignment(horizontal='center')
 
             # Aplicar color en la columna 27
-            if col == 9:
+            if col == 23:
                 if isinstance(value, str):
                     value_upper = value.strip().upper()
                     if value_upper == "NO CUMPLE":
@@ -414,7 +512,7 @@ def fill_worksheet_s22_anemia12(ws, results):
                     cell.font = Font(name='Arial', size=8)
             
             # Aplicar color de letra en las columnas 7 y 17
-            elif col in [22, 45, 46, 61, 63, 74]:
+            elif col in [74]:
                 if isinstance(value, str):
                     value_upper = value.strip().upper()
                     if value_upper == "NO CUMPLE":
@@ -430,7 +528,7 @@ def fill_worksheet_s22_anemia12(ws, results):
                 cell.font = Font(name='Arial', size=8)  # Fuente normal para otras columnas
 
             # Aplicar caracteres especiales check y X
-            if col in [7]:
+            if col in [7,9,11,13,15,17,19,21]:
                 if value == 1:
                     cell.value = check_mark  # Insertar check
                     cell.font = Font(name='Arial', size=10, color='00B050')  # Letra verde
