@@ -466,7 +466,7 @@ def fill_worksheet(ws, results):
     ws['O8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['O8'].fill = fill
     ws['O8'].border = border
-    ws['O8'] = 'IND'  
+    ws['O8'] = 'DENOMINADOR'  
     
     ws['P8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['P8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
