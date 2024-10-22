@@ -349,8 +349,7 @@ document.addEventListener('DOMContentLoaded', function() {
     filtroForm.addEventListener('submit', function(e) {
         e.preventDefault();
         var formData = new FormData(this);
-
-        // Solicitud AJAX para obtener datos de avance
+    
         fetch('{% url "index_v3_paquete_terapeutico" %}?' + new URLSearchParams(formData), {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
@@ -362,8 +361,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error:', data.error);
                 return;
             }
-
-            // Diccionario para mapear los números de mes a nombres
+    
             const meses = {
                 1: 'ENE',
                 2: 'FEB',
@@ -378,10 +376,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 11: 'NOV',
                 12: 'DIC'
             };
-            // Convierte los números de mes en nombres usando el diccionario
-            const nombresMeses = data.mes.map(mesNumero => meses[mesNumero]);
-
-            // Configuración y actualización del gráfico
+    
+            // Crear un array de objetos con todos los datos relacionados
+            const datosCompletos = data.mes.map((mes, index) => ({
+                mes: parseInt(mes),
+                nombreMes: meses[mes],
+                denominador: data.den[index],
+                numerador: data.num[index],
+                avance: data.avance[index]
+            }));
+    
+            // Ordenar los datos por número de mes
+            datosCompletos.sort((a, b) => a.mes - b.mes);
+    
+            // Separar los datos ordenados en arrays individuales
+            const nombresMesesOrdenados = datosCompletos.map(d => d.nombreMes);
+            const denominadoresOrdenados = datosCompletos.map(d => d.denominador);
+            const numeradoresOrdenados = datosCompletos.map(d => d.numerador);
+            const avancesOrdenados = datosCompletos.map(d => d.avance);
+    
             var option = {
                 title: {
                     text: 'EVALUACION MENSUAL'
@@ -395,17 +408,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 legend: {
                     data: ['Denominador', 'Numerador', 'Avance']
                 },
-                // Configuración de la gráfica con los nombres de los meses en el eje X
-                xAxis: [
-                    {
-                        type: 'category',
-                        // data: data.mes,
-                        data: nombresMeses, // Aquí usamos los nombres de los meses
-                        axisPointer: {
-                            type: 'shadow'
-                        }
+                xAxis: [{
+                    type: 'category',
+                    data: nombresMesesOrdenados,
+                    axisPointer: {
+                        type: 'shadow'
                     }
-                ],
+                }],
                 yAxis: [
                     {
                         type: 'value',
@@ -430,7 +439,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     {
                         name: 'Denominador',
                         type: 'bar',
-                        data: data.den,
+                        data: denominadoresOrdenados,
                         label: {
                             show: true,
                             position: 'top',
@@ -445,7 +454,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     {
                         name: 'Numerador',
                         type: 'bar',
-                        data: data.num,
+                        data: numeradoresOrdenados,
                         label: {
                             show: true,
                             position: 'top',
@@ -461,7 +470,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         name: 'Avance',
                         type: 'line',
                         yAxisIndex: 1,
-                        data: data.avance,
+                        data: avancesOrdenados,
                         itemStyle: {
                             color: '#5470c6'
                         },

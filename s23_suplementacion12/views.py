@@ -223,26 +223,23 @@ def fill_worksheet_s23_suplementacion12(ws, results):
     ws.column_dimensions['E'].width = 5
     ws.column_dimensions['F'].width = 9
     ws.column_dimensions['G'].width = 9
-    
     ws.column_dimensions['H'].width = 5
     ws.column_dimensions['I'].width = 9
     ws.column_dimensions['J'].width = 5
     ws.column_dimensions['K'].width = 5
     ws.column_dimensions['L'].width = 5
     ws.column_dimensions['M'].width = 5
-    ws.column_dimensions['N'].width = 5
+    ws.column_dimensions['N'].width = 11
     ws.column_dimensions['O'].width = 9
     ws.column_dimensions['P'].width = 5
     ws.column_dimensions['Q'].width = 9
     ws.column_dimensions['R'].width = 5
     ws.column_dimensions['S'].width = 9
-    
     ws.column_dimensions['T'].width = 6
-    ws.column_dimensions['U'].width = 6
+    ws.column_dimensions['U'].width = 11
     ws.column_dimensions['V'].width = 9
-    ws.column_dimensions['W'].width = 6
+    ws.column_dimensions['W'].width = 11
     ws.column_dimensions['X'].width = 9
-    
     ws.column_dimensions['Y'].width = 6
     ws.column_dimensions['Z'].width = 9
     ws.column_dimensions['AA'].width = 6
@@ -254,12 +251,11 @@ def fill_worksheet_s23_suplementacion12(ws, results):
     ws.column_dimensions['AG'].width = 6
     ws.column_dimensions['AH'].width = 9
     ws.column_dimensions['AI'].width = 6
-    ws.column_dimensions['AJ'].width = 6
+    ws.column_dimensions['AJ'].width = 11
     ws.column_dimensions['AK'].width = 9
-    ws.column_dimensions['AL'].width = 6
+    ws.column_dimensions['AL'].width = 11
     ws.column_dimensions['AM'].width = 9
-    ws.column_dimensions['AN'].width = 6   
-    
+    ws.column_dimensions['AN'].width = 11  
     ws.column_dimensions['AO'].width = 9
     ws.column_dimensions['AP'].width = 11    
     ws.column_dimensions['AQ'].width = 9
@@ -620,7 +616,8 @@ def fill_worksheet_s23_suplementacion12(ws, results):
     # Definir los caracteres especiales de check y X
     check_mark = '✓'  # Unicode para check
     x_mark = '✗'  # Unicode para X
-    
+    sub_cumple = 'CUMPLE'
+    sub_no_cumple = 'NO CUMPLE'
     
     # Escribir datos
     for row, record in enumerate(results, start=9):
@@ -648,24 +645,23 @@ def fill_worksheet_s23_suplementacion12(ws, results):
                 else:
                     cell.font = Font(name='Arial', size=8)
             
-            # Aplicar color de letra en las columnas 7 y 17
-            elif col in [22, 45, 46, 61, 63, 74]:
-                if isinstance(value, str):
-                    value_upper = value.strip().upper()
-                    if value_upper == "NO CUMPLE":
-                        cell.font = Font(name='Arial', size=7, color="FF0000")  # Letra roja
-                    elif value_upper == "CUMPLE":
-                        cell.font = Font(name='Arial', size=7, color="00B050")  # Letra verde
-                    else:
-                        cell.font = Font(name='Arial', size=7)
+                        # Aplicar color de letra SUB INDICADORES
+            elif col in [14, 21, 36, 38, 40]:
+                if value == 0:
+                    cell.value = sub_no_cumple  # Insertar check
+                    cell.font = Font(name='Arial', size=7, color="FF0000") 
+                elif value == 1:
+                    cell.value = sub_cumple # Insertar check
+                    cell.font = Font(name='Arial', size=7, color="00B050")
                 else:
                     cell.font = Font(name='Arial', size=7)
+
             # Fuente normal para otras columnas
             else:
                 cell.font = Font(name='Arial', size=8)  # Fuente normal para otras columnas
-
+            
             # Aplicar caracteres especiales check y X
-            if col in [7]:
+            if col in [8, 10, 11, 12, 13, 16, 18, 20, 23, 25, 27, 29, 31, 33, 35]:
                 if value == 1:
                     cell.value = check_mark  # Insertar check
                     cell.font = Font(name='Arial', size=10, color='00B050')  # Letra verde
@@ -675,5 +671,4 @@ def fill_worksheet_s23_suplementacion12(ws, results):
                 else:
                     cell.font = Font(name='Arial', size=8)  # Fuente normal si no es 1 o 0
             
-                        
             cell.border = border
