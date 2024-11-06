@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import index_paquete_gestante, get_redes_paquete_gestante, RptPaqueteGestanteRed
+from .views import index_paquete_gestante, get_redes_paquete_gestante, RptPaqueteGestanteRed, RptCoberturaPaqueteGestante
 
 
 urlpatterns = [
@@ -11,6 +11,10 @@ urlpatterns = [
     path('get_redes_paquete_gestante/<int:redes_id>/', get_redes_paquete_gestante, name='get_redes_paquete_gestante'),
     #-- redes excel
     path('rpt_paquete_gestante_red_excel/', RptPaqueteGestanteRed.as_view(), name = 'rpt_paquete_gestante_red_xls'),
+    
+    ### COBERTURA
+    path('rpt_cobertura_gestante_red_excel/', RptCoberturaPaqueteGestante.as_view(), name = 'rpt_cobertura_paquete_gestante_red_xls'),
+    
     
     #microredes
     # path('get_microredes/<int:microredes_id>/', views.get_microredes, name='get_microredes'),

@@ -454,7 +454,7 @@ def fill_worksheet(ws, results):
     ws['Z8'].fill = gray_fill
     ws['Z8'].border = border
     ws['Z8'] = 'V' 
-      
+    
     ws['AA8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['AA8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
     ws['AA8'].fill = gray_fill
