@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import index_v1_condicion_previa, get_redes_v1_condicion_previa, RptV1CondicionPreviaRed
+from .views import index_v1_condicion_previa, get_redes_v1_condicion_previa, RptV1CondicionPreviaRed, RptCoberturaV1CondicionPrevia
 
 
 urlpatterns = [
@@ -11,6 +11,9 @@ urlpatterns = [
     path('get_redes_v1_condicion_previa/<int:redes_id>/', get_redes_v1_condicion_previa, name='get_redes_v1_condicion_previa'),
     #-- redes excel
     path('rpt_v1_condicion_previa_excel/', RptV1CondicionPreviaRed.as_view(), name = 'rpt_v1_condicion_previa_red_xls'),
+    
+    ### COBERTURA
+    path('rpt_cobertura_v1_condicion_previa_excel/', RptCoberturaV1CondicionPrevia.as_view(), name = 'rpt_cobertura_v1_condicion_previa_xls'),
     
     #microredes
     # path('get_microredes/<int:microredes_id>/', views.get_microredes, name='get_microredes'),

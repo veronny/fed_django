@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import index_v2_tamizaje_violencia, get_redes_v2_tamizaje_violencia, RptV1CondicionPreviaRed
+from .views import index_v2_tamizaje_violencia, get_redes_v2_tamizaje_violencia, RptV1CondicionPreviaRed, RptCoberturaV2TamizajeViolencia
 
 
 urlpatterns = [
@@ -11,6 +11,11 @@ urlpatterns = [
     path('get_redes_v2_tamizaje_violencia/<int:redes_id>/', get_redes_v2_tamizaje_violencia, name='get_redes_v2_tamizaje_violencia'),
     #-- redes excel
     path('rpt_v2_tamizaje_violencia_excel/', RptV1CondicionPreviaRed.as_view(), name = 'rpt_v2_tamizaje_violencia_red_xls'),
+    
+    
+    ### COBERTURA
+    path('rpt_cobertura_v2_tamizaje_violencia_excel/', RptCoberturaV2TamizajeViolencia.as_view(), name = 'rpt_cobertura_v2_tamizaje_violencia_xls'),
+    
     
     #microredes
     # path('get_microredes/<int:microredes_id>/', views.get_microredes, name='get_microredes'),
