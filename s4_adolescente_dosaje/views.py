@@ -17,8 +17,16 @@ from openpyxl.utils import get_column_letter
 
 from django.db.models.functions import Substr
 
+# Reporte excel
 from datetime import datetime
-import locale
+import getpass  # Para obtener el nombre del usuario
+from django.contrib.auth.models import User  # O tu modelo de usuario personalizado
+from django.http import HttpResponse
+from io import BytesIO
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+
+User = get_user_model()
 
 from django.db.models import IntegerField  # Importar IntegerField
 from django.db.models.functions import Cast, Substr  # Importar Cast y Substr
@@ -46,7 +54,7 @@ def obtener_ranking_s4_adolescente_dosaje(anio, mes):
         )
         result = cursor.fetchall()
         return result
-    
+
 def index_s4_adolescente_dosaje(request):
     # RANKING 
     anio = request.GET.get('anio')  # Valor predeterminado# Valor predeterminado
@@ -167,7 +175,7 @@ def get_redes_s4_adolescente_dosaje(request,redes_id):
 def obtener_seguimiento_redes_s4_adolescente_dosaje(p_red,p_inicio,p_fin):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.fn_seguimiento_s4_adolescente_dosaje(%s, %s, %s)",
+            "SELECT * FROM public.fn_seguimiento_s4_adolescente_dosaje(%s, %s, %s)",
             [p_red, p_inicio, p_fin]
         )
         return cursor.fetchall()
@@ -210,32 +218,32 @@ def fill_worksheet_s4_adolescente_dosaje(ws, results):
     # cambia el alto de la columna
     ws.row_dimensions[1].height = 14
     ws.row_dimensions[2].height = 14
-    ws.row_dimensions[3].height = 3
+    ws.row_dimensions[3].height = 12
     ws.row_dimensions[4].height = 25
     ws.row_dimensions[5].height = 3
-    ws.row_dimensions[7].height = 3
+    ws.row_dimensions[6].height = 20
+    ws.row_dimensions[7].height = 25
     ws.row_dimensions[8].height = 25
     # cambia el ancho de la columna
     ws.column_dimensions['A'].width = 2
     ws.column_dimensions['B'].width = 9
     ws.column_dimensions['C'].width = 9
-    ws.column_dimensions['D'].width = 5
+    ws.column_dimensions['D'].width = 9
     ws.column_dimensions['E'].width = 9
     ws.column_dimensions['F'].width = 9
     ws.column_dimensions['G'].width = 9
-    ws.column_dimensions['H'].width = 9
+    ws.column_dimensions['H'].width = 11
     ws.column_dimensions['I'].width = 11    
     ws.column_dimensions['J'].width = 9
     ws.column_dimensions['K'].width = 16
-    ws.column_dimensions['L'].width = 16
+    ws.column_dimensions['L'].width = 20
     ws.column_dimensions['M'].width = 20
     ws.column_dimensions['N'].width = 20
     ws.column_dimensions['O'].width = 6
-    ws.column_dimensions['P'].width = 25
-
+    ws.column_dimensions['P'].width = 35
     
     # linea de division
-    ws.freeze_panes = 'E9'
+    ws.freeze_panes = 'F9'
     # Configuración del fondo y el borde
     # Definir el color usando formato aRGB (opacidad completa 'FF' + color RGB)
     fill = PatternFill(start_color='FF60D7E0', end_color='FF60D7E0', fill_type='solid')
@@ -251,6 +259,8 @@ def fill_worksheet_s4_adolescente_dosaje(ws, results):
     blue_fill = PatternFill(start_color='FF60A2E0', end_color='FF60A2E0', fill_type='solid')
     # Definir el estilo de color verde 2
     green_fill_2 = PatternFill(start_color='FF60E07E', end_color='FF60E07E', fill_type='solid')   
+    # Definir el estilo de relleno celeste
+    celeste_fill = PatternFill(start_color='FF87CEEB', end_color='FF87CEEB', fill_type='solid')
     
     green_font = Font(name='Arial', size=8, color='00FF00')  # Verde
     red_font = Font(name='Arial', size=8, color='FF0000')    # Rojo
@@ -259,63 +269,179 @@ def fill_worksheet_s4_adolescente_dosaje(ws, results):
                     right=Side(style='thin', color='00B0F0'),
                     top=Side(style='thin', color='00B0F0'),
                     bottom=Side(style='thin', color='00B0F0'))
+    
     borde_plomo = Border(left=Side(style='thin', color='A9A9A9'), # Plomo
                     right=Side(style='thin', color='A9A9A9'), # Plomo
                     top=Side(style='thin', color='A9A9A9'), # Plomo
                     bottom=Side(style='thin', color='A9A9A9')) # Plomo
     
+    border_negro = Border(left=Side(style='thin', color='000000'), # negro
+                right=Side(style='thin', color='000000'),
+                top=Side(style='thin', color='000000'), 
+                bottom=Side(style='thin', color='000000')) 
+    
+    # Merge cells 
+    ws.merge_cells('C6:E6') 
+    ws.merge_cells('F6:G6')
+    ws.merge_cells('C7:E7')
+    ws.merge_cells('F7:G7')
+    
+    # Set the value for the merged cell
+    ws['C6'] = 'DENOMINADOR'
+    ws['F6'] = 'NUMERADOR'
+    ws['C7'] = 'Adolescentes atendidas (N y R) en el mes de medicion'
+    ws['F7'] = '85018 o 85018.01'
+    
+    ### CAMBIO DE CABECERAS     
+    # Apply formatting to the merged cell
+    # Assuming border is predefined
+    
+    ws['C6'].alignment = Alignment(horizontal= "center", vertical="center")
+    ws['C6'].font = Font(name = 'Arial', size= 7, bold = True)
+    ws['C6'].fill = gray_fill
+    ws['C6'].border = border_negro
+    
+    ws['F6'].alignment = Alignment(horizontal= "center", vertical="center")
+    ws['F6'].font = Font(name = 'Arial', size= 7, bold = True)
+    ws['F6'].fill = gray_fill
+    ws['F6'].border = border_negro
+    
+    ws['B7'].alignment = Alignment(horizontal= "center", vertical="center")
+    ws['B7'].font = Font(name = 'Arial', size= 7, bold = True)
+    ws['B7'].fill = celeste_fill
+    ws['B7'].border = border_negro
+    ws['B7'] = 'COD HIS'
+    
+    ws['C7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['C7'].font = Font(name = 'Arial', size= 7)
+    ws['C7'].fill = celeste_fill
+    ws['C7'].border = border_negro
+    
+    ws['F7'].alignment = Alignment(horizontal= "center", vertical="center")
+    ws['F7'].font = Font(name = 'Arial', size= 7)
+    ws['F7'].fill = celeste_fill
+    ws['F7'].border = border_negro
+    
+    ### BORDE DE CELDAS CONBINADAS
+    
+    # Definir el rango desde B3 hasta AA3
+    inicio_columna = 'C'
+    fin_columna = 'G'
+    fila = 6
+    from openpyxl.utils import column_index_from_string
+    # Convertir letras de columna a índices numéricos
+    indice_inicio = column_index_from_string(inicio_columna)
+    indice_fin = column_index_from_string(fin_columna)
+
+    # Iterar sobre las columnas en el rango especificado
+    for col in range(indice_inicio, indice_fin + 1):
+        celda = ws.cell(row=fila, column=col)
+        celda.border = border_negro
+    
+    # Definir el rango desde B3 hasta AA3
+    inicio_columna = 'B'
+    fin_columna = 'G'
+    fila = 7
+    from openpyxl.utils import column_index_from_string
+    # Convertir letras de columna a índices numéricos
+    indice_inicio = column_index_from_string(inicio_columna)
+    indice_fin = column_index_from_string(fin_columna)
+
+    # Iterar sobre las columnas en el rango especificado
+    for col in range(indice_inicio, indice_fin + 1):
+        celda = ws.cell(row=fila, column=col)
+        celda.border = border_negro
+    
+    ##### imprimer fecha y hora del reporte
+    fecha_hora_actual = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+    nombre_usuario = getpass.getuser()
+
+    # Obtener el usuario actualmente autenticado
+    
+
+    try:
+
+        user = User.objects.get(is_active=True)
+    except User.DoesNotExist:
+        user = None
+    except User.MultipleObjectsReturned:
+        # Manejar el caso donde hay múltiples usuarios activos
+        user = User.objects.filter(is_active=True).first()  # Por ejemplo, obtener el primero
+    # Asignar fecha y hora a la celda A1
+    ws['O1'].value = 'Fecha y Hora:'
+    ws['P1'].value = fecha_hora_actual
+
+    # Asignar nombre de usuario a la celda A2
+    ws['O2'].value = 'Usuario:'
+    ws['P2'].value = nombre_usuario
+    
+    # Formatear las etiquetas en negrita
+    etiqueta_font = Font(name='Arial', size=8)
+    ws['O1'].font = etiqueta_font
+    ws['P1'].font = etiqueta_font
+    ws['O2'].font = etiqueta_font
+    ws['P2'].font = etiqueta_font
+
+    # Alinear el texto
+    ws['O1'].alignment = Alignment(horizontal="right", vertical="center")
+    ws['P1'].alignment = Alignment(horizontal="left", vertical="center")
+    ws['O2'].alignment = Alignment(horizontal="right", vertical="center")
+    ws['P2'].alignment = Alignment(horizontal="left", vertical="center")
+    
+    
+    
     ## crea titulo del reporte
     ws['B1'].alignment = Alignment(horizontal= "left", vertical="center")
-    ws['B1'].font = Font(name = 'Arial', size= 7, bold = True)
+    ws['B1'].font = Font(name = 'Arial', size= 8, bold = True)
     ws['B1'] = 'OFICINA DE TECNOLOGIAS DE LA INFORMACION'
     
     ws['B2'].alignment = Alignment(horizontal= "left", vertical="center")
-    ws['B2'].font = Font(name = 'Arial', size= 7, bold = True)
+    ws['B2'].font = Font(name = 'Arial', size= 8, bold = True)
     ws['B2'] = 'DIRECCION REGIONAL DE SALUD JUNIN'
     
     ws['B4'].alignment = Alignment(horizontal= "left", vertical="center")
-    ws['B4'].font = Font(name = 'Arial', size= 12, bold = True)
+    ws['B4'].font = Font(name = 'Arial', size= 11, bold = True )
     ws['B4'] = 'SEGUIMIENTO NOMINAL DEL INDICADOR SI-04. PORCENTAJE DE ADOLESCENTES MUJERES DE 12 A 17 AÑOS DE EDAD, CON DOSAJE DE HEMOGLOBINA, EN ESTABLECIMIENTOS DE SALUD DEL PRIMER Y SEGUNDO NIVEL DE ATENCIÓN (CON POBLACIÓN ASIGNADA)'
     
-    ws['B6'].alignment = Alignment(horizontal= "left", vertical="center")
-    ws['B6'].font = Font(name = 'Arial', size= 7, bold = True, color='0000CC')
-    ws['B6'] ='El usuario se compromete a mantener la confidencialidad de los datos personales que conozca como resultado del reporte realizado, cumpliendo con lo establecido en la Ley N° 29733 - Ley de Protección de Datos Personales y sus normas complementarias.'
-        
+    ws['F3'].alignment = Alignment(horizontal= "left", vertical="center")
+    ws['F3'].font = Font(name = 'Arial', size= 8, italic=True, color='0000CC')
+    ws['F3'] ='El usuario se compromete a mantener la confidencialidad de los datos personales que conozca como resultado del reporte realizado, cumpliendo con lo establecido en la Ley N° 29733 - Ley de Protección de Datos Personales y sus normas complementarias.'
+    
     ws['B8'].alignment = Alignment(horizontal= "center", vertical="center")
     ws['B8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['B8'].fill = fill
+    ws['B8'].fill = orange_fill
     ws['B8'].border = border
-    ws['B8'] = 'NUM DOC'
+    ws['B8'] = 'RENAES'
         
     ws['C8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['C8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['C8'].fill = fill
+    ws['C8'].fill = orange_fill
     ws['C8'].border = border
-    ws['C8'] = 'FECHA ATENCION'      
+    ws['C8'] = 'NUM DOC'      
     
     ws['D8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['D8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
-    ws['D8'].fill = blue_fill
+    ws['D8'].fill = orange_fill
     ws['D8'].border = border
-    ws['D8'] = 'EDAD' 
+    ws['D8'] = 'ATENCION' 
     
     ws['E8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['E8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
-    ws['E8'].fill = yellow_fill
+    ws['E8'].fill = orange_fill
     ws['E8'].border = border
-    ws['E8'] = 'DOSAJE HB'     
+    ws['E8'] = 'EDAD'     
     
     ws['F8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['F8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
-    ws['F8'].fill = yellow_fill
+    ws['F8'].fill = green_fill
     ws['F8'].border = border
-    ws['F8'] = 'RENAES HB'    
+    ws['F8'] = 'DOSAJE HB'    
     
     ws['G8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['G8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     ws['G8'].fill = green_fill
     ws['G8'].border = border
-    ws['G8'] = 'VISITA'    
+    ws['G8'] = 'RENAES HB'
     
     ws['H8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['H8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
@@ -371,7 +497,6 @@ def fill_worksheet_s4_adolescente_dosaje(ws, results):
     ws['P8'].border = border
     ws['P8'] = 'ESTABLECIMIENTO'  
     
-        
     # Definir estilos
     header_font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
     centered_alignment = Alignment(horizontal='center')
@@ -381,11 +506,9 @@ def fill_worksheet_s4_adolescente_dosaje(ws, results):
             bottom=Side(style='thin', color='A9A9A9'))
     header_fill = PatternFill(patternType='solid', fgColor='00B0F0')
     
-    
     # Definir los caracteres especiales de check y X
     check_mark = '✓'  # Unicode para check
     x_mark = '✗'  # Unicode para X
-    
     
     # Escribir datos
     for row, record in enumerate(results, start=9):
@@ -440,12 +563,13 @@ def fill_worksheet_s4_adolescente_dosaje(ws, results):
                 else:
                     cell.font = Font(name='Arial', size=8)  # Fuente normal si no es 1 o 0
             
-                        
             cell.border = border
-            
+
 
 ###########################################################################################
-# -- COBERTURA PAQUETE NEONATAL
+# -- COBERTURA ADOLESCENTE DOSAJE
+###########################################################################################
+
 def obtener_cobertura_s4_adolescente_dosaje():
     with connection.cursor() as cursor:
         cursor.execute(
