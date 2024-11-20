@@ -25,6 +25,11 @@ from django.db.models.functions import Cast, Substr  # Importar Cast y Substr
 
 
 logger = logging.getLogger(__name__)
+
+from tempfile import NamedTemporaryFile
+from openpyxl import Workbook
+from django.http import HttpResponse
+
 # Create your views here.
 def obtener_distritos(provincia):
     distritos = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Provincia=provincia).values('Distrito').distinct().order_by('Distrito')
@@ -1192,15 +1197,13 @@ def obtener_cobertura_paquete_nino():
 class RptCoberturaPaqueteNino(TemplateView):
     def get(self, request, *args, **kwargs):
         # Variables ingresadas
-                
+    
         # Creación de la consulta
         resultado_cobertura = obtener_cobertura_paquete_nino()
         
+        # Crear el libro de trabajo
         wb = Workbook()
-        
-        consultas = [
-                ('Cobertura', resultado_cobertura)
-        ]
+        consultas = [('Cobertura', resultado_cobertura)]
         
         for index, (sheet_name, results) in enumerate(consultas):
             if index == 0:
@@ -1208,19 +1211,24 @@ class RptCoberturaPaqueteNino(TemplateView):
                 ws.title = sheet_name
             else:
                 ws = wb.create_sheet(title=sheet_name)
-        
+            
+            # Rellenar la hoja con los resultados
             fill_worksheet_cobertura_paquete_nino(ws, results)
         
-        ##########################################################################          
         # Establecer el nombre del archivo
         nombre_archivo = "rpt_cobertura_paquete_nino.xlsx"
-        # Definir el tipo de respuesta que se va a dar
-        response = HttpResponse(content_type="application/ms-excel")
-        contenido = "attachment; filename={}".format(nombre_archivo)
-        response["Content-Disposition"] = contenido
-        wb.save(response)
-
-        return response
+        
+        # Usar NamedTemporaryFile para evitar usar demasiada memoria
+        with NamedTemporaryFile() as tmp_file:
+            wb.save(tmp_file.name)  # Guarda el archivo temporalmente
+            tmp_file.seek(0)  # Posiciona el cursor al inicio del archivo
+            response = HttpResponse(
+                tmp_file.read(), 
+                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+            # Configuración del encabezado para descarga
+            response["Content-Disposition"] = f'attachment; filename="{nombre_archivo}"'
+            return response
 
 def fill_worksheet_cobertura_paquete_nino(ws, results): 
     # cambia el alto de la columna

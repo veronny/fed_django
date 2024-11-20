@@ -290,7 +290,7 @@ def fill_worksheet_s4_adolescente_dosaje(ws, results):
     ws['C6'] = 'DENOMINADOR'
     ws['F6'] = 'NUMERADOR'
     ws['C7'] = 'Adolescentes atendidas (N y R) en el mes de medicion'
-    ws['F7'] = '85018 o 85018.01'
+    ws['F7'] = 'Dx=85018 o Dx=85018.01'
     
     ### CAMBIO DE CABECERAS     
     # Apply formatting to the merged cell
