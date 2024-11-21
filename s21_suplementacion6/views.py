@@ -360,7 +360,7 @@ def fill_worksheet_s21_suplementacion6(ws, results):
     ws['J7'] = 'Entrega de hierro Niños prematuros y/o bajo peso al nacer a los 30 dias de nacido: (entre 30 a 59 días)'
     ws['L7'] = 'Dosaje de hemoglobina a los 3 meses de iniciada la suplementacion (Se busca el registro entre 90 a 119 dias) 4 meses de edad'
     ws['N7'] = 'Entrega de hierro a los 4 meses de edad (Se buscar el registro entre 110 a 130 días)'
-    ws['P7'] = 'Entrega a los 6 meses de edad (Se busca el registro entre 170 a 209 dias)'
+    ws['P7'] = 'Dosaje de hemoglobina a los 6 meses de edad (Se busca el registro entre 170 a 209 dias)'
     ws['R7'] = 'NUMERADOR PARCIAL'
     ws['S7'] = 'Entrega de hierro a los 4 meses de edad (Se buscar el registro entre 110 a 130 días)'
     ws['U7'] = 'Dosaje de hemoglobina a los 6 meses de edad (Se busca el registro entre 170 a 209 dias)'
