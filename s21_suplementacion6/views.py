@@ -222,7 +222,7 @@ def fill_worksheet_s21_suplementacion6(ws, results):
     ws.row_dimensions[4].height = 25
     ws.row_dimensions[5].height = 18
     ws.row_dimensions[6].height = 18
-    ws.row_dimensions[7].height = 38
+    ws.row_dimensions[7].height = 60
     ws.row_dimensions[8].height = 20
     # cambia el ancho de la columna
     ws.column_dimensions['A'].width = 2
@@ -242,12 +242,12 @@ def fill_worksheet_s21_suplementacion6(ws, results):
     ws.column_dimensions['O'].width = 5
     ws.column_dimensions['P'].width = 9
     ws.column_dimensions['Q'].width = 5
-    ws.column_dimensions['R'].width = 9
+    ws.column_dimensions['R'].width = 10
     ws.column_dimensions['S'].width = 9
     ws.column_dimensions['T'].width = 5
     ws.column_dimensions['U'].width = 9
     ws.column_dimensions['V'].width = 5
-    ws.column_dimensions['W'].width = 9
+    ws.column_dimensions['W'].width = 10
     ws.column_dimensions['X'].width = 10
     ws.column_dimensions['Y'].width = 11
     ws.column_dimensions['Z'].width = 16
@@ -259,7 +259,7 @@ def fill_worksheet_s21_suplementacion6(ws, results):
     ws.column_dimensions['AF'].width = 25
     
     # linea de division
-    ws.freeze_panes = 'H9'
+    ws.freeze_panes = 'H10'
     
     # Configuración del fondo y el borde
     # Definir el color usando formato aRGB (opacidad completa 'FF' + color RGB)
@@ -356,14 +356,14 @@ def fill_worksheet_s21_suplementacion6(ws, results):
     ws['H6'] = 'NIÑOS BAJO PESO AL NACER Y/O PREMATURIDAD'
     ws['S6'] = 'NIÑOS SIN PREMATURIDAD'
     
-    ws['H7'] = 'Entrega a los 30 dias de nacido (Se busca el registro entre 30 a 59 dias)'
-    ws['J7'] = 'Niños prematuros y/o bajo peso al nacer: entrega de hierro (entre 30 a 59 días)'
-    ws['L7'] = 'Entrega a los 30 dias de nacido (Se busca el registro entre 30 a 59 dias)'
+    ws['H7'] = 'Dosaje de hemoglobina a los 30 dias de nacido (Se busca el registro entre 30 a 59 dias)'
+    ws['J7'] = 'Entrega de hierro Niños prematuros y/o bajo peso al nacer a los 30 dias de nacido: (entre 30 a 59 días)'
+    ws['L7'] = 'Dosaje de hemoglobina a los 3 meses de iniciada la suplementacion (Se busca el registro entre 90 a 119 dias) 4 meses de edad'
     ws['N7'] = 'Entrega de hierro a los 4 meses de edad (Se buscar el registro entre 110 a 130 días)'
     ws['P7'] = 'Entrega a los 6 meses de edad (Se busca el registro entre 170 a 209 dias)'
     ws['R7'] = 'NUMERADOR PARCIAL'
     ws['S7'] = 'Entrega de hierro a los 4 meses de edad (Se buscar el registro entre 110 a 130 días)'
-    ws['U7'] = 'Entrega a los 6 meses de edad (Se busca el registro entre 170 a 209 dias)'
+    ws['U7'] = 'Dosaje de hemoglobina a los 6 meses de edad (Se busca el registro entre 170 a 209 dias)'
     ws['W7'] = 'NUMERADOR PARCIAL'
     
     ws['H8'] = 'DX = 85018 ó 85018.01 + TD = D'
@@ -800,74 +800,90 @@ def fill_worksheet_s21_suplementacion6(ws, results):
     sub_cumple = 'CUMPLE'
     sub_no_cumple = 'NO CUMPLE'
     
-    # Definir estilo para celdas con "X" en BPN
-    promo_fill = PatternFill(patternType='solid', fgColor='FFD966')  # Color promo (amarillo)
+    # Define styles
+    promo_fill = PatternFill(patternType='solid', fgColor='FFD966')  # Yellow fill for promo
     font_normal = Font(name='Arial', size=8)
     font_bold_white = Font(name='Arial', size=7, bold=True, color='FFFFFF')
+    font_red_bold = Font(name='Arial', size=7, bold=True, color='FF0000')
+    font_green_bold = Font(name='Arial', size=7, bold=True, color='00FF00')
+    font_red = Font(name='Arial', size=7, color='FF0000')
+    font_green = Font(name='Arial', size=7, color='00B050')
+    font_check = Font(name='Arial', size=10, color='00B050')
+    font_x = Font(name='Arial', size=10, color='FF0000')
+    plomo_claro_font = Font(name='Arial', size=7, color='FFEDEDED', bold=False)
+
+    # Define fills
+    fill_red = PatternFill(patternType='solid', fgColor='FF0000')
+    fill_green = PatternFill(patternType='solid', fgColor='00FF00')
     
-    # Escribir datos
+    # Write data
     for row, record in enumerate(results, start=10):
-        for col, value in enumerate(record, start=2):
+        bpn_value = record[4]  # BPN is in column 6 (index 4)
+        for col_offset, value in enumerate(record):
+            col = col_offset + 2  # Adjust column index (starts at 2)
             cell = ws.cell(row=row, column=col, value=value)
 
-            # Alinear a la izquierda solo en las columnas especificas
+            # Alignment
             if col in [28, 29, 32]:
                 cell.alignment = Alignment(horizontal='left')
             else:
                 cell.alignment = Alignment(horizontal='center')
 
-            # Aplicar color en la columna 25
+            # Initialize default font and fill
+            cell_font = font_normal
+            cell_fill = None
+
+            # Apply special formatting based on column and value
             if col == 25:
                 if isinstance(value, str):
                     value_upper = value.strip().upper()
                     if value_upper == "NO CUMPLE":
-                        cell.fill = PatternFill(patternType='solid', fgColor='FF0000')  # Fondo rojo
-                        cell.font = Font(name='Arial', size=7,  bold = True, color='FFFFFF')  # Letra blanca
+                        cell_fill = fill_red
+                        cell_font = font_bold_white
                     elif value_upper == "CUMPLE":
-                        cell.fill = PatternFill(patternType='solid', fgColor='00FF00')  # Fondo verde
-                        cell.font = Font(name='Arial', size=7,  bold = True, color='FFFFFF')  # Letra blanca
+                        cell_fill = fill_green
+                        cell_font = font_bold_white
                     else:
-                        cell.font = Font(name='Arial', size=7)
+                        cell_font = Font(name='Arial', size=7)
                 else:
-                    cell.font = Font(name='Arial', size=8)
-            
-            # Aplicar color de letra SUB INDICADORES
+                    cell_font = font_normal
+
             elif col in [18, 23]:
                 if value == 0:
-                    cell.value = sub_no_cumple  # Insertar check
-                    cell.font = Font(name='Arial', size=7, color="FF0000")  # Letra roja
+                    cell.value = sub_no_cumple
+                    cell_font = font_red
                 elif value == 1:
-                    cell.value = sub_cumple # Insertar check
-                    cell.font = Font(name='Arial', size=7, color="00B050")  # Letra verde
+                    cell.value = sub_cumple
+                    cell_font = font_green
                 else:
-                        cell.font = Font(name='Arial', size=7)
+                    cell_font = Font(name='Arial', size=7)
 
-            # Fuente normal para otras columnas
-            else:
-                cell.font = Font(name='Arial', size=8)  # Fuente normal para otras columnas
-
-            # Aplicar caracteres especiales check y X
-            if col in [9, 11, 13, 15, 17, 20, 22]:
+            elif col in [6, 7, 9, 11, 13, 15, 17, 20, 22]:
                 if value == 1:
-                    cell.value = check_mark  # Insertar check
-                    cell.font = Font(name='Arial', size=10, color='00B050')  # Letra verde
+                    cell.value = check_mark
+                    cell_font = font_check
                 elif value == 0:
-                    cell.value = x_mark  # Insertar X
-                    cell.font = Font(name='Arial', size=10, color='FF0000')  # Letra roja
+                    cell.value = x_mark
+                    cell_font = font_x
                 else:
-                    cell.font = Font(name='Arial', size=8)  # Fuente normal si no es 1 o 0
-            
-            # Aplicar color a columnas H a R y escribir "NO APLICA" en columna R si BPN (columna 2) es "X"
-            if col in [6]:  # Columna BPN
-                if value == 0:
-                    if col >= 8 and col <= 17:  # Columnas H a Q
-                        cell.fill = promo_fill  # Color promo
-                        cell.font = font_normal  # Fuente normal
-                    elif col == 18:  # Columna R
-                        cell.value = "NO APLICA"
-                        cell.fill = promo_fill
-                        cell.font = font_bold_white
-                        
+                    cell_font = font_normal
+
+            # Apply color to columns H (8) to Q (17) and write "NO APLICA" in column R (18) if BPN is 0
+            if bpn_value == 0:
+                if 8 <= col <= 17:
+                    cell_fill = plomo_claro_fill
+                    cell_font = plomo_claro_font
+                elif col == 18:
+                    cell.value = "NO APLICA"
+                    cell_fill = plomo_claro_fill
+                    cell_font = font_normal
+
+            # Set font and fill
+            cell.font = cell_font
+            if cell_fill:
+                cell.fill = cell_fill
+
+            # Apply borders
             cell.border = border
 
     
