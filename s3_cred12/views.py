@@ -1024,6 +1024,7 @@ def fill_worksheet_s3_cred12(ws, results):
             
             # Diccionario de columnas por cred_value
             cred_value_columns = {
+                0: [21, 23, 25, 27, 29, 31, 33, 35, 37, 39],
                 1: [21, 23, 25, 27, 29, 31, 33, 35, 37, 39],
                 2: [23, 25, 27, 29, 31, 33, 35, 37, 39],
                 3: [25, 27, 29, 31, 33, 35, 37, 39],
