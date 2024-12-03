@@ -84,13 +84,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        #'NAME': 'dbfed',
+        'NAME': 'dbfed',
         #'NAME': 'mydbfed',
         'USER': 'veronny',
-        #'PASSWORD': 'Diresa2024',
-        'PASSWORD': 'Diresa2*2*',
-        'HOST': 'mydbfed.c7qw8qiyyq8f.sa-east-1.rds.amazonaws.com',
-        #'HOST': 'fed.cl2mkwwai40s.sa-east-1.rds.amazonaws.com',
+        'PASSWORD': 'Diresa2024',
+        #'PASSWORD': 'Diresa2*2*',
+        #'HOST': 'mydbfed.c7qw8qiyyq8f.sa-east-1.rds.amazonaws.com',
+        'HOST': 'fed.cl2mkwwai40s.sa-east-1.rds.amazonaws.com',
         'PORT': '5432',
     }
 }
