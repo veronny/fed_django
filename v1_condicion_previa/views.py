@@ -25,6 +25,21 @@ from django.db.models.functions import Cast, Substr     # Importar Cast y Substr
 
 
 logger = logging.getLogger(__name__)
+
+
+# Reporte excel
+from datetime import datetime
+import getpass  # Para obtener el nombre del usuario
+from django.contrib.auth.models import User  # O tu modelo de usuario personalizado
+from django.http import HttpResponse
+from io import BytesIO
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+
+User = get_user_model()
+
+from django.db.models import IntegerField               # Importar IntegerField
+from django.db.models.functions import Cast, Substr     # Importar Cast y Substr
 # Create your views here.
 def obtener_distritos(provincia):
     distritos = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Provincia=provincia).values('Distrito').distinct().order_by('Distrito')
@@ -33,7 +48,7 @@ def obtener_distritos(provincia):
 def obtener_avance_v1_condicion_previa(red):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_avance_v1_condicion_previa(%s)",
+            "SELECT * FROM public.obtener_avance_v1_condicion_previa(%s)",
             [red]
         )
         return cursor.fetchall()
@@ -41,7 +56,7 @@ def obtener_avance_v1_condicion_previa(red):
 def obtener_ranking_v1_condicion_previa(anio, mes):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_ranking_v1_condicion_previa(%s, %s)",
+            "SELECT * FROM public.obtener_ranking_v1_condicion_previa(%s, %s)",
             [anio, mes]
         )
         result = cursor.fetchall()
@@ -167,7 +182,7 @@ def get_redes_v1_condicion_previa(request,redes_id):
 def obtener_seguimiento_redes_v1_condicion_previa(p_red,p_inicio,p_fin):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.fn_seguimiento_v1_condicion_previa(%s, %s, %s)",
+            "SELECT * FROM public.fn_seguimiento_v1_condicion_previa(%s, %s, %s)",
             [p_red, p_inicio, p_fin]
         )
         return cursor.fetchall()
@@ -207,20 +222,20 @@ class RptV1CondicionPreviaRed(TemplateView):
         return response
 
 def fill_worksheet_v1_condicion_previa(ws, results): 
-    # cambia el alto de la columna
+    
     ws.row_dimensions[1].height = 14
     ws.row_dimensions[2].height = 14
-    ws.row_dimensions[3].height = 3
+    ws.row_dimensions[3].height = 12
     ws.row_dimensions[4].height = 25
-    ws.row_dimensions[5].height = 3
-    ws.row_dimensions[7].height = 3
-    ws.row_dimensions[8].height = 25
+    ws.row_dimensions[5].height = 20
+    ws.row_dimensions[6].height = 60
+    ws.row_dimensions[7].height = 60
     # cambia el ancho de la columna
     ws.column_dimensions['A'].width = 2
     ws.column_dimensions['B'].width = 9
-    ws.column_dimensions['C'].width = 9
-    ws.column_dimensions['D'].width = 5
-    ws.column_dimensions['E'].width = 5
+    ws.column_dimensions['C'].width = 10
+    ws.column_dimensions['D'].width = 10
+    ws.column_dimensions['E'].width = 10
     ws.column_dimensions['F'].width = 9
     ws.column_dimensions['G'].width = 10
     ws.column_dimensions['H'].width = 9
@@ -232,7 +247,7 @@ def fill_worksheet_v1_condicion_previa(ws, results):
     ws.column_dimensions['N'].width = 30
 
     # linea de division
-    ws.freeze_panes = 'E9'
+    ws.freeze_panes = 'D9'
     # Configuración del fondo y el borde
     # Definir el color usando formato aRGB (opacidad completa 'FF' + color RGB)
     fill = PatternFill(start_color='FF60D7E0', end_color='FF60D7E0', fill_type='solid')
@@ -261,6 +276,173 @@ def fill_worksheet_v1_condicion_previa(ws, results):
                     top=Side(style='thin', color='A9A9A9'), # Plomo
                     bottom=Side(style='thin', color='A9A9A9')) # Plomo
     
+    # Definir el estilo de relleno celeste
+    celeste_fill = PatternFill(start_color='FF87CEEB', end_color='FF87CEEB', fill_type='solid')
+    # Morado más claro
+    morado_claro_fill = PatternFill(start_color='FFE9D8FF', end_color='FFE9D8FF', fill_type='solid')
+    # Plomo más claro
+    plomo_claro_fill = PatternFill(start_color='FFEDEDED', end_color='FFEDEDED', fill_type='solid')
+    # Azul más claro
+    azul_claro_fill = PatternFill(start_color='FFD8EFFA', end_color='FFD8EFFA', fill_type='solid')
+    # Naranja más claro
+    naranja_claro_fill = PatternFill(start_color='FFFFEBD8', end_color='FFFFEBD8', fill_type='solid')
+    # Verde más claro
+    verde_claro_fill = PatternFill(start_color='FFBDF7BD', end_color='FFBDF7BD', fill_type='solid')
+    
+    
+    border_negro = Border(left=Side(style='thin', color='000000'), # negro
+        right=Side(style='thin', color='000000'),
+        top=Side(style='thin', color='000000'), 
+        bottom=Side(style='thin', color='000000')) 
+    
+        ### CAMBIO DE CABECERAS     
+    ####################################
+    
+    # Merge cells 
+    # numerador y denominador
+    ws.merge_cells('B5:C5') 
+    ws.merge_cells('D5:E5')
+
+    # intervalo
+    ws.merge_cells('D6:E6')
+
+        
+    # Combina cela
+    ws['B5'] = 'DENOMINADOR'
+    ws['D5'] = 'NUMERADOR'
+    
+    ws['C6'] = 'Atencion Prenatal en el mes de evaluacion'
+    ws['D6'] = ' Detección de violencia contra la mujer en gestantes el mismo día de la APN y en el mismo EESS'
+
+    ws['C7'] = 'DX=Z3491 ó Z3492 ó Z3493 ó Z3591 ó Z3592 ó Z3593'
+    ws['D7'] = 'DX= 96150.01 + TD = D'
+    ws['E7'] = 'DX=96150 + TD= D + LAB = VIF'
+    
+    ### numerador y denominador 
+    ws['B5'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['B5'].font = Font(name = 'Arial', size= 10, bold = True)
+    ws['B5'].fill = gray_fill
+    ws['B5'].border = border_negro
+    
+    ws['D5'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['D5'].font = Font(name = 'Arial', size= 10, bold = True)
+    ws['D5'].fill = naranja_claro_fill
+    ws['D5'].border = border_negro
+    
+    ### intervalo 
+    ws['C6'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['C6'].font = Font(name = 'Arial', size= 7)
+    ws['C6'].fill = plomo_claro_fill
+    ws['C6'].border = border_negro
+    
+    ws['D6'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['D6'].font = Font(name = 'Arial', size= 7)
+    ws['D6'].fill = plomo_claro_fill
+    ws['D6'].border = border_negro
+    
+    ws['C7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['C7'].font = Font(name = 'Arial', size= 7)
+    ws['C7'].fill = azul_claro_fill
+    ws['C7'].border = border_negro
+    
+    ws['D7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['D7'].font = Font(name = 'Arial', size= 7)
+    ws['D7'].fill = azul_claro_fill
+    ws['D7'].border = border_negro
+    
+    ws['E7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['E7'].font = Font(name = 'Arial', size= 7)
+    ws['E7'].fill = azul_claro_fill
+    ws['E7'].border = border_negro
+        
+    ws['B6'].alignment = Alignment(horizontal= "center", vertical="center")
+    ws['B6'].font = Font(name = 'Arial', size= 7, bold = True)
+    ws['B6'].fill = plomo_claro_fill
+    ws['B6'].border = border_negro
+    ws['B6'] = 'INTERVALO'
+    
+    ws['B7'].alignment = Alignment(horizontal= "center", vertical="center")
+    ws['B7'].font = Font(name = 'Arial', size= 7, bold = True)
+    ws['B7'].fill = azul_claro_fill
+    ws['B7'].border = border_negro
+    ws['B7'] = 'COD HIS'
+    
+    
+    ### BORDE DE CELDAS CONBINADAS
+    
+    # NUM y DEN
+    inicio_columna = 'B'
+    fin_columna = 'E'
+    fila = 5
+    from openpyxl.utils import column_index_from_string
+    # Convertir letras de columna a índices numéricos
+    indice_inicio = column_index_from_string(inicio_columna)
+    indice_fin = column_index_from_string(fin_columna)
+    # Iterar sobre las columnas en el rango especificado
+    for col in range(indice_inicio, indice_fin + 1):
+        celda = ws.cell(row=fila, column=col)
+        celda.border = border_negro
+    
+    # INTERVALO
+    inicio_columna = 'B'
+    fin_columna = 'E'
+    fila = 6
+    from openpyxl.utils import column_index_from_string
+    # Convertir letras de columna a índices numéricos
+    indice_inicio = column_index_from_string(inicio_columna)
+    indice_fin = column_index_from_string(fin_columna)
+    # Iterar sobre las columnas en el rango especificado
+    for col in range(indice_inicio, indice_fin + 1):
+        celda = ws.cell(row=fila, column=col)
+        celda.border = border_negro
+        
+    # CODIGO HIS 
+    inicio_columna = 'B'
+    fin_columna = 'E'
+    fila = 7
+    from openpyxl.utils import column_index_from_string
+    # Convertir letras de columna a índices numéricos
+    indice_inicio = column_index_from_string(inicio_columna)
+    indice_fin = column_index_from_string(fin_columna)
+    # Iterar sobre las columnas en el rango especificado
+    for col in range(indice_inicio, indice_fin + 1):
+        celda = ws.cell(row=fila, column=col)
+        celda.border = border_negro
+    
+    ##### imprimer fecha y hora del reporte
+    fecha_hora_actual = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+    nombre_usuario = getpass.getuser()
+
+    # Obtener el usuario actualmente autenticado
+    try:
+        user = User.objects.get(is_active=True)
+    except User.DoesNotExist:
+        user = None
+    except User.MultipleObjectsReturned:
+        # Manejar el caso donde hay múltiples usuarios activos
+        user = User.objects.filter(is_active=True).first()  # Por ejemplo, obtener el primero
+    # Asignar fecha y hora a la celda A1
+    ws['O1'].value = 'Fecha y Hora:'
+    ws['P1'].value = fecha_hora_actual
+
+    # Asignar nombre de usuario a la celda A2
+    ws['O2'].value = 'Usuario:'
+    ws['P2'].value = nombre_usuario
+    
+    # Formatear las etiquetas en negrita
+    etiqueta_font = Font(name='Arial', size=8)
+    ws['O1'].font = etiqueta_font
+    ws['P1'].font = etiqueta_font
+    ws['O2'].font = etiqueta_font
+    ws['P2'].font = etiqueta_font
+
+    # Alinear el texto
+    ws['O1'].alignment = Alignment(horizontal="right", vertical="center")
+    ws['P1'].alignment = Alignment(horizontal="left", vertical="center")
+    ws['O2'].alignment = Alignment(horizontal="right", vertical="center")
+    ws['P2'].alignment = Alignment(horizontal="left", vertical="center")
+    
+
     ## crea titulo del reporte
     ws['B1'].alignment = Alignment(horizontal= "left", vertical="center")
     ws['B1'].font = Font(name = 'Arial', size= 7, bold = True)
@@ -274,9 +456,9 @@ def fill_worksheet_v1_condicion_previa(ws, results):
     ws['B4'].font = Font(name = 'Arial', size= 12, bold = True)
     ws['B4'] = 'SEGUIMIENTO NOMINAL DEL INDICADOR FICHA VI-01.01: CONDICIÓN PREVIA: PORCENTAJE DE GESTANTES ATENDIDAS EN ESTABLECIMIENTOS DE SALUD, QUE DURANTE EL EMBARAZO LE APLICARON LA FICHA DE DETECCIÓN DE VIOLENCIA CONTRA LA MUJER'
     
-    ws['B6'].alignment = Alignment(horizontal= "left", vertical="center")
-    ws['B6'].font = Font(name = 'Arial', size= 7, bold = True, color='0000CC')
-    ws['B6'] ='El usuario se compromete a mantener la confidencialidad de los datos personales que conozca como resultado del reporte realizado, cumpliendo con lo establecido en la Ley N° 29733 - Ley de Protección de Datos Personales y sus normas complementarias.'
+    ws['B3'].alignment = Alignment(horizontal= "left", vertical="center")
+    ws['B3'].font = Font(name = 'Arial', size= 7, color='0000CC')
+    ws['B3'] ='El usuario se compromete a mantener la confidencialidad de los datos personales que conozca como resultado del reporte realizado, cumpliendo con lo establecido en la Ley N° 29733 - Ley de Protección de Datos Personales y sus normas complementarias.'
         
     ws['B8'].alignment = Alignment(horizontal= "center", vertical="center")
     ws['B8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
@@ -294,13 +476,13 @@ def fill_worksheet_v1_condicion_previa(ws, results):
     ws['D8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
     ws['D8'].fill = blue_fill
     ws['D8'].border = border
-    ws['D8'] = 'VAL VIO_1' 
+    ws['D8'] = 'DETECCION' 
     
     ws['E8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['E8'].font = Font(name = 'Arial', size= 7, bold = True, color='FFFFFF')
-    ws['E8'].fill = yellow_fill
+    ws['E8'].fill = blue_fill
     ws['E8'].border = border
-    ws['E8'] = 'VAL VIO_2'     
+    ws['E8'] = 'DETEC + VIF'     
         
     ws['F8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
     ws['F8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
@@ -382,7 +564,7 @@ def fill_worksheet_v1_condicion_previa(ws, results):
                 cell.alignment = Alignment(horizontal='left')
             else:
                 cell.alignment = Alignment(horizontal='center')
-
+            
             # Aplicar color en la columna 27
             if col == 7:
                 if isinstance(value, str):
@@ -415,13 +597,24 @@ def fill_worksheet_v1_condicion_previa(ws, results):
                 cell.font = Font(name='Arial', size=8)  # Fuente normal para otras columnas
 
             # Aplicar caracteres especiales check y X
-            if col in [4,5]:
+            if col in [4]:
                 if value == 1:
                     cell.value = check_mark  # Insertar check
                     cell.font = Font(name='Arial', size=10, color='00B050')  # Letra verde
                 elif value == 0:
                     cell.value = x_mark  # Insertar X
                     cell.font = Font(name='Arial', size=10, color='FF0000')  # Letra roja
+                else:
+                    cell.font = Font(name='Arial', size=8)  # Fuente normal si no es 1 o 0
+                    
+                        # Aplicar caracteres especiales check y X
+            if col in [5]:
+                if value == 1:
+                    cell.value = check_mark  # Insertar check
+                    cell.font = Font(name='Arial', size=10, color='FFEDEDED')  # Letra verde
+                elif value == 0:
+                    cell.value = x_mark  # Insertar X
+                    cell.font = Font(name='Arial', size=10, color='FFEDEDED')  # Letra roja
                 else:
                     cell.font = Font(name='Arial', size=8)  # Fuente normal si no es 1 o 0
             
