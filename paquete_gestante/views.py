@@ -25,6 +25,19 @@ from django.db.models.functions import Cast, Substr  # Importar Cast y Substr
 # linea de border 
 from openpyxl.utils import column_index_from_string
 
+# Reporte excel
+from datetime import datetime
+import getpass  # Para obtener el nombre del usuario
+from django.contrib.auth.models import User  # O tu modelo de usuario personalizado
+from django.http import HttpResponse
+from io import BytesIO
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+
+User = get_user_model()
+
+from django.db.models import IntegerField               # Importar IntegerField
+from django.db.models.functions import Cast, Substr     # Importar Cast y Substr
 
 logger = logging.getLogger(__name__)
 
@@ -170,7 +183,7 @@ def get_redes_paquete_gestante(request,redes_id):
 def obtener_seguimiento_redes_paquete_gestante(p_red,p_inicio,p_fin):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.fn_seguimiento_paquete_gestante(%s, %s, %s)",
+            "SELECT * FROM public.fn_seguimiento_paquete_gestante(%s, %s, %s)",
             [p_red, p_inicio, p_fin]
         )
         return cursor.fetchall()
@@ -215,11 +228,13 @@ def fill_worksheet_paquete_gestante(ws, results):
     # cambia el alto de la columna
     ws.row_dimensions[1].height = 14
     ws.row_dimensions[2].height = 14
-    ws.row_dimensions[3].height = 3
+    ws.row_dimensions[3].height = 12
     ws.row_dimensions[4].height = 25
-    ws.row_dimensions[5].height = 3
-    ws.row_dimensions[7].height = 3
-    ws.row_dimensions[8].height = 25
+    ws.row_dimensions[5].height = 20
+    ws.row_dimensions[6].height = 20
+    ws.row_dimensions[7].height = 60
+    ws.row_dimensions[8].height = 28
+    
     # cambia el ancho de la columna
     ws.column_dimensions['A'].width = 2
     ws.column_dimensions['B'].width = 9
@@ -281,7 +296,7 @@ def fill_worksheet_paquete_gestante(ws, results):
     
     
     # linea de division
-    ws.freeze_panes = 'I9'
+    ws.freeze_panes = 'N10'
     # Configuración del fondo y el borde
     # Definir el color usando formato aRGB (opacidad completa 'FF' + color RGB)
     fill = PatternFill(start_color='FF60D7E0', end_color='FF60D7E0', fill_type='solid')
@@ -311,6 +326,428 @@ def fill_worksheet_paquete_gestante(ws, results):
                     top=Side(style='thin', color='A9A9A9'), # Plomo
                     bottom=Side(style='thin', color='A9A9A9')) # Plomo
     
+        # Configuración del fondo y el borde
+    # Definir el color usando formato aRGB (opacidad completa 'FF' + color RGB)
+    fill = PatternFill(start_color='FF60D7E0', end_color='FF60D7E0', fill_type='solid')
+    # Definir el color anaranjado usando formato aRGB
+    orange_fill = PatternFill(start_color='FFE0A960', end_color='FFE0A960', fill_type='solid')
+    # Definir los estilos para gris
+    gray_fill = PatternFill(start_color='FFD3D3D3', end_color='FFD3D3D3', fill_type='solid')
+    # Definir el estilo de color verde
+    green_fill = PatternFill(start_color='FF60E0B3', end_color='FF60E0B3', fill_type='solid')
+    # Definir el estilo de color amarillo
+    yellow_fill = PatternFill(start_color='FFE0DE60', end_color='FFE0DE60', fill_type='solid')
+    # Definir el estilo de color azul
+    blue_fill = PatternFill(start_color='FF60A2E0', end_color='FF60A2E0', fill_type='solid')
+    # Definir el estilo de color verde 2
+    green_fill_2 = PatternFill(start_color='FF60E07E', end_color='FF60E07E', fill_type='solid')   
+    # Definir el estilo de relleno celeste
+    celeste_fill = PatternFill(start_color='FF87CEEB', end_color='FF87CEEB', fill_type='solid')
+    # Morado más claro
+    morado_claro_fill = PatternFill(start_color='FFE9D8FF', end_color='FFE9D8FF', fill_type='solid')
+    # Plomo más claro
+    plomo_claro_fill = PatternFill(start_color='FFEDEDED', end_color='FFEDEDED', fill_type='solid')
+    # Azul más claro
+    azul_claro_fill = PatternFill(start_color='FFD8EFFA', end_color='FFD8EFFA', fill_type='solid')
+    # Naranja más claro
+    naranja_claro_fill = PatternFill(start_color='FFFFEBD8', end_color='FFFFEBD8', fill_type='solid')
+    # Verde más claro
+    verde_claro_fill = PatternFill(start_color='FFBDF7BD', end_color='FFBDF7BD', fill_type='solid')
+    # Guinda (bordó / burdeos)
+    guinda_claro_fill = PatternFill(start_color='FFE8A8A6', end_color='FFE8A8A6', fill_type='solid')
+
+        
+    green_font = Font(name='Arial', size=8, color='00FF00')  # Verde
+    red_font = Font(name='Arial', size=8, color='FF0000')    # Rojo
+    
+    border = Border(left=Side(style='thin', color='00B0F0'),
+                    right=Side(style='thin', color='00B0F0'),
+                    top=Side(style='thin', color='00B0F0'),
+                    bottom=Side(style='thin', color='00B0F0'))
+    borde_plomo = Border(left=Side(style='thin', color='A9A9A9'), # Plomo
+                    right=Side(style='thin', color='A9A9A9'), # Plomo
+                    top=Side(style='thin', color='A9A9A9'), # Plomo
+                    bottom=Side(style='thin', color='A9A9A9')) # Plomo
+    
+    borde_plomo = Border(left=Side(style='thin', color='A9A9A9'), # Plomo
+                    right=Side(style='thin', color='A9A9A9'), # Plomo
+                    top=Side(style='thin', color='A9A9A9'), # Plomo
+                    bottom=Side(style='thin', color='A9A9A9')) # Plomo
+    
+    border_negro = Border(left=Side(style='thin', color='000000'), # negro
+            right=Side(style='thin', color='000000'),
+            top=Side(style='thin', color='000000'), 
+            bottom=Side(style='thin', color='000000')) 
+    
+    # Merge cells 
+    # numerador y denominador
+    ws.merge_cells('B5:M5') 
+    ws.merge_cells('N5:AV5')
+    
+    # Cabecera del indicador
+    ws.merge_cells('I6:M6') 
+    ws.merge_cells('N6:X6')
+    ws.merge_cells('Y6:Z6')
+    ws.merge_cells('AA6:AD6')
+    ws.merge_cells('AE6:AK6')
+    ws.merge_cells('AL6:AV6')
+    
+    # Auxiliar HORIZONTAL
+    ws.merge_cells('X7:X8')
+    ws.merge_cells('AK7:AK8')
+    ws.merge_cells('AV7:AV8')
+    
+    # intervalo
+    ws.merge_cells('B7:C7')
+    ws.merge_cells('D7:H7')
+    ws.merge_cells('I7:M7')
+    ws.merge_cells('N7:O7')
+    ws.merge_cells('P7:Q7')
+    ws.merge_cells('R7:S7')
+    ws.merge_cells('T7:U7')
+    ws.merge_cells('V7:W7')
+    ws.merge_cells('Y7:Z7')
+    ws.merge_cells('AA7:AD7')
+    ws.merge_cells('AE7:AJ7')
+    ws.merge_cells('AL7:AU7')
+    # COD HIS
+    ws.merge_cells('B8:C8')
+    ws.merge_cells('D8:H8')
+    ws.merge_cells('I8:M8')
+    ws.merge_cells('N8:O8')
+    ws.merge_cells('P8:Q8')
+    ws.merge_cells('R8:S8')
+    ws.merge_cells('T8:U8')
+    ws.merge_cells('V8:W8')
+    ws.merge_cells('Y8:Z8')
+    ws.merge_cells('AA8:AD8')
+    ws.merge_cells('AE8:AJ8')
+    ws.merge_cells('AL8:AU8')
+    
+    # Combina cela
+    ws['B5'] = 'DENOMINADOR'
+    ws['N5'] = 'NUMERADOR'
+    
+    ws['I6'] = 'CALCULO DE LAS SEMANA DE GESTACION'
+    ws['N6'] = 'EXAMENES AUXILIARES / PERFIL OBSTETRICO'
+    ws['Y6'] = 'APN PRIMER TRIMESTRE'
+    ws['AA6'] = 'APN SEGUNDO TRIMESTRE'
+    ws['AE6'] = 'APN TERCER TRIMESTRE'
+    ws['AL6'] = 'ENTREGAS DE SULFATO FERROSO + ÁCIDO FÓLICO'
+        
+    ws['D7'] = 'Mujeres con edad gestacional mayor o igual a 37 semanas de gestación, cuyo parto ha sido atendido en Establecimientos de Salud del MINSA'
+    ws['I7'] = 'Para evaluar las semanas de gestación, se considera la semana de gestación cumplida + 06 días'
+    ws['N7'] = 'Dosaje de Hemoglobina deben incluir una atencion prenatal y realizarse antes de las 14 SG'
+    ws['P7'] = 'Tamizaje de sífilis deben incluir una atencion prenatal y realizarse antes de las 14 SG'
+    ws['R7'] = 'Tamizaje de VIH con prueba rápida, deben incluir una atencion prenatal y realizarse antes de las 14 SG'
+    ws['T7'] = 'Tamizaje de bacteriuria asintomática, deben incluir un atencion prenatal y realizarse antes de las 14 SG'
+    ws['V7'] = 'Perfil obstétrico, deben incluir una atencion prenatal y realizarse antes de las 14 SG'
+    ws['X7'] = 'NUMERADOR PARCIAL'
+    ws['Y7'] = 'Atencion Prenatal antes de las 14 SG (entre INICIO GEST y 14 SEM)'
+    ws['AA7'] = 'Atencion Prenatal antes de las 14 SG (entre 14 SG y 28 SG), intervalo mínimo entre cada APN es de 28 días'
+    ws['AE7'] = 'Atencion Prenatal antes de las 32 SG (de 28 SG hasta Termino GEST), intervalo mínimo de 28 días. A partir de las 33 SG hasta 36 SG, intervalo de 13 días. A partir de las 37 SG culminar la gestancion, intervalo de 07 dias'
+    ws['AK7'] = 'NUMERADOR PARCIAL'
+    ws['AL7'] = 'Se considera un intervalo mínimo de 28 y 32 días, deben incluir un código de atencion prenatal'
+    ws['AV7'] = 'NUMERADOR PARCIAL'
+    
+    ws['D8'] = ''
+    ws['I8'] = ''
+    ws['N8'] = 'DX = 85018 ó 85018.01 + TD = D'
+    ws['P8'] = 'DX = 86780 ó 86592 ó 86593 ó 86318.01 ó 86780.01'
+    ws['R8'] = 'DX = 86703 ó 86703.02 ó 87389 ó 86318.01 ó 86703.01'
+    ws['T8'] = 'DX = 81007 ó 81002 ó 81000.02'
+    ws['V8'] = 'DX = 80055.01'
+    ws['Y8'] =  'DX = Z3491 ó Z3492 ó Z3493 ó Z3591 ó Z3592 ó Z3593 ó Z349 ó Z359'
+    ws['AA8'] = 'DX = Z3491 ó Z3492 ó Z3493 ó Z3591 ó Z3592 ó Z3593 ó Z349 ó Z359'
+    ws['AE8'] = 'DX = Z3491 ó Z3492 ó Z3493 ó Z3591 ó Z3592 ó Z3593 ó Z349 ó Z359'
+    ws['AL8'] = '(DX = 59401.04 ó 99199.26) ó (DX=59401.04 ó 99199.26 + O990)'
+
+    ### numerador y denominador 
+    
+    ws['B5'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['B5'].font = Font(name = 'Arial', size= 10, bold = True)
+    ws['B5'].fill = gray_fill
+    ws['B5'].border = border_negro
+    
+    ws['N5'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['N5'].font = Font(name = 'Arial', size= 10, bold = True)
+    ws['N5'].fill = naranja_claro_fill
+    ws['N5'].border = border_negro
+    
+    ### intervalo 
+    ws['I6'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['I6'].font = Font(name = 'Arial', size= 7)
+    ws['I6'].fill = guinda_claro_fill
+    ws['I6'].border = border_negro
+    
+    ws['N6'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['N6'].font = Font(name = 'Arial', size= 7)
+    ws['N6'].fill = guinda_claro_fill
+    ws['N6'].border = border_negro
+
+    ws['Y6'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['Y6'].font = Font(name = 'Arial', size= 7)
+    ws['Y6'].fill = guinda_claro_fill
+    ws['Y6'].border = border_negro
+    
+    ws['AA6'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AA6'].font = Font(name = 'Arial', size= 7)
+    ws['AA6'].fill = guinda_claro_fill
+    ws['AA6'].border = border_negro
+    
+    ws['AE6'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AE6'].font = Font(name = 'Arial', size= 7)
+    ws['AE6'].fill = guinda_claro_fill
+    ws['AE6'].border = border_negro
+    
+    ws['AL6'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AL6'].font = Font(name = 'Arial', size= 7)
+    ws['AL6'].fill = guinda_claro_fill
+    ws['AL6'].border = border_negro
+    
+    # INTERVALOS
+    ws['D7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['D7'].font = Font(name = 'Arial', size= 7)
+    ws['D7'].fill = plomo_claro_fill
+    ws['D7'].border = border_negro
+    
+    ws['I7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['I7'].font = Font(name = 'Arial', size= 7)
+    ws['I7'].fill = plomo_claro_fill
+    ws['I7'].border = border_negro
+    
+    ws['N7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['N7'].font = Font(name = 'Arial', size= 7)
+    ws['N7'].fill = plomo_claro_fill
+    ws['N7'].border = border_negro
+    
+    ws['P7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['P7'].font = Font(name = 'Arial', size= 7)
+    ws['P7'].fill = plomo_claro_fill
+    ws['P7'].border = border_negro
+    
+    ws['R7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['R7'].font = Font(name = 'Arial', size= 7)
+    ws['R7'].fill = plomo_claro_fill
+    ws['R7'].border = border_negro
+    
+    ws['T7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['T7'].font = Font(name = 'Arial', size= 7)
+    ws['T7'].fill = plomo_claro_fill
+    ws['T7'].border = border_negro
+    
+    ws['V7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['V7'].font = Font(name = 'Arial', size= 7)
+    ws['V7'].fill = plomo_claro_fill
+    ws['V7'].border = border_negro
+    
+    ws['X7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['X7'].font = Font(name = 'Arial', size= 7)
+    ws['X7'].fill = plomo_claro_fill
+    ws['X7'].border = border_negro
+    
+    ws['Y7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['Y7'].font = Font(name = 'Arial', size= 7)
+    ws['Y7'].fill = plomo_claro_fill
+    ws['Y7'].border = border_negro
+    
+    ws['AA7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AA7'].font = Font(name = 'Arial', size= 7)
+    ws['AA7'].fill = plomo_claro_fill
+    ws['AA7'].border = border_negro
+    
+    ws['AC7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AC7'].font = Font(name = 'Arial', size= 7)
+    ws['AC7'].fill = plomo_claro_fill
+    ws['AC7'].border = border_negro
+    
+    ws['AE7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AE7'].font = Font(name = 'Arial', size= 7)
+    ws['AE7'].fill = plomo_claro_fill
+    ws['AE7'].border = border_negro
+    
+    ws['AG7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AG7'].font = Font(name = 'Arial', size= 7)
+    ws['AG7'].fill = plomo_claro_fill
+    ws['AG7'].border = border_negro
+    
+    ws['AI7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AI7'].font = Font(name = 'Arial', size= 7)
+    ws['AI7'].fill = plomo_claro_fill
+    ws['AI7'].border = border_negro
+    
+    ws['AK7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AK7'].font = Font(name = 'Arial', size= 7)
+    ws['AK7'].fill = plomo_claro_fill
+    ws['AK7'].border = border_negro
+    
+    ws['AL7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AL7'].font = Font(name = 'Arial', size= 7)
+    ws['AL7'].fill = plomo_claro_fill
+    ws['AL7'].border = border_negro
+    
+    ws['AV7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AV7'].font = Font(name = 'Arial', size= 7)
+    ws['AV7'].fill = plomo_claro_fill
+    ws['AV7'].border = border_negro
+    
+    # CODIGO HIS
+    ws['D8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['D8'].font = Font(name = 'Arial', size= 7)
+    ws['D8'].fill = azul_claro_fill
+    ws['D8'].border = border_negro
+    
+    ws['I8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['I8'].font = Font(name = 'Arial', size= 7)
+    ws['I8'].fill = azul_claro_fill
+    ws['I8'].border = border_negro
+    
+    ws['N8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['N8'].font = Font(name = 'Arial', size= 7)
+    ws['N8'].fill = azul_claro_fill
+    ws['N8'].border = border_negro
+    
+    ws['P8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['P8'].font = Font(name = 'Arial', size= 7)
+    ws['P8'].fill = azul_claro_fill
+    ws['P8'].border = border_negro
+    
+    ws['R8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['R8'].font = Font(name = 'Arial', size= 7)
+    ws['R8'].fill = azul_claro_fill
+    ws['R8'].border = border_negro
+    
+    ws['T8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['T8'].font = Font(name = 'Arial', size= 7)
+    ws['T8'].fill = azul_claro_fill
+    ws['T8'].border = border_negro
+    
+    ws['V8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['V8'].font = Font(name = 'Arial', size= 7)
+    ws['V8'].fill = azul_claro_fill
+    ws['V8'].border = border_negro
+    
+    ws['Y8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['Y8'].font = Font(name = 'Arial', size= 7)
+    ws['Y8'].fill = azul_claro_fill
+    ws['Y8'].border = border_negro
+    
+    ws['AA8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AA8'].font = Font(name = 'Arial', size= 7)
+    ws['AA8'].fill = azul_claro_fill
+    ws['AA8'].border = border_negro
+    
+    ws['AE8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AE8'].font = Font(name = 'Arial', size= 7)
+    ws['AE8'].fill = azul_claro_fill
+    ws['AE8'].border = border_negro
+    
+    ws['AL8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AL8'].font = Font(name = 'Arial', size= 7)
+    ws['AL8'].fill = azul_claro_fill
+    ws['AL8'].border = border_negro
+    
+    ws['B7'].alignment = Alignment(horizontal= "center", vertical="center")
+    ws['B7'].font = Font(name = 'Arial', size= 7, bold = True)
+    ws['B7'].fill = plomo_claro_fill
+    ws['B7'].border = border_negro
+    ws['B7'] = 'INTERVALO'
+    
+    ws['B8'].alignment = Alignment(horizontal= "center", vertical="center")
+    ws['B8'].font = Font(name = 'Arial', size= 7, bold = True)
+    ws['B8'].fill = azul_claro_fill
+    ws['B8'].border = border_negro
+    ws['B8'] = 'COD HIS'
+    
+    ### BORDE DE CELDAS CONBINADAS
+    
+    # NUM y DEN
+    inicio_columna = 'B'
+    fin_columna = 'AV'
+    fila = 5
+    from openpyxl.utils import column_index_from_string
+    # Convertir letras de columna a índices numéricos
+    indice_inicio = column_index_from_string(inicio_columna)
+    indice_fin = column_index_from_string(fin_columna)
+    # Iterar sobre las columnas en el rango especificado
+    for col in range(indice_inicio, indice_fin + 1):
+        celda = ws.cell(row=fila, column=col)
+        celda.border = border_negro
+    
+    # NUM y DEN
+    inicio_columna = 'I'
+    fin_columna = 'AV'
+    fila = 6
+    from openpyxl.utils import column_index_from_string
+    # Convertir letras de columna a índices numéricos
+    indice_inicio = column_index_from_string(inicio_columna)
+    indice_fin = column_index_from_string(fin_columna)
+    # Iterar sobre las columnas en el rango especificado
+    for col in range(indice_inicio, indice_fin + 1):
+        celda = ws.cell(row=fila, column=col)
+        celda.border = border_negro
+        
+    # INTERVALO
+    inicio_columna = 'B'
+    fin_columna = 'AU'
+    fila = 7
+    from openpyxl.utils import column_index_from_string
+    # Convertir letras de columna a índices numéricos
+    indice_inicio = column_index_from_string(inicio_columna)
+    indice_fin = column_index_from_string(fin_columna)
+    # Iterar sobre las columnas en el rango especificado
+    for col in range(indice_inicio, indice_fin + 1):
+        celda = ws.cell(row=fila, column=col)
+        celda.border = border_negro
+        
+    # CODIGO HIS 
+    inicio_columna = 'B'
+    fin_columna = 'AU'
+    fila = 8
+    from openpyxl.utils import column_index_from_string
+    # Convertir letras de columna a índices numéricos
+    indice_inicio = column_index_from_string(inicio_columna)
+    indice_fin = column_index_from_string(fin_columna)
+    # Iterar sobre las columnas en el rango especificado
+    for col in range(indice_inicio, indice_fin + 1):
+        celda = ws.cell(row=fila, column=col)
+        celda.border = border_negro
+    
+    
+    
+    ##### imprimer fecha y hora del reporte
+    fecha_hora_actual = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+    nombre_usuario = getpass.getuser()
+
+    # Obtener el usuario actualmente autenticado
+    try:
+        user = User.objects.get(is_active=True)
+    except User.DoesNotExist:
+        user = None
+    except User.MultipleObjectsReturned:
+        # Manejar el caso donde hay múltiples usuarios activos
+        user = User.objects.filter(is_active=True).first()  # Por ejemplo, obtener el primero
+    # Asignar fecha y hora a la celda A1
+    ws['V1'].value = 'Fecha y Hora:'
+    ws['W1'].value = fecha_hora_actual
+
+    # Asignar nombre de usuario a la celda A2
+    ws['V2'].value = 'Usuario:'
+    ws['W2'].value = nombre_usuario
+    
+    # Formatear las etiquetas en negrita
+    etiqueta_font = Font(name='Arial', size=8)
+    ws['V1'].font = etiqueta_font
+    ws['W1'].font = etiqueta_font
+    ws['V2'].font = etiqueta_font
+    ws['W2'].font = etiqueta_font
+
+    # Alinear el texto
+    ws['V1'].alignment = Alignment(horizontal="right", vertical="center")
+    ws['W1'].alignment = Alignment(horizontal="left", vertical="center")
+    ws['V2'].alignment = Alignment(horizontal="right", vertical="center")
+    ws['W2'].alignment = Alignment(horizontal="left", vertical="center")
+    
     ## crea titulo del reporte
     ws['B1'].alignment = Alignment(horizontal= "left", vertical="center")
     ws['B1'].font = Font(name = 'Arial', size= 7, bold = True)
@@ -324,345 +761,357 @@ def fill_worksheet_paquete_gestante(ws, results):
     ws['B4'].font = Font(name = 'Arial', size= 12, bold = True)
     ws['B4'] = 'SEGUIMIENTO NOMINAL DEL INDICADOR MC-01. MUJERES CON PARTO INSTITUCIONAL, PROCEDENTES DE LOS DISTRITOS DE QUINTILES 1 Y 2 DE POBREZA DEPARTAMENTAL, QUE DURANTE SU GESTACIÓN RECIBIERON EL PAQUETE INTEGRADO DE SERVICIOS'
     
-    ws['B6'].alignment = Alignment(horizontal= "left", vertical="center")
-    ws['B6'].font = Font(name = 'Arial', size= 7, bold = True, color='0000CC')
-    ws['B6'] ='El usuario se compromete a mantener la confidencialidad de los datos personales que conozca como resultado del reporte realizado, cumpliendo con lo establecido en la Ley N° 29733 - Ley de Protección de Datos Personales y sus normas complementarias.'
+    ws['B3'].alignment = Alignment(horizontal= "left", vertical="center")
+    ws['B3'].font = Font(name = 'Arial', size= 7, color='0000CC')
+    ws['B3'] ='El usuario se compromete a mantener la confidencialidad de los datos personales que conozca como resultado del reporte realizado, cumpliendo con lo establecido en la Ley N° 29733 - Ley de Protección de Datos Personales y sus normas complementarias.'
         
-    ws['B8'].alignment = Alignment(horizontal= "center", vertical="center")
-    ws['B8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['B8'].fill = fill
-    ws['B8'].border = border
-    ws['B8'] = 'NUM DOC'
+    ws['B9'].alignment = Alignment(horizontal= "center", vertical="center")
+    ws['B9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['B9'].fill = fill
+    ws['B9'].border = border
+    ws['B9'] = 'NUM DOC'
     
-    ws['C8'].alignment = Alignment(horizontal= "center", vertical="center")
-    ws['C8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['C8'].fill = fill
-    ws['C8'].border = border
-    ws['C8'] = 'PARTO'
+    ws['C9'].alignment = Alignment(horizontal= "center", vertical="center")
+    ws['C9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['C9'].fill = fill
+    ws['C9'].border = border
+    ws['C9'] = 'PARTO'
     
-    ws['D8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['D8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['D8'].fill = fill
-    ws['D8'].border = border
-    ws['D8'] = 'SEM GEST'      
+    ws['D9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['D9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['D9'].fill = fill
+    ws['D9'].border = border
+    ws['D9'] = 'SEM GEST'      
     
-    ws['E8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['E8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['E8'].fill = fill
-    ws['E8'].border = border
-    ws['E8'] = '37 SEM' 
+    ws['E9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['E9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['E9'].fill = fill
+    ws['E9'].border = border
+    ws['E9'] = '37 SG' 
     
-    ws['F8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['F8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['F8'].fill = fill
-    ws['F8'].border = border
-    ws['F8'] = 'UBIGUEO'     
+    ws['F9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['F9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['F9'].fill = fill
+    ws['F9'].border = border
+    ws['F9'] = 'UBIGUEO'     
     
-    ws['G8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['G8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['G8'].fill = fill
-    ws['G8'].border = border
-    ws['G8'] = 'IPRESS PARTO'    
+    ws['G9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['G9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['G9'].fill = fill
+    ws['G9'].border = border
+    ws['G9'] = 'IPRESS PARTO'    
     
-    ws['H8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['H8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['H8'].fill = fill
-    ws['H8'].border = border
-    ws['H8'] = 'DEN GEST'    
+    ws['H9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['H9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['H9'].fill = fill
+    ws['H9'].border = border
+    ws['H9'] = 'DEN GEST'    
     
-    ws['I8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['I8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['I8'].fill = green_fill
-    ws['I8'].border = border
-    ws['I8'] = 'INICIO GEST'    
+    ws['I9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['I9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['I9'].fill = fill
+    ws['I9'].border = border
+    ws['I9'] = 'INICIO GEST'    
     
-    ws['J8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['J8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['J8'].fill = green_fill
-    ws['J8'].border = border
-    ws['J8'] = 'SEM 14'  
+    ws['J9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['J9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['J9'].fill = fill
+    ws['J9'].border = border
+    ws['J9'] = '14 SG'  
     
-    ws['K8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['K8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['K8'].fill = green_fill
-    ws['K8'].border = border
-    ws['K8'] = 'SEM 28'  
+    ws['K9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['K9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['K9'].fill = fill
+    ws['K9'].border = border
+    ws['K9'] = '28 SG'  
     
-    ws['L8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['L8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['L8'].fill = green_fill
-    ws['L8'].border = border
-    ws['L8'] = 'SEM 33'  
+    ws['L9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['L9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['L9'].fill = fill
+    ws['L9'].border = border
+    ws['L9'] = '33 SG'  
     
-    ws['M8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['M8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['M8'].fill = green_fill
-    ws['M8'].border = border
-    ws['M8'] = 'SEM 37'  
+    ws['M9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['M9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['M9'].fill = fill
+    ws['M9'].border = border
+    ws['M9'] = '37 SG'  
     
-    ws['N8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['N8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['N8'].fill = gray_fill
-    ws['N8'].border = border
-    ws['N8'] = 'EXAM HB'  
+    ws['N9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['N9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['N9'].fill = gray_fill
+    ws['N9'].border = border
+    ws['N9'] = 'DOSAJE HB'  
     
-    ws['O8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['O8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['O8'].fill = gray_fill
-    ws['O8'].border = border
-    ws['O8'] = 'VAL' 
+    ws['O9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['O9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['O9'].fill = gray_fill
+    ws['O9'].border = border
+    ws['O9'] = 'V' 
     
-    ws['P8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['P8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['P8'].fill = gray_fill
-    ws['P8'].border = border
-    ws['P8'] = 'EXAM SIFILIS'  
+    ws['P9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['P9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['P9'].fill = gray_fill
+    ws['P9'].border = border
+    ws['P9'] = 'SIFILIS'  
     
-    ws['Q8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['Q8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['Q8'].fill = gray_fill
-    ws['Q8'].border = border
-    ws['Q8'] = 'VAL' 
+    ws['Q9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['Q9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['Q9'].fill = gray_fill
+    ws['Q9'].border = border
+    ws['Q9'] = 'V' 
     
-    ws['R8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['R8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['R8'].fill = gray_fill
-    ws['R8'].border = border
-    ws['R8'] = 'EXAM VIH'  
+    ws['R9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['R9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['R9'].fill = gray_fill
+    ws['R9'].border = border
+    ws['R9'] = 'VIH'  
     
-    ws['S8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['S8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['S8'].fill = gray_fill
-    ws['S8'].border = border
-    ws['S8'] = 'VAL' 
+    ws['S9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['S9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['S9'].fill = gray_fill
+    ws['S9'].border = border
+    ws['S9'] = 'V' 
     
-    ws['T8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['T8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['T8'].fill = gray_fill
-    ws['T8'].border = border
-    ws['T8'] = 'EXAM BACTERI'  
+    ws['T9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['T9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['T9'].fill = gray_fill
+    ws['T9'].border = border
+    ws['T9'] = 'BACTERIURIA'  
     
-    ws['U8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['U8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['U8'].fill = gray_fill
-    ws['U8'].border = border
-    ws['U8'] = 'VAL' 
+    ws['U9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['U9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['U9'].fill = gray_fill
+    ws['U9'].border = border
+    ws['U9'] = 'V' 
     
-    ws['V8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['V8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['V8'].fill = gray_fill
-    ws['V8'].border = border
-    ws['V8'] = 'EXAM PERFIL OBS.'  
+    ws['V9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['V9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['V9'].fill = gray_fill
+    ws['V9'].border = border
+    ws['V9'] = 'PERFIL OBS.'  
     
-    ws['W8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['W8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['W8'].fill = gray_fill
-    ws['W8'].border = border
-    ws['W8'] = 'IND EXAM' 
+    ws['W9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['W9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['W9'].fill = gray_fill
+    ws['W9'].border = border
+    ws['W9'] = 'V' 
         
-    ws['X8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['X8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['X8'].fill = blue_fill
-    ws['X8'].border = border
-    ws['X8'] = 'NUM EXAM' 
+    ws['X9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['X9'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['X9'].fill = blue_fill
+    ws['X9'].border = border
+    ws['X9'] = 'NUM EXAM' 
 
-    ws['Y8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['Y8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['Y8'].fill = green_fill_2
-    ws['Y8'].border = border
-    ws['Y8'] = '1° APN 1 TRIM'  
+    ws['Y9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['Y9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['Y9'].fill = green_fill_2
+    ws['Y9'].border = border
+    ws['Y9'] = '1° APN '  
     
-    ws['Z8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['Z8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['Z8'].fill = green_fill_2
-    ws['Z8'].border = border
-    ws['Z8'] = 'VAL' 
+    ws['Z9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['Z9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['Z9'].fill = green_fill_2
+    ws['Z9'].border = border
+    ws['Z9'] = 'V' 
 
-    ws['AA8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AA8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AA8'].fill = green_fill_2
-    ws['AA8'].border = border
-    ws['AA8'] = '1° APN 2 TRIM'  
+    ws['AA9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AA9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AA9'].fill = green_fill
+    ws['AA9'].border = border
+    ws['AA9'] = '1° APN'  
     
-    ws['AB8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AB8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AB8'].fill = green_fill_2
-    ws['AB8'].border = border
-    ws['AB8'] = 'VAL' 
+    ws['AB9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AB9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AB9'].fill = green_fill
+    ws['AB9'].border = border
+    ws['AB9'] = 'V' 
     
-    ws['AC8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AC8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AC8'].fill = green_fill_2
-    ws['AC8'].border = border
-    ws['AC8'] = '2° APN 2 TRIM'  
+    ws['AC9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AC9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AC9'].fill = green_fill
+    ws['AC9'].border = border
+    ws['AC9'] = '2° APN'  
     
-    ws['AD8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AD8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AD8'].fill = green_fill_2
-    ws['AD8'].border = border
-    ws['AD8'] = 'VAL' 
+    ws['AD9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AD9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AD9'].fill = green_fill
+    ws['AD9'].border = border
+    ws['AD9'] = 'V' 
     
-    ws['AE8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AE8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AE8'].fill = green_fill_2
-    ws['AE8'].border = border
-    ws['AE8'] = '1° APN 3 TRIM'  
+    ws['AE9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AE9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AE9'].fill = green_fill_2
+    ws['AE9'].border = border
+    ws['AE9'] = '1° APN'  
     
-    ws['AF8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AF8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AF8'].fill = green_fill_2
-    ws['AF8'].border = border
-    ws['AF8'] = 'VAL' 
+    ws['AF9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AF9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AF9'].fill = green_fill_2
+    ws['AF9'].border = border
+    ws['AF9'] = 'V' 
     
-    ws['AG8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AG8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AG8'].fill = green_fill_2
-    ws['AG8'].border = border
-    ws['AG8'] = '2° APN 3 TRIM'  
+    ws['AG9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AG9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AG9'].fill = green_fill_2
+    ws['AG9'].border = border
+    ws['AG9'] = '2° APN'  
     
-    ws['AH8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AH8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AH8'].fill = green_fill_2
-    ws['AH8'].border = border
-    ws['AH8'] = 'VAL' 
+    ws['AH9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AH9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AH9'].fill = green_fill_2
+    ws['AH9'].border = border
+    ws['AH9'] = 'V' 
     
-    ws['AI8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AI8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AI8'].fill = green_fill_2
-    ws['AI8'].border = border
-    ws['AI8'] = '3° APN 3 TRIM'  
+    ws['AI9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AI9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AI9'].fill = green_fill_2
+    ws['AI9'].border = border
+    ws['AI9'] = '3° APN'  
     
-    ws['AJ8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AJ8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AJ8'].fill = green_fill_2
-    ws['AJ8'].border = border
-    ws['AJ8'] = 'VAL' 
+    ws['AJ9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AJ9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AJ9'].fill = green_fill_2
+    ws['AJ9'].border = border
+    ws['AJ9'] = 'V' 
     
-    ws['AK8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AK8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['AK8'].fill = blue_fill
-    ws['AK8'].border = border
-    ws['AK8'] = 'NUM APN' 
+    ws['AK9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AK9'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['AK9'].fill = blue_fill
+    ws['AK9'].border = border
+    ws['AK9'] = 'NUM APN' 
     
-    ws['AL8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AL8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AL8'].fill = yellow_fill
-    ws['AL8'].border = border
-    ws['AL8'] = '1° ENT SfAf'  
+    ws['AL9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AL9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AL9'].fill = yellow_fill
+    ws['AL9'].border = border
+    ws['AL9'] = '1° ENT'  
     
-    ws['AM8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AM8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AM8'].fill = yellow_fill
-    ws['AM8'].border = border
-    ws['AM8'] = 'VAL' 
+    ws['AM9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AM9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AM9'].fill = yellow_fill
+    ws['AM9'].border = border
+    ws['AM9'] = 'V' 
     
-    ws['AN8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AN8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AN8'].fill = yellow_fill
-    ws['AN8'].border = border
-    ws['AN8'] = '2° ENT SfAf'  
+    ws['AN9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AN9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AN9'].fill = yellow_fill
+    ws['AN9'].border = border
+    ws['AN9'] = '2° ENT'  
     
-    ws['AO8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AO8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AO8'].fill = yellow_fill
-    ws['AO8'].border = border
-    ws['AO8'] = 'VAL' 
+    ws['AO9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AO9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AO9'].fill = yellow_fill
+    ws['AO9'].border = border
+    ws['AO9'] = 'V' 
     
-    ws['AP8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AP8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AP8'].fill = yellow_fill
-    ws['AP8'].border = border
-    ws['AP8'] = '3° ENT SfAf'  
+    ws['AP9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AP9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AP9'].fill = yellow_fill
+    ws['AP9'].border = border
+    ws['AP9'] = '3° ENT'  
     
-    ws['AQ8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AQ8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AQ8'].fill = yellow_fill
-    ws['AQ8'].border = border
-    ws['AQ8'] = 'VAL' 
+    ws['AQ9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AQ9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AQ9'].fill = yellow_fill
+    ws['AQ9'].border = border
+    ws['AQ9'] = 'V' 
     
-    ws['AR8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AR8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AR8'].fill = yellow_fill
-    ws['AR8'].border = border
-    ws['AR8'] = '4° ENT SfAf'  
+    ws['AR9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AR9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AR9'].fill = yellow_fill
+    ws['AR9'].border = border
+    ws['AR9'] = '4° ENT'  
     
-    ws['AS8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AS8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AS8'].fill = yellow_fill
-    ws['AS8'].border = border
-    ws['AS8'] = 'VAL' 
+    ws['AS9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AS9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AS9'].fill = yellow_fill
+    ws['AS9'].border = border
+    ws['AS9'] = 'V' 
     
-    ws['AT8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AT8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AT8'].fill = yellow_fill
-    ws['AT8'].border = border
-    ws['AT8'] = '5° ENT SfAf'  
+    ws['AT9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AT9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AT9'].fill = yellow_fill
+    ws['AT9'].border = border
+    ws['AT9'] = '5° ENT'  
     
-    ws['AU8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AU8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AU8'].fill = yellow_fill
-    ws['AU8'].border = border
-    ws['AU8'] = 'VAL' 
+    ws['AU9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AU9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AU9'].fill = yellow_fill
+    ws['AU9'].border = border
+    ws['AU9'] = 'V' 
     
-    ws['AV8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AV8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['AV8'].fill = blue_fill
-    ws['AV8'].border = border
-    ws['AV8'] = 'IND ENTREGA' 
+    ws['AV9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AV9'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['AV9'].fill = blue_fill
+    ws['AV9'].border = border
+    ws['AV9'] = 'IND ENTREGA' 
     
-    ws['AW8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AW8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AW8'].fill = fill
-    ws['AW8'].border = border
-    ws['AW8'] = 'MES' 
+    ws['AW9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AW9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AW9'].fill = fill
+    ws['AW9'].border = border
+    ws['AW9'] = 'MES' 
     
-    ws['AX8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AX8'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
-    ws['AX8'].fill = gray_fill
-    ws['AX8'].border = border
-    ws['AX8'] = 'IND' 
+    ws['AX9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AX9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['AX9'].fill = gray_fill
+    ws['AX9'].border = border
+    ws['AX9'] = 'IND' 
     
-    ws['AY8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AY8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['AY8'].fill = orange_fill
-    ws['AY8'].border = border
-    ws['AY8'] = 'UBIGEO'  
+    ws['AY9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AY9'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['AY9'].fill = orange_fill
+    ws['AY9'].border = border
+    ws['AY9'] = 'UBIGEO'  
     
-    ws['AZ8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['AZ8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['AZ8'].fill = orange_fill
-    ws['AZ8'].border = border
-    ws['AZ8'] = 'PROVINCIA'       
+    ws['AZ9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['AZ9'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['AZ9'].fill = orange_fill
+    ws['AZ9'].border = border
+    ws['AZ9'] = 'PROVINCIA'       
     
-    ws['BA8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['BA8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['BA8'].fill = orange_fill
-    ws['BA8'].border = border
-    ws['BA8'] = 'DISTRITO' 
+    ws['BA9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['BA9'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['BA9'].fill = orange_fill
+    ws['BA9'].border = border
+    ws['BA9'] = 'DISTRITO' 
     
-    ws['BB8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['BB8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['BB8'].fill = orange_fill
-    ws['BB8'].border = border
-    ws['BB8'] = 'RED'  
+    ws['BB9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['BB9'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['BB9'].fill = orange_fill
+    ws['BB9'].border = border
+    ws['BB9'] = 'RED'  
     
-    ws['BC8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['BC8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['BC8'].fill = orange_fill
-    ws['BC8'].border = border
-    ws['BC8'] = 'MICRORED'  
+    ws['BC9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['BC9'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['BC9'].fill = orange_fill
+    ws['BC9'].border = border
+    ws['BC9'] = 'MICRORED'  
     
-    ws['BD8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['BD8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['BD8'].fill = orange_fill
-    ws['BD8'].border = border
-    ws['BD8'] = 'COD EST'  
+    ws['BD9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['BD9'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['BD9'].fill = orange_fill
+    ws['BD9'].border = border
+    ws['BD9'] = 'COD EST'  
     
-    ws['BE8'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['BE8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
-    ws['BE8'].fill = orange_fill
-    ws['BE8'].border = border
-    ws['BE8'] = 'NOMBRE ESTABLECIMIENTO'  
+    ws['BE9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['BE9'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
+    ws['BE9'].fill = orange_fill
+    ws['BE9'].border = border
+    ws['BE9'] = 'NOMBRE ESTABLECIMIENTO'  
+        
+        # Define styles
+    promo_fill = PatternFill(patternType='solid', fgColor='FFD966')  # Yellow fill for promo
+    font_normal = Font(name='Arial', size=8)
+    font_bold_white = Font(name='Arial', size=7, bold=True, color='FFFFFF')
+    font_red_bold = Font(name='Arial', size=7, bold=True, color='FF0000')
+    font_green_bold = Font(name='Arial', size=7, bold=True, color='00FF00')
+    font_red = Font(name='Arial', size=7, color='FF0000')
+    font_green = Font(name='Arial', size=7, color='00B050')
+    font_check = Font(name='Arial', size=10, color='00B050')
+    font_x = Font(name='Arial', size=10, color='FF0000')
+    plomo_claro_font = Font(name='Arial', size=7, color='FFEDEDED', bold=False)
     
     # Definir estilos
     header_font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
@@ -679,10 +1128,9 @@ def fill_worksheet_paquete_gestante(ws, results):
     sub_cumple = 'CUMPLE'
     sub_no_cumple = 'NO CUMPLE'
     
-    results.sort(key=lambda x: x[3])
     
     # Escribir datos
-    for row, record in enumerate(results, start=9):
+    for row, record in enumerate(results, start=10):
         for col, value in enumerate(record, start=2):
             cell = ws.cell(row=row, column=col, value=value)
 
@@ -708,7 +1156,7 @@ def fill_worksheet_paquete_gestante(ws, results):
                     cell.font = Font(name='Arial', size=8)
             
             # Aplicar color de letra SUB INDICADORES
-            elif col in [8, 24, 37, 48]:
+            elif col in [24, 37, 48]:
                 if value == 0:
                     cell.value = sub_no_cumple  # Insertar check
                     cell.font = Font(name='Arial', size=7, color="FF0000")  # Letra roja
@@ -717,13 +1165,29 @@ def fill_worksheet_paquete_gestante(ws, results):
                     cell.font = Font(name='Arial', size=7, color="00B050")  # Letra verde
                 else:
                         cell.font = Font(name='Arial', size=7)
+                        
+            # Aplicar color de letra SUB INDICADORES
+            elif col in [9, 10, 11, 12, 13]:
+                cell.font = Font(name='Arial', size=8, color="FF000033")
+
+            
+            elif col in [8]:
+                if value == '0':
+                    cell.value = sub_no_cumple  # Insertar check
+                    cell.font = Font(name='Arial', size=7, color="FF0000")  # Letra roja
+                elif value == '1':
+                    cell.value = sub_cumple # Insertar check
+                    cell.font = Font(name='Arial', size=7, color="00B050")  # Letra verde
+                else:
+                        cell.font = Font(name='Arial', size=7)
+                        
 
             # Fuente normal para otras columnas
             else:
                 cell.font = Font(name='Arial', size=8)  # Fuente normal para otras columnas
 
             # Aplicar caracteres especiales check y X
-            if col in [5, 15, 17, 19, 21, 23, 26, 28, 30, 32, 34, 36, 39, 41, 43, 45, 47]:
+            if col in [15, 17, 19, 21, 23, 26, 28, 30, 32, 34, 36, 39, 41, 43, 45, 47]:
                 if value == 1:
                     cell.value = check_mark  # Insertar check
                     cell.font = Font(name='Arial', size=10, color='00B050')  # Letra verde
@@ -732,6 +1196,16 @@ def fill_worksheet_paquete_gestante(ws, results):
                     cell.font = Font(name='Arial', size=10, color='FF0000')  # Letra roja
                 else:
                     cell.font = Font(name='Arial', size=8)  # Fuente normal si no es 1 o 0
+            
+            if col in [5]:
+                if value == '1':
+                    cell.value = check_mark  # Insertar check
+                    cell.font = Font(name='Arial', size=10, color='00B050')  # Letra verde
+                elif value == '0':
+                    cell.value = x_mark  # Insertar X
+                    cell.font = Font(name='Arial', size=10, color='FF0000')  # Letra roja
+                else:
+                    cell.font = Font(name='Arial', size=8) 
             
                         
             cell.border = border
