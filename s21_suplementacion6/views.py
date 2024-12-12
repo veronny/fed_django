@@ -41,7 +41,7 @@ def obtener_distritos(provincia):
 def obtener_avance_s21_suplementacion6(red):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_avance_s21_suplementacion6(%s)",
+            "SELECT * FROM public.obtener_avance_s21_suplementacion6(%s)",
             [red]
         )
         return cursor.fetchall()
@@ -49,12 +49,12 @@ def obtener_avance_s21_suplementacion6(red):
 def obtener_ranking_s21_suplementacion6(anio, mes):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_ranking_s21_suplementacion6(%s, %s)",
+            "SELECT * FROM public.obtener_ranking_s21_suplementacion6(%s, %s)",
             [anio, mes]
         )
         result = cursor.fetchall()
         return result
-    
+
 def index_s21_suplementacion6(request):
     # RANKING 
     anio = request.GET.get('anio')  # Valor predeterminado# Valor predeterminado
@@ -175,7 +175,7 @@ def get_redes_s21_suplementacion6(request,redes_id):
 def obtener_seguimiento_redes_s21_suplementacion6(p_red,p_inicio,p_fin):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.fn_seguimiento_s21_suplementacion6(%s, %s, %s)",
+            "SELECT * FROM public.fn_seguimiento_s21_suplementacion6(%s, %s, %s)",
             [p_red, p_inicio, p_fin]
         )
         return cursor.fetchall()
@@ -886,7 +886,6 @@ def fill_worksheet_s21_suplementacion6(ws, results):
             # Apply borders
             cell.border = border
 
-    
 ###########################################################################################
 # -- COBERTURA PAQUETE NEONATAL
 def obtener_cobertura_s21_suplementacion6():

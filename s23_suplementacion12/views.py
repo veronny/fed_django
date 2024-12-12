@@ -41,8 +41,6 @@ User = get_user_model()
 from django.db.models import IntegerField               # Importar IntegerField
 from django.db.models.functions import Cast, Substr     # Importar Cast y Substr
 
-
-
 # Create your views here.
 def obtener_distritos(provincia):
     distritos = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Provincia=provincia).values('Distrito').distinct().order_by('Distrito')
@@ -51,7 +49,7 @@ def obtener_distritos(provincia):
 def obtener_avance_s23_suplementacion12(red):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_avance_s23_suplementacion12(%s)",
+            "SELECT * FROM public.obtener_avance_s23_suplementacion12(%s)",
             [red]
         )
         return cursor.fetchall()
@@ -59,12 +57,12 @@ def obtener_avance_s23_suplementacion12(red):
 def obtener_ranking_s23_suplementacion12(anio, mes):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_ranking_s23_suplementacion12(%s, %s)",
+            "SELECT * FROM public.obtener_ranking_s23_suplementacion12(%s, %s)",
             [anio, mes]
         )
         result = cursor.fetchall()
         return result
-    
+
 def index_s23_suplementacion12(request):
     # RANKING 
     anio = request.GET.get('anio')  # Valor predeterminado# Valor predeterminado
@@ -185,7 +183,7 @@ def get_redes_s23_suplementacion12(request,redes_id):
 def obtener_seguimiento_redes_s23_suplementacion12(p_red,p_inicio,p_fin):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.fn_seguimiento_s23_suplementacion12(%s, %s, %s)",
+            "SELECT * FROM public.fn_seguimiento_s23_suplementacion12(%s, %s, %s)",
             [p_red, p_inicio, p_fin]
         )
         return cursor.fetchall()
@@ -1135,7 +1133,7 @@ def fill_worksheet_s23_suplementacion12(ws, results):
 
             # Apply borders
             cell.border = border
-            
+
 
 ###########################################################################################
 # -- COBERTURA PAQUETE NEONATAL
@@ -1253,7 +1251,6 @@ def fill_worksheet_cobertura_s23_suplementacion12(ws, results):
     
     green_font = Font(name='Arial', size=8, color='00FF00')  # Verde
     red_font = Font(name='Arial', size=8, color='FF0000')    # Rojo
-    
     
     border = Border(left=Side(style='thin', color='00B0F0'),
                     right=Side(style='thin', color='00B0F0'),

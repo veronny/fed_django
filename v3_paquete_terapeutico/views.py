@@ -41,7 +41,7 @@ def obtener_distritos(provincia):
 def obtener_avance_v3_paquete_terapeutico(red):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_avance_v3_paquete_terapeutico(%s)",
+            "SELECT * FROM public.obtener_avance_v3_paquete_terapeutico(%s)",
             [red]
         )
         return cursor.fetchall()
@@ -49,12 +49,12 @@ def obtener_avance_v3_paquete_terapeutico(red):
 def obtener_ranking_v3_paquete_terapeutico(anio, mes):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_ranking_v3_paquete_terapeutico(%s, %s)",
+            "SELECT  * FROM public.obtener_ranking_v3_paquete_terapeutico(%s, %s)",
             [anio, mes]
         )
         result = cursor.fetchall()
         return result
-    
+
 def index_v3_paquete_terapeutico(request):
     # RANKING 
     anio = request.GET.get('anio')  # Valor predeterminado# Valor predeterminado
@@ -175,7 +175,7 @@ def get_redes_v3_paquete_terapeutico(request,redes_id):
 def obtener_seguimiento_redes_v3_paquete_terapeutico(p_red,p_inicio,p_fin):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.fn_seguimiento_v3_paquete_terapeutico(%s, %s, %s)",
+            "SELECT  * FROM public.fn_seguimiento_v3_paquete_terapeutico(%s, %s, %s)",
             [p_red, p_inicio, p_fin]
         )
         return cursor.fetchall()
@@ -821,7 +821,7 @@ def fill_worksheet_v3_paquete_terapeutico(ws, results):
             
                         
             cell.border = border
-            
+
 
 ###########################################################################################
 # -- COBERTURA PAQUETE NEONATAL

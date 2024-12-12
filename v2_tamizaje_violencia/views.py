@@ -589,7 +589,7 @@ def fill_worksheet_v2_tamizaje_violencia(ws, results):
     # Definir los caracteres especiales de check y X
     check_mark = '✓'  # Unicode para check
     x_mark = '✗'  # Unicode para X
-    
+    plomo_claro_font = Font(name='Arial', size=7, color='FFEDEDED', bold=False)
     # Escribir datos
     for row, record in enumerate(results, start=9):
         for col, value in enumerate(record, start=2):
@@ -648,14 +648,14 @@ def fill_worksheet_v2_tamizaje_violencia(ws, results):
                     cell.value = check_mark  # Insertar check
                     cell.font = Font(name='Arial', size=10, color='FFEDEDED')  # Letra verde
                 elif value == 0:
-                    cell.value = x_mark  # Insertar X
-                    cell.font = Font(name='Arial', size=10, color='FFEDEDED')  # Letra roja
+                    cell.fill = plomo_claro_fill
+                    cell.font = plomo_claro_font
                 else:
                     cell.font = Font(name='Arial', size=8)  # Fuente normal si no es 1 o 0
                         
             cell.border = border
 
-            
+
 ###########################################################################################
 # -- COBERTURA PAQUETE NEONATAL
 def obtener_cobertura_v2_tamizaje_violencia():
@@ -668,7 +668,7 @@ def obtener_cobertura_v2_tamizaje_violencia():
 class RptCoberturaV2TamizajeViolencia(TemplateView):
     def get(self, request, *args, **kwargs):
         # Variables ingresadas
-                
+        
         # Creación de la consulta
         resultado_cobertura = obtener_cobertura_v2_tamizaje_violencia()
         

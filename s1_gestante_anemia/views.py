@@ -49,7 +49,7 @@ def obtener_distritos(provincia):
 def obtener_avance_s1_gestante_anemia(red):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_avance_s1_gestante_anemia(%s)",
+            "SELECT * FROM public.obtener_avance_s1_gestante_anemia(%s)",
             [red]
         )
         return cursor.fetchall()
@@ -57,7 +57,7 @@ def obtener_avance_s1_gestante_anemia(red):
 def obtener_ranking_s1_gestante_anemia(anio, mes):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_ranking_s1_gestante_anemia(%s, %s)",
+            "SELECT * FROM public.obtener_ranking_s1_gestante_anemia(%s, %s)",
             [anio, mes]
         )
         result = cursor.fetchall()

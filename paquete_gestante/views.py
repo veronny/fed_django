@@ -1210,7 +1210,6 @@ def fill_worksheet_paquete_gestante(ws, results):
                         
             cell.border = border
 
-
 # -- COBERTURA PAQUETE GESTANTE
 def obtener_cobertura_paquete_gestante():
     with connection.cursor() as cursor:

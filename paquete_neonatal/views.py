@@ -46,6 +46,7 @@ def obtener_ranking_paquete_neonatal(anio, mes):
         )
         result = cursor.fetchall() # Agrega esta línea
         return result
+
     
 def index_paquete_neonatal(request):
     # RANKING 

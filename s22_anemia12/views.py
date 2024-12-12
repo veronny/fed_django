@@ -50,7 +50,7 @@ def obtener_distritos(provincia):
 def obtener_avance_s22_anemia12(red):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_avance_s22_anemia12(%s)",
+            "SELECT * FROM public.obtener_avance_s22_anemia12(%s)",
             [red]
         )
         return cursor.fetchall()
@@ -58,12 +58,12 @@ def obtener_avance_s22_anemia12(red):
 def obtener_ranking_s22_anemia12(anio, mes):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_ranking_s22_anemia12(%s, %s)",
+            "SELECT * FROM public.obtener_ranking_s22_anemia12(%s, %s)",
             [anio, mes]
         )
         result = cursor.fetchall()
         return result
-    
+
 def index_s22_anemia12(request):
     # RANKING 
     anio = request.GET.get('anio')  # Valor predeterminado# Valor predeterminado
@@ -184,7 +184,7 @@ def get_redes_s22_anemia12(request,redes_id):
 def obtener_seguimiento_redes_s22_anemia12(p_red,p_inicio,p_fin):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.fn_seguimiento_s22_anemia12(%s, %s, %s)",
+            "SELECT * FROM public.fn_seguimiento_s22_anemia12(%s, %s, %s)",
             [p_red, p_inicio, p_fin]
         )
         return cursor.fetchall()
@@ -829,7 +829,7 @@ def fill_worksheet_s22_anemia12(ws, results):
             
                         
             cell.border = border
-            
+
 ###########################################################################################
 # -- COBERTURA PAQUETE NEONATAL
 def obtener_cobertura_s22_anemia12():
@@ -842,7 +842,7 @@ def obtener_cobertura_s22_anemia12():
 class RptCoberturaS22Anemia12(TemplateView):
     def get(self, request, *args, **kwargs):
         # Variables ingresadas
-                
+
         # Creación de la consulta
         resultado_cobertura = obtener_cobertura_s22_anemia12()
         

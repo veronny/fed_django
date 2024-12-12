@@ -41,7 +41,7 @@ def obtener_distritos(provincia):
 def obtener_avance_s4_adolescente_dosaje(red):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_avance_s4_adolescente_dosaje(%s)",
+            "SELECT * FROM public.obtener_avance_s4_adolescente_dosaje(%s)",
             [red]
         )
         return cursor.fetchall()
@@ -49,7 +49,7 @@ def obtener_avance_s4_adolescente_dosaje(red):
 def obtener_ranking_s4_adolescente_dosaje(anio, mes):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT DISTINCT * FROM public.obtener_ranking_s4_adolescente_dosaje(%s, %s)",
+            "SELECT * FROM public.obtener_ranking_s4_adolescente_dosaje(%s, %s)",
             [anio, mes]
         )
         result = cursor.fetchall()
