@@ -23,6 +23,19 @@ import locale
 from django.db.models import IntegerField  # Importar IntegerField
 from django.db.models.functions import Cast, Substr  # Importar Cast y Substr
 
+# Reporte excel
+from datetime import datetime
+import getpass  # Para obtener el nombre del usuario
+from django.contrib.auth.models import User  # O tu modelo de usuario personalizado
+from django.http import HttpResponse
+from io import BytesIO
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+
+User = get_user_model()
+
+from django.db.models import IntegerField               # Importar IntegerField
+from django.db.models.functions import Cast, Substr     # Importar Cast y Substr
 
 logger = logging.getLogger(__name__)
 # Create your views here.
@@ -47,7 +60,7 @@ def obtener_ranking_paquete_neonatal(anio, mes):
         result = cursor.fetchall() # Agrega esta línea
         return result
 
-    
+
 def index_paquete_neonatal(request):
     # RANKING 
     anio = request.GET.get('anio')  # Valor predeterminado# Valor predeterminado
@@ -212,11 +225,11 @@ def fill_worksheet(ws, results):
     # cambia el alto de la columna
     ws.row_dimensions[1].height = 14
     ws.row_dimensions[2].height = 14
-    ws.row_dimensions[3].height = 3
+    ws.row_dimensions[3].height = 12
     ws.row_dimensions[4].height = 25
-    ws.row_dimensions[5].height = 3
-    ws.row_dimensions[7].height = 3
-    ws.row_dimensions[8].height = 25
+    ws.row_dimensions[5].height = 20
+    ws.row_dimensions[6].height = 60
+    ws.row_dimensions[7].height = 40
     # cambia el ancho de la columna
     ws.column_dimensions['A'].width = 2
     ws.column_dimensions['B'].width = 9
@@ -227,7 +240,7 @@ def fill_worksheet(ws, results):
     ws.column_dimensions['G'].width = 5
     ws.column_dimensions['H'].width = 5
     ws.column_dimensions['I'].width = 5
-    ws.column_dimensions['J'].width = 5
+    ws.column_dimensions['J'].width = 11
     ws.column_dimensions['K'].width = 9
     ws.column_dimensions['L'].width = 5
     ws.column_dimensions['M'].width = 9
@@ -273,12 +286,8 @@ def fill_worksheet(ws, results):
     # Definir el estilo de color verde 2
     green_fill_2 = PatternFill(start_color='FF60E07E', end_color='FF60E07E', fill_type='solid')
     
-
-    
-    
     green_font = Font(name='Arial', size=8, color='00FF00')  # Verde
     red_font = Font(name='Arial', size=8, color='FF0000')    # Rojo
-    
     
     border = Border(left=Side(style='thin', color='00B0F0'),
                     right=Side(style='thin', color='00B0F0'),
@@ -288,6 +297,273 @@ def fill_worksheet(ws, results):
                     right=Side(style='thin', color='A9A9A9'), # Plomo
                     top=Side(style='thin', color='A9A9A9'), # Plomo
                     bottom=Side(style='thin', color='A9A9A9')) # Plomo
+    
+    # Definir el estilo de relleno celeste
+    celeste_fill = PatternFill(start_color='FF87CEEB', end_color='FF87CEEB', fill_type='solid')
+    # Morado más claro
+    morado_claro_fill = PatternFill(start_color='FFE9D8FF', end_color='FFE9D8FF', fill_type='solid')
+    # Plomo más claro
+    plomo_claro_fill = PatternFill(start_color='FFEDEDED', end_color='FFEDEDED', fill_type='solid')
+    # Azul más claro
+    azul_claro_fill = PatternFill(start_color='FFD8EFFA', end_color='FFD8EFFA', fill_type='solid')
+    # Naranja más claro
+    naranja_claro_fill = PatternFill(start_color='FFFFEBD8', end_color='FFFFEBD8', fill_type='solid')
+    # Verde más claro
+    verde_claro_fill = PatternFill(start_color='FFBDF7BD', end_color='FFBDF7BD', fill_type='solid')
+    
+    border_negro = Border(left=Side(style='thin', color='000000'), # negro
+            right=Side(style='thin', color='000000'),
+            top=Side(style='thin', color='000000'), 
+            bottom=Side(style='thin', color='000000')) 
+    
+    ### CAMBIO DE CABECERAS     
+    ####################################
+    
+    # numerador y denominador
+    ws.merge_cells('B5:J5') 
+    ws.merge_cells('K5:Z5')
+    
+    # Auxiliar HORIZONTAL
+    ws.merge_cells('O6:O7')
+    ws.merge_cells('X6:X7')
+        
+    # intervalo
+    ws.merge_cells('B6:C6')
+    ws.merge_cells('D6:J6')
+    ws.merge_cells('K6:L6')
+    ws.merge_cells('M6:N6')
+    ws.merge_cells('P6:Q6')
+    ws.merge_cells('R6:S6')
+    ws.merge_cells('T6:U6')
+    ws.merge_cells('V6:W6')
+    ws.merge_cells('Y6:Z6')
+    
+    # COD HIS
+    ws.merge_cells('B7:C7')
+    ws.merge_cells('D7:J7')
+    ws.merge_cells('K7:L7')
+    ws.merge_cells('M7:N7')
+    ws.merge_cells('P7:Q7')
+    ws.merge_cells('R7:S7')
+    ws.merge_cells('T7:U7')
+    ws.merge_cells('V7:W7')
+    ws.merge_cells('Y7:Z7')
+    
+    # Combina cela
+    ws['B5'] = 'DENOMINADOR'
+    ws['K5'] = 'NUMERADOR'
+    
+    ws['D6'] = 'Se excluye a niños y niñas con bajo peso al nacer (menor de 2500 gramos) y/o prematuros (menor de 37 SG), registrados en CNV en línea'
+    ws['K6'] = 'Desde la fecha de nacimiento + 01 día'
+    ws['M6'] = 'Desde la fecha de nacimiento + 01 día'
+    ws['O6'] = 'NUMERADOR PARCIAL'
+    ws['P6'] = '1° control CRED se realiza a partir del 3er día de vida, hasta los 28 dias de edad'
+    ws['R6'] = '2° CRED con intervalo mínimo de 3 dias a partir del 1° control, hasta los 28 dias de edad'
+    ws['T6'] = '3° CRED con un intervalo minimo de 7 dias a partir 2° control, hasta los 28 dias de edad'
+    ws['V6'] = '4° CRED con un intervalo minimo de 7 dias a partir 3° control, hasta los 28 dias de edad'
+    ws['X6'] = 'NUMERADOR PARCIAL'
+    ws['Y6'] = 'A partir del 2do día (48 horas) hasta 6 días de nacido'
+    
+    ws['K7'] = 'DX = 90585'
+    ws['M7'] = 'DX = 90744'
+    ws['P7'] = 'DX = 99381.01 ó Z001'
+    ws['R7'] = 'DX = 99381.01 ó Z001'
+    ws['T7'] = 'DX = 99381.01 ó Z001'
+    ws['V7'] = 'DX = 99381.01 ó Z001'
+    ws['Y7'] = 'DX = 36416'
+    
+    ### numerador y denominador 
+    ws['B5'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['B5'].font = Font(name = 'Arial', size= 10, bold = True)
+    ws['B5'].fill = gray_fill
+    ws['B5'].border = border_negro
+    
+    ws['K5'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['K5'].font = Font(name = 'Arial', size= 10, bold = True)
+    ws['K5'].fill = naranja_claro_fill
+    ws['K5'].border = border_negro
+    
+    ### intervalo 
+    ws['D6'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['D6'].font = Font(name = 'Arial', size= 7)
+    ws['D6'].fill = plomo_claro_fill
+    ws['D6'].border = border_negro
+    
+    ws['K6'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['K6'].font = Font(name = 'Arial', size= 7)
+    ws['K6'].fill = plomo_claro_fill
+    ws['K6'].border = border_negro
+
+    ws['M6'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['M6'].font = Font(name = 'Arial', size= 7)
+    ws['M6'].fill = plomo_claro_fill
+    ws['M6'].border = border_negro
+    
+    ws['O6'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['O6'].font = Font(name = 'Arial', size= 7)
+    ws['O6'].fill = plomo_claro_fill
+    ws['O6'].border = border_negro
+    
+    ws['P6'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['P6'].font = Font(name = 'Arial', size= 7)
+    ws['P6'].fill = plomo_claro_fill
+    ws['P6'].border = border_negro    
+    
+    ws['R6'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['R6'].font = Font(name = 'Arial', size= 7)
+    ws['R6'].fill = plomo_claro_fill
+    ws['R6'].border = border_negro
+    
+    ws['T6'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['T6'].font = Font(name = 'Arial', size= 7)
+    ws['T6'].fill = plomo_claro_fill
+    ws['T6'].border = border_negro
+    
+    ws['V6'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['V6'].font = Font(name = 'Arial', size= 7)
+    ws['V6'].fill = plomo_claro_fill
+    ws['V6'].border = border_negro
+    
+    ws['Y6'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['Y6'].font = Font(name = 'Arial', size= 7)
+    ws['Y6'].fill = plomo_claro_fill
+    ws['Y6'].border = border_negro
+
+    ws['X6'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['X6'].font = Font(name = 'Arial', size= 7)
+    ws['X6'].fill = plomo_claro_fill
+    ws['X6'].border = border_negro
+    
+    #CODIGO HIS
+    
+    ws['D7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['D7'].font = Font(name = 'Arial', size= 7)
+    ws['D7'].fill = azul_claro_fill
+    ws['D7'].border = border_negro
+    
+    ws['K7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['K7'].font = Font(name = 'Arial', size= 7)
+    ws['K7'].fill = azul_claro_fill
+    ws['K7'].border = border_negro
+    
+    ws['M7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['M7'].font = Font(name = 'Arial', size= 7)
+    ws['M7'].fill = azul_claro_fill
+    ws['M7'].border = border_negro
+    
+    ws['P7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['P7'].font = Font(name = 'Arial', size= 7)
+    ws['P7'].fill = azul_claro_fill
+    ws['P7'].border = border_negro
+    
+    ws['R7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['R7'].font = Font(name = 'Arial', size= 7)
+    ws['R7'].fill = azul_claro_fill
+    ws['R7'].border = border_negro
+    
+    ws['T7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['T7'].font = Font(name = 'Arial', size= 7)
+    ws['T7'].fill = azul_claro_fill
+    ws['T7'].border = border_negro
+    
+    ws['V7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['V7'].font = Font(name = 'Arial', size= 7)
+    ws['V7'].fill = azul_claro_fill
+    ws['V7'].border = border_negro
+    
+    ws['Y7'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
+    ws['Y7'].font = Font(name = 'Arial', size= 7)
+    ws['Y7'].fill = azul_claro_fill
+    ws['Y7'].border = border_negro
+    
+    
+    ws['B6'].alignment = Alignment(horizontal= "center", vertical="center")
+    ws['B6'].font = Font(name = 'Arial', size= 7, bold = True)
+    ws['B6'].fill = plomo_claro_fill
+    ws['B6'].border = border_negro
+    ws['B6'] = 'INTERVALO'
+    
+    ws['B7'].alignment = Alignment(horizontal= "center", vertical="center")
+    ws['B7'].font = Font(name = 'Arial', size= 7, bold = True)
+    ws['B7'].fill = azul_claro_fill
+    ws['B7'].border = border_negro
+    ws['B7'] = 'COD HIS'
+    
+    
+    ### BORDE DE CELDAS CONBINADAS
+    
+    # NUM y DEN
+    inicio_columna = 'B'
+    fin_columna = 'Z'
+    fila = 5
+    from openpyxl.utils import column_index_from_string
+    # Convertir letras de columna a índices numéricos
+    indice_inicio = column_index_from_string(inicio_columna)
+    indice_fin = column_index_from_string(fin_columna)
+    # Iterar sobre las columnas en el rango especificado
+    for col in range(indice_inicio, indice_fin + 1):
+        celda = ws.cell(row=fila, column=col)
+        celda.border = border_negro
+    
+    # INTERVALO
+    inicio_columna = 'B'
+    fin_columna = 'Z'
+    fila = 6
+    from openpyxl.utils import column_index_from_string
+    # Convertir letras de columna a índices numéricos
+    indice_inicio = column_index_from_string(inicio_columna)
+    indice_fin = column_index_from_string(fin_columna)
+    # Iterar sobre las columnas en el rango especificado
+    for col in range(indice_inicio, indice_fin + 1):
+        celda = ws.cell(row=fila, column=col)
+        celda.border = border_negro
+        
+    # CODIGO HIS 
+    inicio_columna = 'B'
+    fin_columna = 'Z'
+    fila = 7
+    from openpyxl.utils import column_index_from_string
+    # Convertir letras de columna a índices numéricos
+    indice_inicio = column_index_from_string(inicio_columna)
+    indice_fin = column_index_from_string(fin_columna)
+    # Iterar sobre las columnas en el rango especificado
+    for col in range(indice_inicio, indice_fin + 1):
+        celda = ws.cell(row=fila, column=col)
+        celda.border = border_negro
+    
+    ##### imprimer fecha y hora del reporte
+    fecha_hora_actual = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+    nombre_usuario = getpass.getuser()
+
+    # Obtener el usuario actualmente autenticado
+    try:
+        user = User.objects.get(is_active=True)
+    except User.DoesNotExist:
+        user = None
+    except User.MultipleObjectsReturned:
+        # Manejar el caso donde hay múltiples usuarios activos
+        user = User.objects.filter(is_active=True).first()  # Por ejemplo, obtener el primero
+    # Asignar fecha y hora a la celda A1
+    ws['O1'].value = 'Fecha y Hora:'
+    ws['P1'].value = fecha_hora_actual
+
+    # Asignar nombre de usuario a la celda A2
+    ws['O2'].value = 'Usuario:'
+    ws['P2'].value = nombre_usuario
+    
+    # Formatear las etiquetas en negrita
+    etiqueta_font = Font(name='Arial', size=8)
+    ws['O1'].font = etiqueta_font
+    ws['P1'].font = etiqueta_font
+    ws['O2'].font = etiqueta_font
+    ws['P2'].font = etiqueta_font
+
+    # Alinear el texto
+    ws['O1'].alignment = Alignment(horizontal="right", vertical="center")
+    ws['P1'].alignment = Alignment(horizontal="left", vertical="center")
+    ws['O2'].alignment = Alignment(horizontal="right", vertical="center")
+    ws['P2'].alignment = Alignment(horizontal="left", vertical="center")
+
     
     ## crea titulo del reporte
     ws['B1'].alignment = Alignment(horizontal= "left", vertical="center")
@@ -302,9 +578,9 @@ def fill_worksheet(ws, results):
     ws['B4'].font = Font(name = 'Arial', size= 12, bold = True)
     ws['B4'] = 'SEGUIMIENTO NOMINAL DEL INDICADOR MC-03. RECIÉN NACIDOS DEL DEPARTAMENTO, RECIBEN VACUNAS BCG, HVB, CONTROLES CRED Y TAMIZAJE NEONATAL'
     
-    ws['B6'].alignment = Alignment(horizontal= "left", vertical="center")
-    ws['B6'].font = Font(name = 'Arial', size= 7, bold = True, color='0000CC')
-    ws['B6'] ='El usuario se compromete a mantener la confidencialidad de los datos personales que conozca como resultado del reporte realizado, cumpliendo con lo establecido en la Ley N° 29733 - Ley de Protección de Datos Personales y sus normas complementarias.'
+    ws['B3'].alignment = Alignment(horizontal= "left", vertical="center")
+    ws['B3'].font = Font(name = 'Arial', size= 7, color='0000CC')
+    ws['B3'] ='El usuario se compromete a mantener la confidencialidad de los datos personales que conozca como resultado del reporte realizado, cumpliendo con lo establecido en la Ley N° 29733 - Ley de Protección de Datos Personales y sus normas complementarias.'
         
     ws['B8'].alignment = Alignment(horizontal= "center", vertical="center")
     ws['B8'].font = Font(name = 'Arial', size= 8, bold = True, color='FFFFFF')
@@ -564,9 +840,28 @@ def fill_worksheet(ws, results):
                 else:
                     cell.font = Font(name='Arial', size=7)
 
+            elif col in [10]:
+                if value == 1:
+                    cell.value = sub_no_cumple  # Insertar check
+                    cell.font = Font(name='Arial', size=7, color="FF0000") 
+                elif value == 0:
+                    cell.value = sub_cumple # Insertar check
+                    cell.font = Font(name='Arial', size=7, color="00B050")
+                else:
+                    cell.font = Font(name='Arial', size=7)
+            
+            
+            
             # Fuente normal para otras columnas
             else:
                 cell.font = Font(name='Arial', size=8)  # Fuente normal para otras columnas
+            
+            
+
+
+            # Fuente normal para otras columnas
+            
+            
             
             # Aplicar caracteres especiales check y X
             if col in [7,9,12,14,17,19,21,23,26]:
