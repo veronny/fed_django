@@ -31,7 +31,6 @@ User = get_user_model()
 from django.db.models import IntegerField               # Importar IntegerField
 from django.db.models.functions import Cast, Substr     # Importar Cast y Substr
 
-
 logger = logging.getLogger(__name__)
 # Create your views here.
 def obtener_distritos(provincia):
@@ -55,6 +54,103 @@ def obtener_ranking_s21_suplementacion6(anio, mes):
         result = cursor.fetchall()
         return result
 
+## AVANCE REGIONAL
+def obtener_avance_regional_s21_suplementacion6():
+    """
+    Obtiene el avance regional de gestantes con anemia.
+    Retorna una lista de diccionarios con las claves 'num', 'den' y 'cob'.
+    """
+    try:
+        # Asegúrate de que la conexión a la base de datos está establecida
+        with connection.cursor() as cursor:
+            cursor.execute(
+                '''
+                SELECT 
+                    SUM(numerador_mes_noviembre) AS num,
+                    SUM(denominador_mes_noviembre) AS den,
+                    ROUND((SUM(numerador_mes_noviembre)::NUMERIC / NULLIF(SUM(denominador_mes_noviembre), 0)) * 100, 2) AS cob
+                FROM public."Cobertura_SI_0201_Suplementacion6M"
+                '''
+            )
+            resultados = cursor.fetchall()
+            
+            # Obtener los nombres de las columnas
+            column_names = [desc[0] for desc in cursor.description]
+            
+            # Convertir cada fila en un diccionario
+            datos = [dict(zip(column_names, fila)) for fila in resultados]
+        
+        return datos
+    except Exception as e:
+        print(f"Error al obtener el avance regional: {e}")
+        return None
+
+
+## AVANCE REGIONAL MENSUALIZADO
+def obtener_avance_regional_mensual_s21_suplementacion6():
+    """
+    Obtiene el avance regional de gestantes con anemia de manera mensualizada.
+    Retorna una lista de diccionarios con las claves 'num', 'den' y 'cob' por meses.
+    """
+    try:
+        # Asegúrate de que la conexión a la base de datos está establecida
+        with connection.cursor() as cursor:
+            cursor.execute(
+                '''
+                    SELECT 
+                    SUM(numerador_mes_enero) AS NUM_1, 
+                    SUM(denominador_mes_enero) AS DEN_1, 
+                    ROUND((SUM(numerador_mes_enero)::NUMERIC / NULLIF(SUM(denominador_mes_enero), 0)) * 100, 2) AS COB_1,
+                    SUM(numerador_mes_febrero) AS NUM_2, 
+                    SUM(denominador_mes_febrero) AS DEN_2, 
+                    ROUND((SUM(numerador_mes_febrero)::NUMERIC / NULLIF(SUM(denominador_mes_febrero), 0)) * 100, 2) AS COB_2,
+                    SUM(numerador_mes_marzo) AS NUM_3, 
+                    SUM(denominador_mes_marzo) AS DEN_3, 
+                    ROUND((SUM(numerador_mes_marzo)::NUMERIC / NULLIF(SUM(denominador_mes_marzo), 0)) * 100, 2) AS COB_3,
+                    SUM(numerador_mes_abril) AS NUM_4, 
+                    SUM(denominador_mes_abril) AS DEN_4, 
+                    ROUND((SUM(numerador_mes_abril)::NUMERIC / NULLIF(SUM(denominador_mes_abril), 0)) * 100, 2) AS COB_4,
+                    SUM(numerador_mes_mayo) AS NUM_5, 
+                    SUM(denominador_mes_mayo) AS DEN_5, 
+                    ROUND((SUM(numerador_mes_mayo)::NUMERIC / NULLIF(SUM(denominador_mes_mayo), 0)) * 100, 2) AS COB_5,
+                    SUM(numerador_mes_junio) AS NUM_6, 
+                    SUM(denominador_mes_junio) AS DEN_6,
+                    ROUND((SUM(numerador_mes_junio)::NUMERIC / NULLIF(SUM(denominador_mes_junio), 0)) * 100, 2) AS COB_6,
+                    SUM(numerador_mes_julio) AS NUM_7, 
+                    SUM(denominador_mes_julio) AS DEN_7,
+                    ROUND((SUM(numerador_mes_julio)::NUMERIC / NULLIF(SUM(denominador_mes_julio), 0)) * 100, 2) AS COB_7,
+                    SUM(numerador_mes_agosto) AS NUM_8, 
+                    SUM(denominador_mes_agosto) AS DEN_8, 
+                    ROUND((SUM(numerador_mes_agosto)::NUMERIC / NULLIF(SUM(denominador_mes_agosto), 0)) * 100, 2) AS COB_8,
+                    SUM(numerador_mes_setiembre) AS NUM_9, 
+                    SUM(denominador_mes_setiembre) AS DEN_9, 
+                    ROUND((SUM(numerador_mes_setiembre)::NUMERIC / NULLIF(SUM(denominador_mes_setiembre), 0)) * 100, 2) AS COB_9,
+                    SUM(numerador_mes_octubre) AS NUM_10, 
+                    SUM(denominador_mes_octubre) AS DEN_10, 
+                    ROUND((SUM(numerador_mes_octubre)::NUMERIC / NULLIF(SUM(denominador_mes_octubre), 0)) * 100, 2) AS COB_10,
+                    SUM(numerador_mes_noviembre) AS NUM_11, 
+                    SUM(denominador_mes_noviembre) AS DEN_11, 
+                    ROUND((SUM(numerador_mes_noviembre)::NUMERIC / NULLIF(SUM(denominador_mes_noviembre), 0)) * 100, 2) AS COB_11,
+                    SUM(numerador_mes_diciembre) AS NUM_12, 
+                    SUM(denominador_mes_diciembre) AS DEN_12, 
+                    ROUND((SUM(numerador_mes_diciembre)::NUMERIC / NULLIF(SUM(denominador_mes_diciembre), 0)) * 100, 2) AS COB_12
+                    FROM 
+                    public."Cobertura_SI_0201_Suplementacion6M";
+                '''
+            )
+            resultados = cursor.fetchall()
+            
+            # Obtener los nombres de las columnas
+            column_names = [desc[0] for desc in cursor.description]
+            
+            # Convertir cada fila en un diccionario
+            datos = [dict(zip(column_names, fila)) for fila in resultados]
+        
+        return datos
+    except Exception as e:
+        print(f"Error al obtener el avance regional: {e}")
+        return None
+    
 def index_s21_suplementacion6(request):
     # RANKING 
     anio = request.GET.get('anio')  # Valor predeterminado# Valor predeterminado
@@ -69,7 +165,10 @@ def index_s21_suplementacion6(request):
             resultados_ranking_obtener_s21_suplementacion6 = obtener_ranking_s21_suplementacion6(anio,mes_seleccionado)
             # Obtener datos de AVANCE GRAFICO MESES
             resultados_avance_obtener_s21_suplementacion6 = obtener_avance_s21_suplementacion6(red_seleccionada)
-            
+            # Obtener datos de AVANCE GRAFICO ANUAL
+            resultados_avance_regional_s21_suplementacion6 = obtener_avance_regional_s21_suplementacion6()
+            # Obtener datos de AVANCE GRAFICO ANUAL
+            resultados_avance_regional_mensual_s21_suplementacion6 = obtener_avance_regional_mensual_s21_suplementacion6()
             # Procesar los resultados
             if any(len(row) < 4 for row in resultados_ranking_obtener_s21_suplementacion6):
                 raise ValueError("Algunas filas del ranking no tienen suficientes elementos")
@@ -86,7 +185,153 @@ def index_s21_suplementacion6(request):
                 'num': [],
                 'den': [],
                 'avance': [],
-            }
+            #avance regional
+                'num_region': [],
+                'den_region': [],
+                'avance_region': [],
+                
+                #avance regional mensual
+                'num_1': [],
+                'den_1': [],
+                'cob_1': [],
+                'num_2': [],
+                'den_2': [],
+                'cob_2': [],
+                'num_3': [],
+                'den_3': [],
+                'cob_3': [],
+                'num_4': [],
+                'den_4': [],
+                'cob_4': [],
+                'num_5': [],
+                'den_5': [],
+                'cob_5': [],
+                'num_6': [],
+                'den_6': [],
+                'cob_6': [],
+                'num_7': [],
+                'den_7': [],
+                'cob_7': [],
+                'num_8': [],
+                'den_8': [],
+                'cob_8': [],                
+                'num_9': [],
+                'den_9': [],
+                'cob_9': [],
+                'num_10': [],
+                'den_10': [],
+                'cob_10': [],
+                'num_11': [],
+                'den_11': [],
+                'cob_11': [],
+                'num_12': [],
+                'den_12': [],
+                'cob_12': [],
+            }     
+            # AVANCE GRAFICO REGIONAL
+            for index, row in enumerate(resultados_avance_regional_s21_suplementacion6):
+                try:
+                    # Verifica que el diccionario tenga las claves necesarias
+                    required_keys = {'num', 'den', 'cob'}
+                    if not required_keys.issubset(row.keys()):
+                        raise ValueError(f"La fila {index} no tiene las claves necesarias: {row}")
+
+                    num_region_value = float(row.get('num', 0.0))
+                    den_region_value = float(row.get('den', 0.0))
+                    avance_region_value = float(row.get('cob', 0.0))
+
+                    data['num_region'].append(num_region_value)
+                    data['den_region'].append(den_region_value)
+                    data['avance_region'].append(avance_region_value)
+
+                except Exception as e:
+                    logger.error(f"Error procesando la fila {index}: {str(e)}")
+                    
+            # AVANCE GRAFICO MENSUAL
+            for index, row in enumerate(resultados_avance_regional_mensual_s21_suplementacion6):
+                try:
+                    # Verifica que el diccionario tenga las claves necesarias
+                    required_keys = {'num_1','den_1','cob_1','num_2','den_2','cob_2','num_3','den_3','cob_3','num_4','den_4','cob_4','num_5','den_5','cob_5','num_6','den_6','cob_6','num_7','den_7','cob_7','num_8','den_8','cob_8','num_9','den_9','cob_9','num_10','den_10','cob_10','num_11','den_11','cob_11','num_12','den_12','cob_12'}
+                    
+                    if not required_keys.issubset(row.keys()):
+                        raise ValueError(f"La fila {index} no tiene las claves necesarias: {row}")
+
+                    num_1_value = float(row.get('num_1', 0.0))
+                    den_1_value = float(row.get('den_1', 0.0))
+                    cob_1_value = float(row.get('cob_1', 0.0))
+                    num_2_value = float(row.get('num_2', 0.0))
+                    den_2_value = float(row.get('den_2', 0.0))
+                    cob_2_value = float(row.get('cob_2', 0.0))
+                    num_3_value = float(row.get('num_3', 0.0))
+                    den_3_value = float(row.get('den_3', 0.0))
+                    cob_3_value = float(row.get('cob_3', 0.0))
+                    num_4_value = float(row.get('num_4', 0.0))
+                    den_4_value = float(row.get('den_4', 0.0))
+                    cob_4_value = float(row.get('cob_4', 0.0))
+                    num_5_value = float(row.get('num_5', 0.0))
+                    den_5_value = float(row.get('den_5', 0.0))
+                    cob_5_value = float(row.get('cob_5', 0.0))
+                    num_6_value = float(row.get('num_6', 0.0))
+                    den_6_value = float(row.get('den_6', 0.0))
+                    cob_6_value = float(row.get('cob_6', 0.0))
+                    num_7_value = float(row.get('num_7', 0.0))
+                    den_7_value = float(row.get('den_7', 0.0))
+                    cob_7_value = float(row.get('cob_7', 0.0))
+                    num_8_value = float(row.get('num_8', 0.0))
+                    den_8_value = float(row.get('den_8', 0.0))
+                    cob_8_value = float(row.get('cob_8', 0.0))
+                    num_9_value = float(row.get('num_9', 0.0))
+                    den_9_value = float(row.get('den_9', 0.0))
+                    cob_9_value = float(row.get('cob_9', 0.0))
+                    num_10_value = float(row.get('num_10', 0.0))
+                    den_10_value = float(row.get('den_10', 0.0))
+                    cob_10_value = float(row.get('cob_10', 0.0))
+                    num_11_value = float(row.get('num_11', 0.0))
+                    den_11_value = float(row.get('den_11', 0.0))
+                    cob_11_value = float(row.get('cob_11', 0.0))
+                    num_12_value = float(row.get('num_12', 0.0))
+                    den_12_value = float(row.get('den_12', 0.0))
+                    cob_12_value = float(row.get('cob_12', 0.0))
+                    
+                    data['num_1'].append(num_1_value)
+                    data['den_1'].append(den_1_value)
+                    data['cob_1'].append(cob_1_value)
+                    data['num_2'].append(num_2_value)
+                    data['den_2'].append(den_2_value)
+                    data['cob_2'].append(cob_2_value)
+                    data['num_3'].append(num_3_value)
+                    data['den_3'].append(den_3_value)
+                    data['cob_3'].append(cob_3_value)
+                    data['num_4'].append(num_4_value)
+                    data['den_4'].append(den_4_value)
+                    data['cob_4'].append(cob_4_value)
+                    data['num_5'].append(num_5_value)
+                    data['den_5'].append(den_5_value)
+                    data['cob_5'].append(cob_5_value)
+                    data['num_6'].append(num_6_value)
+                    data['den_6'].append(den_6_value)
+                    data['cob_6'].append(cob_6_value)
+                    data['num_7'].append(num_7_value)
+                    data['den_7'].append(den_7_value)
+                    data['cob_7'].append(cob_7_value)
+                    data['num_8'].append(num_8_value)
+                    data['den_8'].append(den_8_value)
+                    data['cob_8'].append(cob_8_value)
+                    data['num_9'].append(num_9_value)
+                    data['den_9'].append(den_9_value)
+                    data['cob_9'].append(cob_9_value)
+                    data['num_10'].append(num_10_value)
+                    data['den_10'].append(den_10_value)
+                    data['cob_10'].append(cob_10_value)
+                    data['num_11'].append(num_11_value)
+                    data['den_11'].append(den_11_value)
+                    data['cob_11'].append(cob_11_value)
+                    data['num_12'].append(num_12_value)
+                    data['den_12'].append(den_12_value)
+                    data['cob_12'].append(cob_12_value)
+
+                except Exception as e:
+                    logger.error(f"Error procesando la fila {index}: {str(e)}")
             #RANKING
             for index, row in enumerate(resultados_ranking_obtener_s21_suplementacion6):
                 try:

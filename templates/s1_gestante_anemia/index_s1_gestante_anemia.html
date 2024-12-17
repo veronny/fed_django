@@ -85,7 +85,7 @@
     <div class="col-md-9">
         <div class="card card-primary">
             <div class="card-header">
-                <h3 class="card-title">AVANCE REGIONAL MENSUAL</h3>
+                <h3 class="card-title">AVANCE REGIONAL - MENSUALIZADO</h3>
             </div>
     
             <div class="card-body">
@@ -340,7 +340,11 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 // AVANCE MENSUAL
 document.addEventListener('DOMContentLoaded', function () {
-    // Fetch inicial para cargar los datos
+    // Valor máximo en el eje Y (por ejemplo 80%)
+    const maxValue = 80; 
+    // Meta (por ejemplo 70%)
+    const meta = 70;
+    
     fetch('{% url "index_s1_gestante_anemia" %}', {
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
@@ -358,7 +362,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // Construir arrays mensuales para numerador, denominador y cobertura
         const monthlyNum = [
             data.num_1[0], data.num_2[0], data.num_3[0], data.num_4[0], data.num_5[0],
             data.num_6[0], data.num_7[0], data.num_8[0], data.num_9[0], data.num_10[0],
@@ -377,17 +380,13 @@ document.addEventListener('DOMContentLoaded', function () {
             data.cob_11[0], data.cob_12[0]
         ];
 
-        var chartContainerMensual = document.getElementById('chart_regional_mensual');
+        const chartContainerMensual = document.getElementById('chart_regional_mensual');
         if (chartContainerMensual) {
-            var myChartRegionalMensual = echarts.init(chartContainerMensual);
+            const myChartRegionalMensual = echarts.init(chartContainerMensual);
 
-            // Definir los meses
             const months = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DIC'];
 
-            // Meta (por ejemplo 80%)
-            const meta = 70;
-
-            var option = {
+            const option = {
                 title: {
                     text: 'Avance Regional Mensual',
                     left: 'center'
@@ -395,7 +394,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 tooltip: {
                     trigger: 'axis',
                     formatter: function (params) {
-                        // params es un array, tomamos el primer elemento (la línea)
                         const idx = params[0].dataIndex;
                         const monthName = params[0].name;
                         const num = monthlyNum[idx];
@@ -431,6 +429,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 yAxis: {
                     type: 'value',
+                    max: maxValue,  // Limitar el eje Y hasta maxValue (por defecto 80%)
                     axisLabel: {
                         formatter: '{value}%'
                     }
@@ -446,7 +445,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             show: true,
                             position: 'top',
                             formatter: function(params) {
-                                // Mostrar el valor con un decimal y el símbolo '%'
                                 return params.value.toFixed(1) + '%';
                             }
                         },
@@ -457,10 +455,13 @@ document.addEventListener('DOMContentLoaded', function () {
                                 color: 'red'
                             },
                             data: [
-                                { yAxis: meta, name: 'Meta' }
+                                { yAxis: meta, name: 'M' }
                             ],
                             label: {
-                                formatter: `Meta: ${meta}%`
+                                show: true,
+                                formatter: `M: ${meta}%`,
+                                position: 'end',
+                                offset: [0, -14]
                             }
                         }
                     }
@@ -476,6 +477,7 @@ document.addEventListener('DOMContentLoaded', function () {
         console.error('Error al obtener los datos:', error.message);
     });
 });
+
 // GRAFICOS RANKING Y SEMANAL REDES
 document.addEventListener('DOMContentLoaded', function() {
     // Obtener referencias a los elementos HTML
@@ -493,10 +495,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Función para determinar el color del avance
     function getAvanceColor(avance) {
-        if (avance  >= 70 && avance <= 100) return 'green';
-        if (avance >= 54 && avance <= 70) return 'orange';
-        if (avance < 54) return 'red';
-        return 'black'; // color por defecto para otros casos
+        // Redondear avance a dos decimales
+        const valor = parseFloat(avance.toFixed(2));
+        
+        if (valor >= 70 && valor <= 100) {
+            return 'green';
+        } else if (valor >= 54 && valor < 70) {
+            return 'orange';
+        } else if (valor < 54) {
+            return 'red';
+        }
+        
+        return 'black'; // Color por defecto
     }
 
     // Función para mostrar una ventana flotante de depuración
@@ -520,7 +530,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // RANKING REDES obtenerDatosButton
     // Evento para obtener datos basado en el mes seleccionado
-    // Agrega un evento de clic al botón con id 'obtener-datos'
     document.getElementById('obtener-datos').addEventListener('click', function() {
         // Obtiene los valores seleccionados de año y mes
         const anio = document.getElementById('anio-select').value;
