@@ -47,7 +47,8 @@
     </div>
 
 </div>
-<!------------->
+
+<!--- GRAFICOS POR REDES    --->
 <div class="row">
     <!-- RANKING -->
     <div class="col-md-4">
@@ -211,6 +212,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const filtroForm = document.getElementById('filtroForm');
 
     // Inicialización del gráfico
+    var chartContainerRegional = document.getElementById('chart_regional');
+    var myChartRegional = echarts.init(chartContainerRegional);  // Inicializar el gráfico ECharts
+    
+    
+    // Inicialización del gráfico por redes
     var chartContainer = document.getElementById('chart');
     var myChart = echarts.init(chartContainer);  // Inicializar el gráfico ECharts
     
@@ -489,8 +495,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-
 });
+
 </script>
 
 {% endblock %}

@@ -357,7 +357,7 @@ def fill_worksheet(ws, results):
     ws.column_dimensions['DP'].width = 33
     
     # linea de division
-    ws.freeze_panes = 'Q9'
+    ws.freeze_panes = 'Q10'
     # Configuración del fondo y el borde
     # Definir el color usando formato aRGB (opacidad completa 'FF' + color RGB)
     fill = PatternFill(start_color='FF60D7E0', end_color='FF60D7E0', fill_type='solid')
