@@ -33,8 +33,17 @@
         padding: 2px;
         border-radius: 5px;
     }
+
+    .texto-mas-grande {
+      font-size: 13px; /* Ajusta el valor a tu preferencia */
+    }
+
+    .texto-titulo {
+      font-size: 16px; /* Ajusta el valor a tu preferencia */
+    }
   </style>
 </head>
+
 <body class="hold-transition sidebar-mini layout-fixed">
   {% if user.is_authenticated %}
   <div class="wrapper">
@@ -263,6 +272,25 @@
                   </p>
                 </a>
             </li>
+            <!-- OBSERVACIONES -->
+            <li class="nav-header text-info">CONSULTAS/OBSERVACIONES</li>
+              <li class="nav-item">
+                <a href="https://forms.gle/5oVAbjXnRNEYSo4z5" class="nav-link" target="_blank">
+                  <i class="nav-icon fas fa-list"></i>
+                  <p>
+                    Solicitudes
+                  </p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="https://docs.google.com/spreadsheets/d/1tlgzyxcUL_ayh3x77yq-5rGmedMg7QECdsfC_8HolZo/edit?resourcekey=&gid=1341780323#gid=1341780323" class="nav-link" target="_blank">
+                  <i class="nav-icon fas fa-tags"></i>
+                  <p>
+                    Reporte Avance
+                  </p>
+                </a>
+              </li>
+            </li>
           </ul>
       </nav>
       <!-- /.sidebar-menu -->
@@ -325,7 +353,82 @@
   
   {% endif %}
 
-  <!-- jQuery -->
+  <!-- MODAL -->  
+  <div class="modal fade" id="modal-lg" tabindex="-1" role="dialog" aria-labelledby="modal-lgLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document"> 
+      <div class="modal-content texto-mas-grande">
+        <div class="modal-header">
+          <h4 class="modal-title texto-titulo" id="modal-lgLabel">ACTUALIZACION DE LA PLATAFORMA</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Primera tabla: Horario de Procesamiento -->
+          <div class="row">
+            <div class="col">
+              <table class="table table-bordered">
+                <thead class="thead-dark">
+                  <tr>
+                    <th colspan="3" class="text-center">HORARIO DE DESCARGA Y PROCESAMIENTO DE SCRIPTS INDICADORES</th>
+                  </tr>
+                  <tr>
+                    <th>DIAS</th>
+                    <th>HORA INICIO</th>
+                    <th>HORA FIN</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Lunes y Jueves</td>
+                    <td>08:00 am</td>
+                    <td>12:00 am</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+  
+          <!-- Segunda tabla: Fuentes de Información -->
+          <div class="row mt-4">
+            <div class="col">
+              <div class="d-flex align-items-center mb-2 ">
+                <i class="fas fa-hospital" style="font-size: 1em; color: red; margin-right: 10px;" aria-hidden="true"></i>
+                <h5 class="m-0 texto-titulo"><strong>CORTES DE INFORMACION</strong></h5>
+              </div>
+  
+              <table class="table table-bordered">
+                <thead class="thead-dark">
+                  <tr>
+                    <th>SISTEMA</th>
+                    <th>ARCHIVOS</th>
+                    <th>FECHA REGISTRO</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for a in actualizacion %}
+                    <tr>
+                      <td>{{ a.Sistema }}</td>
+                      <td>{{ a.Descripcion }}</td>
+                      <td>{{ a.fecha }} {{ a.hora }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Fin segunda tabla -->
+  
+          <p>Recordar que los archivos de la BD HISMINSA, presenta cortes de informacion Nacional</p>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>  
+  
+<!-- jQuery -->
 <script src="{% static 'assets/plugins/jquery/jquery.min.js' %}"></script>
 <!-- jQuery UI 1.11.4 -->
 <script src="{% static 'assets/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
@@ -397,6 +500,14 @@
           "previous": "Anterior"
       }
     },
+  });
+</script>
+
+<!-- Script para mostrar el modal al cargar la página -->
+<script type="text/javascript">
+  $(document).ready(function() {
+    // Muestra el modal automáticamente al cargar la página
+    $('#modal-lg').modal('show');
   });
 </script>
 
