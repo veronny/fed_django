@@ -19,7 +19,6 @@ def inicio(request):
     actualizacion = Actualizacion.objects.all()
     return render(request, 'index.html', {"actualizacion": actualizacion})
 
-
 def home_redirect_view(request):
 
     return redirect('signin')

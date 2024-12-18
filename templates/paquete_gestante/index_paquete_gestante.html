@@ -3,6 +3,11 @@
 
 {% block body %}
 
+{% block modal_inicio %}
+<!-- Puedes dejarlo vacío para no mostrar el modal, o agregar otro contenido -->
+{{ block.super }} <!-- Para heredar el contenido del bloque modal_inicio original -->
+{% endblock %}
+
 <!--- ESTILOS DE GRAFICOS --->
 <style>
     #chart_regional {

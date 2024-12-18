@@ -31,8 +31,9 @@ User = get_user_model()
 from django.db.models import IntegerField  # Importar IntegerField
 from django.db.models.functions import Cast, Substr  # Importar Cast y Substr
 
-
 logger = logging.getLogger(__name__)
+from base.models import Actualizacion
+
 # Create your views here.
 def obtener_distritos(provincia):
     distritos = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Provincia=provincia).values('Distrito').distinct().order_by('Distrito')
@@ -152,6 +153,7 @@ def obtener_avance_regional_mensual_s4_adolescente_dosaje():
         return None
 
 def index_s4_adolescente_dosaje(request):
+    actualizacion = Actualizacion.objects.all()
     # RANKING 
     anio = request.GET.get('anio')  # Valor predeterminado# Valor predeterminado
     mes_seleccionado = request.GET.get('mes')
@@ -381,6 +383,7 @@ def index_s4_adolescente_dosaje(request):
     return render(request, 's4_adolescente_dosaje/index_s4_adolescente_dosaje.html', {
         'red': red,
         'mes_seleccionado': mes_seleccionado,
+        'actualizacion': actualizacion
     })
 ## SEGUIMIENTO
 def get_redes_s4_adolescente_dosaje(request,redes_id):

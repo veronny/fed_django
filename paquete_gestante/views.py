@@ -3,7 +3,7 @@ from django.shortcuts import render
 # TABLERO PAQUETE NEONATAL 
 from django.db import connection
 from django.http import JsonResponse
-from base.models import MAESTRO_HIS_ESTABLECIMIENTO, DimPeriodo
+from base.models import MAESTRO_HIS_ESTABLECIMIENTO, DimPeriodo, Actualizacion
 from django.db.models.functions import Substr
 import logging
 
@@ -36,11 +36,14 @@ from django.contrib.auth.decorators import login_required
 
 User = get_user_model()
 
-from django.db.models import IntegerField               # Importar IntegerField
+from django.db.models import IntegerField             # Importar IntegerField
 from django.db.models.functions import Cast, Substr     # Importar Cast y Substr
 
 logger = logging.getLogger(__name__)
 
+def BASE(request):
+    
+    return render(request,'paquete_gestante/index_paquete_gestante.html', {"actualizacion": actualizacion})
 # Create your views here.
 def obtener_distritos(provincia):
     distritos = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Provincia=provincia).values('Distrito').distinct().order_by('Distrito')
@@ -161,6 +164,7 @@ def obtener_avance_regional_mensual_paquete_gestante():
 
 ## PANTALLA PRINCIPAL
 def index_paquete_gestante(request):
+    actualizacion = Actualizacion.objects.all()
     # RANKING 
     anio = request.GET.get('anio')  # Valor predeterminado# Valor predeterminado
     mes_seleccionado = request.GET.get('mes')
@@ -390,6 +394,7 @@ def index_paquete_gestante(request):
     return render(request, 'paquete_gestante/index_paquete_gestante.html', {
         'red': red,
         'mes_seleccionado': mes_seleccionado,
+        'actualizacion': actualizacion
     })
 
 

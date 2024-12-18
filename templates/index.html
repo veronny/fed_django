@@ -1,4 +1,11 @@
-{% extends "base.html" %} {% load static %} {% block body %}
+{% extends "base.html" %} 
+{% load static %} 
+{% block body %}
+
+{% block modal_inicio %}
+<!-- Puedes dejarlo vacío para no mostrar el modal, o agregar otro contenido -->
+{{ block.super }} <!-- Para heredar el contenido del bloque modal_inicio original -->
+{% endblock %}
 
 <div class="row">AVANCE REGIONAL</div>
 

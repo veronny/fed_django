@@ -42,7 +42,7 @@ User = get_user_model()
 
 from django.db.models import IntegerField               # Importar IntegerField
 from django.db.models.functions import Cast, Substr     # Importar Cast y Substr
-
+from base.models import Actualizacion
 # Create your views here.
 def obtener_distritos(provincia):
     distritos = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Provincia=provincia).values('Distrito').distinct().order_by('Distrito')
@@ -162,6 +162,7 @@ def obtener_avance_regional_mensual_paquete_nino():
         return None
 
 def index_paquete_nino(request):
+    actualizacion = Actualizacion.objects.all()
     # RANKING 
     anio = request.GET.get('anio')  # Valor predeterminado# Valor predeterminado
     mes_seleccionado = request.GET.get('mes')
@@ -394,6 +395,7 @@ def index_paquete_nino(request):
     return render(request, 'paquete_nino/index_paquete_nino.html', {
         'red': red,
         'mes_seleccionado': mes_seleccionado,
+        'actualizacion': actualizacion
     })
 
 ## SEGUIMIENTO

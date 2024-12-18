@@ -37,7 +37,9 @@ from django.contrib.auth.decorators import login_required
 User = get_user_model()
 
 from django.db.models import IntegerField               # Importar IntegerField
-from django.db.models.functions import Cast, Substr     # Importar Cast y Substr
+from django.db.models.functions import Cast, Substr
+
+from base.models import Actualizacion# Importar Cast y Substr
 # Create your views here.
 def obtener_distritos(provincia):
     distritos = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Provincia=provincia).values('Distrito').distinct().order_by('Distrito')
@@ -157,6 +159,7 @@ def obtener_avance_regional_mensual_v2_tamizaje_violencia():
         return None
 
 def index_v2_tamizaje_violencia(request):
+    actualizacion = Actualizacion.objects.all()
     # RANKING 
     anio = request.GET.get('anio')  # Valor predeterminado# Valor predeterminado
     mes_seleccionado = request.GET.get('mes')
@@ -387,6 +390,7 @@ def index_v2_tamizaje_violencia(request):
     return render(request, 'v2_tamizaje_violencia/index_v2_tamizaje_violencia.html', {
         'red': red,
         'mes_seleccionado': mes_seleccionado,
+        'actualizacion': actualizacion
     })
 
 ## SEGUIMIENTO

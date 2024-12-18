@@ -38,7 +38,7 @@ from django.db.models import IntegerField               # Importar IntegerField
 from django.db.models.functions import Cast, Substr     # Importar Cast y Substr
 
 logger = logging.getLogger(__name__)
-
+from base.models import Actualizacion
 
 # AVANCE Y RANKING 
 def obtener_distritos(provincia):
@@ -163,7 +163,7 @@ def index_s1_gestante_anemia(request):
     Vista principal para el Gestamte Anemia. Retorna ranking y avance si es una petición AJAX.
     Caso contrario, renderiza la plantilla.
     """
-    # RANKING 
+    actualizacion = Actualizacion.objects.all() 
     anio = request.GET.get('anio')  # Valor predeterminado# Valor predeterminado
     mes_seleccionado = request.GET.get('mes')
     
@@ -398,6 +398,7 @@ def index_s1_gestante_anemia(request):
     return render(request, 's1_gestante_anemia/index_s1_gestante_anemia.html', {
         'red': red,
         'mes_seleccionado': mes_seleccionado,
+        'actualizacion': actualizacion
     })
 
 ## SEGUIMIENTO
