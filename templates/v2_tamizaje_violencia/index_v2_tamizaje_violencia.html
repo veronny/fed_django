@@ -2,7 +2,22 @@
 {% load static %}
 
 {% block body %}
+<!--- ESTILOS DE GRAFICOS --->
+<style>
+    #chart_regional {
+        width: 100%;
+        height: 280px;
+        max-width: 600px; /* Ancho máximo opcional */
+        margin: 0 auto; /* Centrar horizontalmente */
+    }
 
+    #chart_regional_mensual {
+        width: 100%;
+        height: 280px;
+        max-width: 1300px; /* Ancho máximo opcional */
+        margin: 0 auto; /* Centrar horizontalmente */
+    }
+</style>
 <!--- TITULO --->
 <div class="row">
     <div class="col-sm-4">
@@ -48,7 +63,38 @@
 
 </div>
 <!------------->
+<!--- GRAFICO REGIONAL --->
+<div class="row">
+    <!-- VELOCIMETRO -->
+    <div class="col-md-3">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">AVANCE REGIONAL - MES EVALUACION</h3>
+            </div>
 
+            <div class="card-body">        <!-- Sección para mostrar la tabla de resultados -->
+                <div class="container">
+                    <div id="chart_regional"></div>
+                </div>  
+            </div> 
+        </div>
+    </div>
+    
+    <!-- AVANCE REGIONAL -->
+    <div class="col-md-9">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">AVANCE REGIONAL - MENSUALIZADO</h3>
+            </div>
+    
+            <div class="card-body">
+                <div class="container">
+                    <div id="chart_regional_mensual"></div>
+                </div>  
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="row">
     <!-- RANKING -->
@@ -202,6 +248,234 @@
 <script>
 let dataTableInstance; // Definir globalmente
 
+// AVANCE REGIONAL
+document.addEventListener('DOMContentLoaded', function () {
+    // Fetch inicial para cargar los datos
+    fetch('{% url "index_v2_tamizaje_violencia" %}', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!data || data.error) {
+            console.error('Error en los datos recibidos:', data?.error || 'Respuesta vacía');
+            return;
+        }
+
+        const avanceRegional = (Array.isArray(data.avance_region) && data.avance_region.length > 0)
+            ? data.avance_region[0]
+            : 0;
+
+        var chartContainer = document.getElementById('chart_regional');
+        if (chartContainer) {
+            var myChartRegional = echarts.init(chartContainer);
+            var option = {
+                series: [
+                    {
+                        type: 'gauge',
+                        center: ['50%', '60%'], // Ajustar posición vertical del gauge
+                        radius: '80%', // Reducir el tamaño del gauge (porcentaje respecto al contenedor)
+                        axisLine: {
+                            lineStyle: {
+                                width: 20,
+                                color: [
+                                    [0.18, '#fd666d'], // basal
+                                    [0.20, '#fddf66'], // regional
+                                    [1, '#66fd6f']
+                                ]
+                            }
+                        },
+                        pointer: {
+                            itemStyle: {
+                            color: 'auto'
+                            }
+                        },
+                        axisTick: {
+                            distance: -20,
+                            length: 6,
+                            lineStyle: {
+                                color: '#fff',
+                                width: 2
+                            }
+                        },
+                        splitLine: {
+                            distance: -20,
+                            length: 20,
+                            lineStyle: {
+                                color: '#fff',
+                                width: 4
+                            }
+                        },
+                        axisLabel: {
+                            color: 'inherit',
+                            distance: 23,
+                            fontSize: 14
+                        },
+                        detail: {
+                            valueAnimation: true,
+                            formatter: '{value} %\nAVANCE', // Agrega '\n' para el salto de línea
+                            fontSize: 16,
+                            color: 'inherit' // Cambia el valor a tu preferencia, por ejemplo: 20, 25, etc.
+                        },
+                        data: [{ value: avanceRegional }]
+                    }
+                ]
+            };
+            myChartRegional.setOption(option);
+        } else {
+            console.error('El contenedor del gráfico no existe');
+        }
+    })
+    .catch(error => {
+        console.error('Error al obtener los datos:', error.message);
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Valor máximo en el eje Y (por ejemplo 80%)
+    const maxValue = 50; 
+    // Meta (por ejemplo 70%)
+    const meta = 20;
+    
+    fetch('{% url "index_v2_tamizaje_violencia" %}', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!data || data.error) {
+            console.error('Error en los datos recibidos:', data?.error || 'Respuesta vacía');
+            return;
+        }
+
+        const monthlyNum = [
+            data.num_1[0], data.num_2[0], data.num_3[0], data.num_4[0], data.num_5[0],
+            data.num_6[0], data.num_7[0], data.num_8[0], data.num_9[0], data.num_10[0],
+            data.num_11[0], data.num_12[0]
+        ];
+
+        const monthlyDen = [
+            data.den_1[0], data.den_2[0], data.den_3[0], data.den_4[0], data.den_5[0],
+            data.den_6[0], data.den_7[0], data.den_8[0], data.den_9[0], data.den_10[0],
+            data.den_11[0], data.den_12[0]
+        ];
+
+        const monthlyCob = [
+            data.cob_1[0], data.cob_2[0], data.cob_3[0], data.cob_4[0], data.cob_5[0],
+            data.cob_6[0], data.cob_7[0], data.cob_8[0], data.cob_9[0], data.cob_10[0],
+            data.cob_11[0], data.cob_12[0]
+        ];
+
+        const chartContainerMensual = document.getElementById('chart_regional_mensual');
+        if (chartContainerMensual) {
+            const myChartRegionalMensual = echarts.init(chartContainerMensual);
+
+            const months = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DIC'];
+
+            const option = {
+                title: {
+                    text: 'Avance Regional Mensual',
+                    left: 'center'
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function (params) {
+                        const idx = params[0].dataIndex;
+                        const monthName = params[0].name;
+                        const num = monthlyNum[idx];
+                        const den = monthlyDen[idx];
+                        const cob = monthlyCob[idx];
+
+                        return `
+                            <strong>${monthName}</strong><br/>
+                            Den: ${den}<br/>
+                            Num: ${num}<br/>
+                            Cob: ${cob.toFixed(1)}%
+                        `;
+                    }
+                },
+                legend: {
+                    data: ['% Avance'],
+                    left: 'left'
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: months
+                },
+                yAxis: {
+                    type: 'value',
+                    max: maxValue,  // Limitar el eje Y hasta maxValue (por defecto 80%)
+                    axisLabel: {
+                        formatter: '{value}%'
+                    }
+                },
+                series: [
+                    {
+                        name: '% Avance',
+                        type: 'line',
+                        step: 'start',
+                        data: monthlyCob,
+                        areaStyle: {},
+                        label: {
+                            show: true,
+                            position: 'top',
+                            formatter: function(params) {
+                                return params.value.toFixed(1) + '%';
+                            }
+                        },
+                        markLine: {
+                            symbol: 'none',
+                            lineStyle: {
+                                type: 'dash',
+                                color: 'red'
+                            },
+                            data: [
+                                { yAxis: meta, name: 'M' }
+                            ],
+                            label: {
+                                show: true,
+                                formatter: `M: ${meta}%`,
+                                position: 'end',
+                                offset: [0, -14]
+                            }
+                        }
+                    }
+                ]
+            };
+
+            myChartRegionalMensual.setOption(option);
+        } else {
+            console.error('El contenedor del gráfico (chart_regional_mensual) no existe');
+        }
+    })
+    .catch(error => {
+        console.error('Error al obtener los datos:', error.message);
+    });
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     // Obtener referencias a los elementos HTML
     const mesAnio = document.getElementById('anio-select');
@@ -218,10 +492,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Función para determinar el color del avance
     function getAvanceColor(avance) {
-        if (avance  >= 96 && avance <= 100) return 'green';
-        if (avance >= 70 && avance <= 95) return 'orange';
-        if (avance < 70) return 'red';
-        return 'black'; // color por defecto para otros casos
+        // Redondear avance a dos decimales
+        const valor = parseFloat(avance.toFixed(2));
+        
+        if (valor >= 20 && valor <= 100) {
+            return 'green';
+        } else if (valor >= 18 && valor < 20) {
+            return 'orange';
+        } else if (valor < 18) {
+            return 'red';
+        }
+        
+        return 'black'; // Color por defecto
     }
 
     // Función para mostrar una ventana flotante de depuración
