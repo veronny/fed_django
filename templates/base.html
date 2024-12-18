@@ -330,11 +330,6 @@
             <div class="col-md-6 float-right d-none d-sm-inline-block">
               <b>Desarrollado por :</b> Dirección Regional de Salud Junín | Copyright &copy; 2024 <a href="#"></a>
             </div>
-            <div class="col-md-6 marquee-container float-left d-none d-sm-inline-block text-white">
-              <marquee direction="Left" behavior="scroll" scrollamount="5">
-                  <strong>ULTIMA ACTUALIZACION AL:</strong>  {% for a in actualizacion %} {{ a.fecha }} {{ a.hora }} {% endfor %} <strong> - FUENTE INFORMACION:</strong> BD HISMINSA | PADRON NOMINAL |  Script REGION JUNIN
-              </marquee>
-              
           </div>
         </div>
     </footer>
@@ -345,12 +340,7 @@
     </aside>
   <!-- /.control-sidebar -->
   </div>
-<!-- ./wrapper -->
-  {% else %}
-  
-  {% block content_inicio %} 
-  {% endblock %}
-
+  <!-- ./wrapper -->
   {% block modal_inicio %}
   <div class="modal fade" id="modal-lg" tabindex="-1" role="dialog" aria-labelledby="modal-lgLabel" aria-hidden="true">
       <div class="modal-dialog" role="document"> 
@@ -386,7 +376,7 @@
                 </table>
               </div>
             </div>
-    
+          
             <!-- Segunda tabla: Fuentes de Información -->
             <div class="row mt-4">
               <div class="col">
@@ -394,7 +384,7 @@
                   <i class="fas fa-hospital" style="font-size: 1em; color: red; margin-right: 10px;" aria-hidden="true"></i>
                   <h5 class="m-0 texto-titulo"><strong>CORTES DE INFORMACION</strong></h5>
                 </div>
-    
+              
                 <table class="table table-bordered">
                   <thead class="thead-dark">
                     <tr>
@@ -417,7 +407,7 @@
             </div>
             <!-- Fin segunda tabla -->
             <p>Recordar que los archivos de la BD HISMINSA, presentan cortes de informacion Nacional</p>
-  
+
             <!-- Modal interno para detalles -->
             <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
               <div class="modal-dialog" role="document">
@@ -447,6 +437,11 @@
         </div>
       </div>
   </div>
+  {% endblock %}
+
+  {% else %}
+  
+  {% block content_inicio %} 
   {% endblock %}
   
   {% endif %}
