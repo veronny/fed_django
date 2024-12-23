@@ -42,7 +42,7 @@ from django.db.models.functions import Cast, Substr     # Importar Cast y Substr
 logger = logging.getLogger(__name__)
 
 def BASE(request):
-    
+    actualizacion = Actualizacion.objects.all()
     return render(request,'paquete_gestante/index_paquete_gestante.html', {"actualizacion": actualizacion})
 # Create your views here.
 def obtener_distritos(provincia):
@@ -396,7 +396,6 @@ def index_paquete_gestante(request):
         'mes_seleccionado': mes_seleccionado,
         'actualizacion': actualizacion
     })
-
 
 ## SEGUIMIENTO
 def get_redes_paquete_gestante(request,redes_id):
