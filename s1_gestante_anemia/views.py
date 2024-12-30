@@ -74,9 +74,9 @@ def obtener_avance_regional_s1_gestante_anemia():
             cursor.execute(
                 '''
                 SELECT 
-                    SUM(numerador_mes_noviembre) AS num,
-                    SUM(denominador_mes_noviembre) AS den,
-                    ROUND((SUM(numerador_mes_noviembre)::NUMERIC / NULLIF(SUM(denominador_mes_noviembre), 0)) * 100, 2) AS cob
+                    SUM(numerador_mes_diciembre) AS num,
+                    SUM(denominador_mes_diciembre) AS den,
+                    ROUND((SUM(numerador_mes_diciembre)::NUMERIC / NULLIF(SUM(denominador_mes_diciembre), 0)) * 100, 2) AS cob
                 FROM public."Cobertura_SI_01_AnemiaGestante"
                 '''
             )

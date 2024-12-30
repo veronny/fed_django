@@ -68,7 +68,7 @@ def obtener_ranking_paquete_nino(anio, mes):
 ## AVANCE REGIONAL
 def obtener_avance_regional_paquete_nino():
     """
-    Obtiene el avance regional de gestantes con anemia.
+    Obtiene el avance regional de ninos con anemia.
     Retorna una lista de diccionarios con las claves 'num', 'den' y 'cob'.
     """
     try:
@@ -77,9 +77,9 @@ def obtener_avance_regional_paquete_nino():
             cursor.execute(
                 '''
                 SELECT 
-                    SUM(numerador_mes_noviembre) AS num,
-                    SUM(denominador_mes_noviembre) AS den,
-                    ROUND((SUM(numerador_mes_noviembre)::NUMERIC / NULLIF(SUM(denominador_mes_noviembre), 0)) * 100, 2) AS cob
+                    SUM(numerador_mes_diciembre) AS num,
+                    SUM(denominador_mes_diciembre) AS den,
+                    ROUND((SUM(numerador_mes_diciembre)::NUMERIC / NULLIF(SUM(denominador_mes_diciembre), 0)) * 100, 2) AS cob
                 FROM public."Cobertura_MC02_PaquetenNino"
                 '''
             )
@@ -99,7 +99,7 @@ def obtener_avance_regional_paquete_nino():
 ## AVANCE REGIONAL MENSUALIZADO
 def obtener_avance_regional_mensual_paquete_nino():
     """
-    Obtiene el avance regional de gestantes con anemia de manera mensualizada.
+    Obtiene el avance regional de ninos con anemia de manera mensualizada.
     Retorna una lista de diccionarios con las claves 'num', 'den' y 'cob' por meses.
     """
     try:
@@ -432,22 +432,121 @@ def get_redes_paquete_nino(request,redes_id):
     
     return render(request, 'paquete_nino/redes.html', context)
 
-def obtener_seguimiento_redes_paquete_nino(p_red,p_inicio,p_fin):
+def obtener_seguimiento_redes_paquete_nino(p_anio,p_red,p_microred,p_establec,p_inicio,p_fin,p_cumple):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT * FROM public.fn_seguimiento_paquete_nino(%s, %s, %s)",
-            [p_red, p_inicio, p_fin]
+            "SELECT * FROM public.fn_seguimiento_paquete_nino(%s,%s,%s,%s,%s,%s,%s)",
+            [p_anio, p_red, p_microred, p_establec, p_inicio, p_fin, p_cumple]
         )
         return cursor.fetchall()
+
+## SEGUIMIENTO POR MICRO-REDES
+def get_microredes_paquete_nino(request, microredes_id):
+    redes = (
+            MAESTRO_HIS_ESTABLECIMIENTO
+            .objects.filter(Descripcion_Sector='GOBIERNO REGIONAL',Departamento='JUNIN')
+            .annotate(codigo_red_filtrado=Substr('Codigo_Red', 1, 4))
+            .values('Red','codigo_red_filtrado')
+            .distinct()
+            .order_by('Red')
+    )
+    mes_inicio = (
+                DimPeriodo
+                .objects.filter(Anio='2024')
+                .annotate(nro_mes=Cast('NroMes', IntegerField())) 
+                .values('Mes','nro_mes')
+                .order_by('NroMes')
+                .distinct()
+    ) 
+    mes_fin = (
+                DimPeriodo
+                .objects.filter(Anio='2024')
+                .annotate(nro_mes=Cast('NroMes', IntegerField())) 
+                .values('Mes','nro_mes')
+                .order_by('NroMes')
+                .distinct()
+    ) 
+    context = {
+                'redes': redes,
+                'mes_inicio':mes_inicio,
+                'mes_fin':mes_fin,
+    }
+    
+    return render(request, 'paquete_nino/microredes.html', context)
+
+def p_microredes_paquete_nino(request):
+    redes_param = request.GET.get('red')
+    microredes = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Codigo_Red=redes_param, Descripcion_Sector='GOBIERNO REGIONAL', Disa='JUNIN').values('Codigo_MicroRed','MicroRed').distinct()
+    context = {
+        'redes_param': redes_param,
+        'microredes': microredes
+    }
+    return render(request, 'paquete_nino/partials/p_microredes.html', context)
+
+## REPORTE POR ESTABLECIMIENTO
+def get_establecimientos_paquete_nino(request,establecimiento_id):
+    redes = (
+                MAESTRO_HIS_ESTABLECIMIENTO
+                .objects.filter(Descripcion_Sector='GOBIERNO REGIONAL',Disa='JUNIN')
+                .annotate(codigo_red_filtrado=Substr('Codigo_Red', 1, 4))
+                .values('Red','codigo_red_filtrado')
+                .distinct()
+                .order_by('Red')
+    )
+    mes_inicio = (
+                DimPeriodo
+                .objects.filter(Anio='2024')
+                .annotate(nro_mes=Cast('NroMes', IntegerField())) 
+                .values('Mes','nro_mes')
+                .order_by('NroMes')
+                .distinct()
+    ) 
+    mes_fin = (
+                DimPeriodo
+                .objects.filter(Anio='2024')
+                .annotate(nro_mes=Cast('NroMes', IntegerField())) 
+                .values('Mes','nro_mes')
+                .order_by('NroMes')
+                .distinct()
+    ) 
+    context = {
+                'redes': redes,
+                'mes_inicio':mes_inicio,
+                'mes_fin':mes_fin,
+    }
+    return render(request,'paquete_nino/establecimientos.html', context)
+
+def p_microredes_establec_paquete_nino(request):
+    redes_param = request.GET.get('red') 
+    microredes = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Codigo_Red=redes_param, Descripcion_Sector='GOBIERNO REGIONAL',Disa='JUNIN').values('Codigo_MicroRed','MicroRed').distinct()
+    context = {
+        'microredes': microredes,
+        'is_htmx': True
+    }
+    return render(request, 'paquete_nino/partials/p_microredes_establec.html', context)
+
+def p_establecimientos_paquete_nino(request):
+    microredes = request.GET.get('p_microredes_establec')    
+    codigo_red = request.GET.get('red')
+    establec = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Codigo_MicroRed=microredes,Codigo_Red=codigo_red,Descripcion_Sector='GOBIERNO REGIONAL',Disa='JUNIN').values('Codigo_Unico','Nombre_Establecimiento').distinct()
+    
+    context= {
+        'establec': establec
+    }
+    return render(request, 'paquete_nino/partials/p_establecimientos.html', context)
 
 class RptPaqueteNinoRed(TemplateView):
     def get(self, request, *args, **kwargs):
         # Variables ingresadas
-        p_red = request.GET.get('red')
-        p_inicio = request.GET.get('fecha_inicio')
-        p_fin = request.GET.get('fecha_fin')
+        p_anio = request.GET.get('anio')
+        p_red = request.GET.get('red','')
+        p_microred = ''
+        p_establec = ''
+        p_inicio = int(request.GET.get('fecha_inicio'))
+        p_fin = int(request.GET.get('fecha_fin'))
+        p_cumple = request.GET.get('cumple', '')     
         # Creación de la consulta
-        resultado_seguimiento = obtener_seguimiento_redes_paquete_nino(p_red, p_inicio, p_fin)
+        resultado_seguimiento = obtener_seguimiento_redes_paquete_nino(p_anio,p_red,p_microred,p_establec,p_inicio,p_fin,p_cumple)
         
         wb = Workbook()
         
@@ -463,6 +562,84 @@ class RptPaqueteNinoRed(TemplateView):
                 ws = wb.create_sheet(title=sheet_name)
         
             fill_worksheet(ws, results)
+        ##########################################################################          
+        # Establecer el nombre del archivo
+        nombre_archivo = "rpt_paquete_nino_red.xlsx"
+        # Definir el tipo de respuesta que se va a dar
+        response = HttpResponse(content_type="application/ms-excel")
+        contenido = "attachment; filename={}".format(nombre_archivo)
+        response["Content-Disposition"] = contenido
+        wb.save(response)
+
+        return response
+
+class RptPaqueteNinoMicroRed(TemplateView):
+    def get(self, request, *args, **kwargs):
+        # Variables ingresadas
+        p_anio = request.GET.get('anio')
+        p_red = request.GET.get('red','')
+        p_microred = request.GET.get('p_microredes','')
+        p_establec = ''
+        p_inicio = int(request.GET.get('fecha_inicio'))
+        p_fin = int(request.GET.get('fecha_fin'))
+        p_cumple = request.GET.get('cumple', '')     
+        # Creación de la consulta
+        resultado_seguimiento = obtener_seguimiento_redes_paquete_nino(p_anio,p_red,p_microred,p_establec,p_inicio,p_fin,p_cumple)
+                
+        wb = Workbook()
+        
+        consultas = [
+                ('Seguimiento', resultado_seguimiento)
+        ]
+        
+        for index, (sheet_name, results) in enumerate(consultas):
+            if index == 0:
+                ws = wb.active
+                ws.title = sheet_name
+            else:
+                ws = wb.create_sheet(title=sheet_name)
+        
+            fill_worksheet(ws, results)
+        
+        ##########################################################################          
+        # Establecer el nombre del archivo
+        nombre_archivo = "rpt_paquete_nino_red.xlsx"
+        # Definir el tipo de respuesta que se va a dar
+        response = HttpResponse(content_type="application/ms-excel")
+        contenido = "attachment; filename={}".format(nombre_archivo)
+        response["Content-Disposition"] = contenido
+        wb.save(response)
+
+        return response
+
+class RptPaqueteNinoEstablec(TemplateView):
+    def get(self, request, *args, **kwargs):
+        # Variables ingresadas
+        p_anio = request.GET.get('anio')
+        p_red = request.GET.get('red','')
+        p_microred = request.GET.get('p_microredes','')
+        p_establec = request.GET.get('p_establecimiento','')
+        p_inicio = int(request.GET.get('fecha_inicio'))
+        p_fin = int(request.GET.get('fecha_fin'))
+        p_cumple = request.GET.get('cumple', '')     
+        # Creación de la consulta
+        resultado_seguimiento = obtener_seguimiento_redes_paquete_nino(p_anio,p_red,p_microred,p_establec,p_inicio,p_fin,p_cumple)
+                
+        wb = Workbook()
+        
+        consultas = [
+                ('Seguimiento', resultado_seguimiento)
+        ]
+        
+        for index, (sheet_name, results) in enumerate(consultas):
+            if index == 0:
+                ws = wb.active
+                ws.title = sheet_name
+            else:
+                ws = wb.create_sheet(title=sheet_name)
+        
+            fill_worksheet(ws, results)
+        
         ##########################################################################          
         # Establecer el nombre del archivo
         nombre_archivo = "rpt_paquete_nino_red.xlsx"
@@ -601,7 +778,7 @@ def fill_worksheet(ws, results):
     ws.column_dimensions['DJ'].width = 16
     ws.column_dimensions['DK'].width = 20
     ws.column_dimensions['DL'].width = 20
-    ws.column_dimensions['DM'].width = 6
+    ws.column_dimensions['DM'].width = 20
     ws.column_dimensions['DN'].width = 25
     ws.column_dimensions['DO'].width = 9
     ws.column_dimensions['DP'].width = 33
@@ -2300,7 +2477,7 @@ def fill_worksheet(ws, results):
     ws['DH9'] = 'MES' 
     
     ws['DI9'].alignment = Alignment(horizontal= "center", vertical="center", wrap_text=True)
-    ws['DI9'].font = Font(name = 'Arial', size= 8, bold = True, color='000000')
+    ws['DI9'].font = Font(name = 'Arial', size= 8, bold = True)
     ws['DI9'].fill = gray_fill
     ws['DI9'].border = border
     ws['DI9'] = 'IND' 
@@ -2380,14 +2557,14 @@ def fill_worksheet(ws, results):
                     value_upper = value.strip().upper()
                     if value_upper == "NO CUMPLE":
                         cell.fill = PatternFill(patternType='solid', fgColor='FF0000')  # Fondo rojo
-                        cell.font = Font(name='Arial', size=7,  bold = True)  # Letra blanca
+                        cell.font = Font(name='Arial', size=8, bold = True,color="FFFFFF")  # Letra blanca
                     elif value_upper == "CUMPLE":
                         cell.fill = PatternFill(patternType='solid', fgColor='00FF00')  # Fondo verde
-                        cell.font = Font(name='Arial', size=7,  bold = True)  # Letra blanca
+                        cell.font = Font(name='Arial', size=8,  bold = True,color="FFFFFF")  # Letra blanca
                     else:
-                        cell.font = Font(name='Arial', size=7)
+                        cell.font = Font(name='Arial', size=8, bold = True)
                 else:
-                    cell.font = Font(name='Arial', size=8)
+                    cell.font = Font(name='Arial', size=8,  bold = True)
             
             # Aplicar color de letra SUB INDICADORES
             elif col in [15, 18, 27, 51, 56, 63, 70, 76, 79, 80, 85, 92]:

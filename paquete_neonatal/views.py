@@ -73,9 +73,9 @@ def obtener_avance_regional_paquete_neonatal():
             cursor.execute(
                 '''
                 SELECT 
-                    SUM(numerador_mes_noviembre) AS num,
-                    SUM(denominador_mes_noviembre) AS den,
-                    ROUND((SUM(numerador_mes_noviembre)::NUMERIC / NULLIF(SUM(denominador_mes_noviembre), 0)) * 100, 2) AS cob
+                    SUM(numerador_mes_diciembre) AS num,
+                    SUM(denominador_mes_diciembre) AS den,
+                    ROUND((SUM(numerador_mes_diciembre)::NUMERIC / NULLIF(SUM(denominador_mes_diciembre), 0)) * 100, 2) AS cob
                 FROM public."Cobertura_MC03_PaqueteNeonatal"
                 '''
             )
@@ -392,6 +392,7 @@ def index_paquete_neonatal(request):
         'actualizacion': actualizacion
     })
 
+
 ## SEGUIMIENTO
 def get_redes_paquete_neonatal(request,redes_id):
     redes = (
@@ -425,23 +426,24 @@ def get_redes_paquete_neonatal(request,redes_id):
     
     return render(request, 'paquete_neonatal/redes.html', context)
 
-def obtener_seguimiento_redes_paquete_neonatal(p_red,p_inicio,p_fin):
+def obtener_seguimiento_redes_paquete_neonatal(p_anio,p_red,p_inicio,p_fin,p_cumple):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT * FROM public.fn_seguimiento_paquete_neonatal(%s, %s, %s)",
-            [p_red, p_inicio, p_fin]
+            "SELECT * FROM public.fn_seguimiento_paquete_neonatal(%s, %s, %s, %s, %s)",
+            [p_anio,p_red, p_inicio, p_fin, p_cumple]
         )
         return cursor.fetchall()
 
 class RptPaqueteNeonatalRed(TemplateView):
     def get(self, request, *args, **kwargs):
         # Variables ingresadas
-        p_red = request.GET.get('red')
-        p_inicio = request.GET.get('fecha_inicio')
-        p_fin = request.GET.get('fecha_fin')
-                
+        p_anio = request.GET.get('anio')
+        p_red = request.GET.get('red','')
+        p_inicio = int(request.GET.get('fecha_inicio'))
+        p_fin = int(request.GET.get('fecha_fin'))
+        p_cumple = request.GET.get('cumple', '')  # '' si viene vacío       
         # Creación de la consulta
-        resultado_seguimiento = obtener_seguimiento_redes_paquete_neonatal(p_red, p_inicio, p_fin)
+        resultado_seguimiento = obtener_seguimiento_redes_paquete_neonatal(p_anio,p_red,p_inicio,p_fin,p_cumple)
         
         wb = Workbook()
         

@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import index_paquete_nino, get_redes_paquete_nino, RptPaqueteNinoRed, RptCoberturaPaqueteNino
-
+from .views import get_microredes_paquete_nino, p_microredes_paquete_nino, RptPaqueteNinoMicroRed
+from .views import get_establecimientos_paquete_nino, p_microredes_establec_paquete_nino, p_establecimientos_paquete_nino, RptPaqueteNinoEstablec
 
 urlpatterns = [
 
@@ -12,18 +13,19 @@ urlpatterns = [
     #-- redes excel
     path('rpt_paquete_nino_red_excel/', RptPaqueteNinoRed.as_view(), name = 'rpt_paquete_nino_red_xls'),
     
+    # microredes
+    path('get_microredes_paquete_nino/<int:microredes_id>/', get_microredes_paquete_nino, name='get_microredes_paquete_nino'),
+    path('p_microredes_paquete_nino/', p_microredes_paquete_nino, name='p_microredes_paquete_nino'),
+    #-- microredes excel
+    path('rpt_paquete_nino_microred_excel/', RptPaqueteNinoMicroRed.as_view(), name = 'rpt_paquete_nino_red_xls'),
+    
+    # establecimientos
+    path('get_establecimientos_paquete_nino/<int:establecimiento_id>/', get_establecimientos_paquete_nino, name='get_establecimientos_paquete_nino'),
+    path('p_microredes_establec_paquete_nino/', p_microredes_establec_paquete_nino, name='p_microredes_establec_paquete_nino'),
+    path('p_establecimiento_paquete_nino/', p_establecimientos_paquete_nino, name='p_establecimientos_paquete_nino'),       
+    #-- estableccimiento excel
+    path('rpt_paquete_nino_establec_excel/', RptPaqueteNinoEstablec.as_view(), name = 'rpt_paquete_nino_red_xls'),
+    
     ### COBERTURA
     path('rpt_cobertura_nino_red_excel/', RptCoberturaPaqueteNino.as_view(), name = 'rpt_cobertura_paquete_nino_red_xls'),
-    
-    
-    #microredes
-    # path('get_microredes/<int:microredes_id>/', views.get_microredes, name='get_microredes'),
-    # path('p_microredes/', views.p_microredes, name='p_microredes'),
-    # #-- microredes excel
-    # path('rpt_operacional_microred_excel/', RptOperacinalMicroRed.as_view(), name = 'rpt_operacional_microred_xls'),
-    # 
-    #establecimientos
-    # path('get_establecimientos/<int:establecimiento_id>/', views.get_establecimientos, name='get_establecimientos'),
-    # path('p_microredes_establec/', views.p_microredes_establec, name='p_microredes_establec'),
-    # path('p_establecimiento/', views.p_establecimientos, name='p_establecimientos'),    
 ]
