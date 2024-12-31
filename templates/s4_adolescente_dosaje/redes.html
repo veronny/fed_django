@@ -7,52 +7,65 @@
                 </div>
                 <form method="GET" enctype="multipart/form-data" action="{% url 'rpt_s4_adolescente_dosaje_red_xls' %}">
                 <!-- cabecera-->   
-                    <div class="form row">
-                        <div class="col-md-4 form-group">
-                            <div class="form-group">
-                                <label class="text-danger" for="anio" >AÑO:</label>
-                                <input class="form-control form-select-sm" id="anio" name="anio" placeholder='2024'>
-                            </div>
-                        </div>
-                        <div class="col-md-4 form-group">
-                            <div class="form-group">
-                                <label class="text-danger" for="fecha_inicio">MES INICIO:</label>
-                                <select class="form-control" name="fecha_inicio">
-                                    {% for m in mes_inicio %}
-                                    <option value="{{ m.nro_mes }}">{{ m.Mes }} </option>
-                                    {% endfor %}
+                <div class="form row">
+                    <div class="col-md-3 form-group">
+                        <div class="form-group">
+                            <label class="text-danger" for="anio" >AÑO:</label>
+                            <select class="form-control form-select-sm" id="anio" name="anio">
+                                <option value = '2024'>2024</option>
+                                <option value = '2025'>2025</option>
                             </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4 form-group">
-                            <div class="form-group">
-                                <label class="text-danger" for="fecha_fin">MES FIN:</label>
-                                <select class="form-control" name="fecha_fin">
-                                    {% for m in mes_fin %}
-                                    <option value="{{ m.nro_mes }}">{{ m.Mes }} </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                    </div>    
-                    <!-- fin cabecera-->                  
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label class="text-primary" for="red">REDES :</label>
-                                <select class="form-control" name="red">
-                                    <option value="">--- SELECCIONAR ---</option>
-                                    {% for p in redes %}
-                                    <option value="{{ p.Red }}">{{ p.Red }} </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
                         </div>
                     </div>
-                    <br>        
-                    <div class="col-md-6 offset-md-3 text-center py-1 form-group">        
-                        <button type="submit" class="btn btn-success btn-lg text-center"><i class="fa fa-file-excel"></i> Procesar</button>
+                    <div class="col-md-3 form-group">
+                        <div class="form-group">
+                            <label class="text-danger" for="fecha_inicio">MES INICIO:</label>
+                            <select class="form-control" id="fecha_inicio" name="fecha_inicio">
+                                {% for m in mes_inicio %}
+                                <option value="{{ m.nro_mes }}">{{ m.Mes }} </option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
+                    <div class="col-md-3 form-group">
+                        <div class="form-group">
+                            <label class="text-danger" for="fecha_fin">MES FIN:</label>
+                            <select class="form-control" id="fecha_fin" name="fecha_fin">
+                                {% for m in mes_fin %}
+                                <option value="{{ m.nro_mes }}">{{ m.Mes }} </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <div class="form-group">
+                            <label class="text-danger" for="fecha_fin">ESTADO INDICADOR:</label>
+                            <select class="form-control form-select-sm" id="cumple" name="cumple">
+                                <option value="">Todos</option>
+                                <option value="1">Cumplen</option>
+                                <option value="0">NO Cumplen</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>    
+                <!-- fin cabecera-->                  
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="text-primary" for="red">REDES :</label>
+                            <select class="form-control" name="red">
+                                <option value="">--- SELECCIONAR ---</option>
+                                {% for p in redes %}
+                                <option value="{{ p.codigo_red_filtrado}}">{{ p.Red }} </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <br>        
+                <div class="col-md-6 offset-md-3 text-center py-1 form-group">        
+                    <button type="submit" class="btn btn-success btn-lg text-center"><i class="fa fa-file-excel"></i> Procesar</button>
+                </div>
                 </form>
             </section>
         </div> 
