@@ -64,7 +64,7 @@ def obtener_ranking_paquete_neonatal(anio, mes):
 ## AVANCE REGIONAL
 def obtener_avance_regional_paquete_neonatal():
     """
-    Obtiene el avance regional de gestantes con anemia.
+    Obtiene el avance regional de neonatals con anemia.
     Retorna una lista de diccionarios con las claves 'num', 'den' y 'cob'.
     """
     try:
@@ -95,7 +95,7 @@ def obtener_avance_regional_paquete_neonatal():
 ## AVANCE REGIONAL MENSUALIZADO
 def obtener_avance_regional_mensual_paquete_neonatal():
     """
-    Obtiene el avance regional de gestantes con anemia de manera mensualizada.
+    Obtiene el avance regional de neonatals con anemia de manera mensualizada.
     Retorna una lista de diccionarios con las claves 'num', 'den' y 'cob' por meses.
     """
     try:
@@ -392,8 +392,7 @@ def index_paquete_neonatal(request):
         'actualizacion': actualizacion
     })
 
-
-## SEGUIMIENTO
+## SEGUIMIENTO POR REDES
 def get_redes_paquete_neonatal(request,redes_id):
     redes = (
             MAESTRO_HIS_ESTABLECIMIENTO
@@ -426,11 +425,105 @@ def get_redes_paquete_neonatal(request,redes_id):
     
     return render(request, 'paquete_neonatal/redes.html', context)
 
-def obtener_seguimiento_redes_paquete_neonatal(p_anio,p_red,p_inicio,p_fin,p_cumple):
+def get_microredes_paquete_neonatal(request, microredes_id):
+    redes = (
+            MAESTRO_HIS_ESTABLECIMIENTO
+            .objects.filter(Descripcion_Sector='GOBIERNO REGIONAL',Departamento='JUNIN')
+            .annotate(codigo_red_filtrado=Substr('Codigo_Red', 1, 4))
+            .values('Red','codigo_red_filtrado')
+            .distinct()
+            .order_by('Red')
+    )
+    mes_inicio = (
+                DimPeriodo
+                .objects.filter(Anio='2024')
+                .annotate(nro_mes=Cast('NroMes', IntegerField())) 
+                .values('Mes','nro_mes')
+                .order_by('NroMes')
+                .distinct()
+    ) 
+    mes_fin = (
+                DimPeriodo
+                .objects.filter(Anio='2024')
+                .annotate(nro_mes=Cast('NroMes', IntegerField())) 
+                .values('Mes','nro_mes')
+                .order_by('NroMes')
+                .distinct()
+    ) 
+    context = {
+                'redes': redes,
+                'mes_inicio':mes_inicio,
+                'mes_fin':mes_fin,
+    }
+    
+    return render(request, 'paquete_neonatal/microredes.html', context)
+
+def p_microredes_paquete_neonatal(request):
+    redes_param = request.GET.get('red')
+    microredes = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Codigo_Red=redes_param, Descripcion_Sector='GOBIERNO REGIONAL', Disa='JUNIN').values('Codigo_MicroRed','MicroRed').distinct()
+    context = {
+        'redes_param': redes_param,
+        'microredes': microredes
+    }
+    return render(request, 'paquete_neonatal/partials/p_microredes.html', context)
+
+## REPORTE POR ESTABLECIMIENTO
+def get_establecimientos_paquete_neonatal(request,establecimiento_id):
+    redes = (
+                MAESTRO_HIS_ESTABLECIMIENTO
+                .objects.filter(Descripcion_Sector='GOBIERNO REGIONAL',Disa='JUNIN')
+                .annotate(codigo_red_filtrado=Substr('Codigo_Red', 1, 4))
+                .values('Red','codigo_red_filtrado')
+                .distinct()
+                .order_by('Red')
+    )
+    mes_inicio = (
+                DimPeriodo
+                .objects.filter(Anio='2024')
+                .annotate(nro_mes=Cast('NroMes', IntegerField())) 
+                .values('Mes','nro_mes')
+                .order_by('NroMes')
+                .distinct()
+    ) 
+    mes_fin = (
+                DimPeriodo
+                .objects.filter(Anio='2024')
+                .annotate(nro_mes=Cast('NroMes', IntegerField())) 
+                .values('Mes','nro_mes')
+                .order_by('NroMes')
+                .distinct()
+    ) 
+    context = {
+                'redes': redes,
+                'mes_inicio':mes_inicio,
+                'mes_fin':mes_fin,
+    }
+    return render(request,'paquete_neonatal/establecimientos.html', context)
+
+def p_microredes_establec_paquete_neonatal(request):
+    redes_param = request.GET.get('red') 
+    microredes = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Codigo_Red=redes_param, Descripcion_Sector='GOBIERNO REGIONAL',Disa='JUNIN').values('Codigo_MicroRed','MicroRed').distinct()
+    context = {
+        'microredes': microredes,
+        'is_htmx': True
+    }
+    return render(request, 'paquete_neonatal/partials/p_microredes_establec.html', context)
+
+def p_establecimientos_paquete_neonatal(request):
+    microredes = request.GET.get('p_microredes_establec')    
+    codigo_red = request.GET.get('red')
+    establec = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Codigo_MicroRed=microredes,Codigo_Red=codigo_red,Descripcion_Sector='GOBIERNO REGIONAL',Disa='JUNIN').values('Codigo_Unico','Nombre_Establecimiento').distinct()
+    context= {
+        'establec': establec
+    }
+    return render(request, 'paquete_neonatal/partials/p_establecimientos.html', context)
+
+
+def obtener_seguimiento_redes_paquete_neonatal(p_anio,p_red,p_microred,p_establec,p_inicio,p_fin,p_cumple):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT * FROM public.fn_seguimiento_paquete_neonatal(%s, %s, %s, %s, %s)",
-            [p_anio,p_red, p_inicio, p_fin, p_cumple]
+            "SELECT * FROM public.fn_seguimiento_paquete_neonatal(%s,%s,%s,%s,%s,%s,%s)",
+            [p_anio, p_red, p_microred, p_establec, p_inicio, p_fin, p_cumple]
         )
         return cursor.fetchall()
 
@@ -439,11 +532,13 @@ class RptPaqueteNeonatalRed(TemplateView):
         # Variables ingresadas
         p_anio = request.GET.get('anio')
         p_red = request.GET.get('red','')
+        p_microred = ''
+        p_establec = ''
         p_inicio = int(request.GET.get('fecha_inicio'))
         p_fin = int(request.GET.get('fecha_fin'))
-        p_cumple = request.GET.get('cumple', '')  # '' si viene vacío       
+        p_cumple = request.GET.get('cumple', '') 
         # Creación de la consulta
-        resultado_seguimiento = obtener_seguimiento_redes_paquete_neonatal(p_anio,p_red,p_inicio,p_fin,p_cumple)
+        resultado_seguimiento = obtener_seguimiento_redes_paquete_neonatal(p_anio,p_red,p_microred,p_establec,p_inicio,p_fin,p_cumple)
         
         wb = Workbook()
         
@@ -470,6 +565,86 @@ class RptPaqueteNeonatalRed(TemplateView):
         wb.save(response)
 
         return response
+
+class RptPaqueteNeonatalMicroRed(TemplateView):
+    def get(self, request, *args, **kwargs):
+        # Variables ingresadas
+        p_anio = request.GET.get('anio')
+        p_red = request.GET.get('red','')
+        p_microred = request.GET.get('p_microredes','')
+        p_establec = ''
+        p_inicio = int(request.GET.get('fecha_inicio'))
+        p_fin = int(request.GET.get('fecha_fin'))
+        p_cumple = request.GET.get('cumple', '')     
+        # Creación de la consulta
+        resultado_seguimiento = obtener_seguimiento_redes_paquete_neonatal(p_anio,p_red,p_microred,p_establec,p_inicio,p_fin,p_cumple)
+                
+        wb = Workbook()
+        
+        consultas = [
+                ('Seguimiento', resultado_seguimiento)
+        ]
+        
+        for index, (sheet_name, results) in enumerate(consultas):
+            if index == 0:
+                ws = wb.active
+                ws.title = sheet_name
+            else:
+                ws = wb.create_sheet(title=sheet_name)
+        
+            fill_worksheet(ws, results)
+        
+        ##########################################################################          
+        # Establecer el nombre del archivo
+        nombre_archivo = "rpt_paquete_neonatal_microred.xlsx"
+        # Definir el tipo de respuesta que se va a dar
+        response = HttpResponse(content_type="application/ms-excel")
+        contenido = "attachment; filename={}".format(nombre_archivo)
+        response["Content-Disposition"] = contenido
+        wb.save(response)
+
+        return response
+
+class RptPaqueteNeonatalEstablec(TemplateView):
+    def get(self, request, *args, **kwargs):
+        # Variables ingresadas
+        p_anio = request.GET.get('anio')
+        p_red = request.GET.get('red','')
+        p_microred = request.GET.get('p_microredes','')
+        p_establec = request.GET.get('p_establecimiento','')
+        p_inicio = int(request.GET.get('fecha_inicio'))
+        p_fin = int(request.GET.get('fecha_fin'))
+        p_cumple = request.GET.get('cumple', '')     
+        # Creación de la consulta
+        resultado_seguimiento = obtener_seguimiento_redes_paquete_neonatal(p_anio,p_red,p_microred,p_establec,p_inicio,p_fin,p_cumple)
+                
+        wb = Workbook()
+        
+        consultas = [
+                ('Seguimiento', resultado_seguimiento)
+        ]
+        
+        for index, (sheet_name, results) in enumerate(consultas):
+            if index == 0:
+                ws = wb.active
+                ws.title = sheet_name
+            else:
+                ws = wb.create_sheet(title=sheet_name)
+        
+            fill_worksheet(ws, results)
+        
+        ##########################################################################          
+        # Establecer el nombre del archivo
+        nombre_archivo = "rpt_paquete_neonatal_establec.xlsx"
+        # Definir el tipo de respuesta que se va a dar
+        response = HttpResponse(content_type="application/ms-excel")
+        contenido = "attachment; filename={}".format(nombre_archivo)
+        response["Content-Disposition"] = contenido
+        wb.save(response)
+
+        return response
+
+
 
 def fill_worksheet(ws, results): 
     # cambia el alto de la columna
