@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import index_s22_anemia12, get_redes_s22_anemia12, RptS22Anemia12Red, RptCoberturaS22Anemia12
-
+from .views import get_microredes_s22_anemia12, p_microredes_s22_anemia12, RptS22Anemia12MicroRed
+from .views import get_establecimientos_s22_anemia12, p_microredes_establec_s22_anemia12, p_establecimientos_s22_anemia12, RptS22Anemia12Establec
 
 urlpatterns = [
 
@@ -12,17 +13,24 @@ urlpatterns = [
     #-- redes excel
     path('rpt_s22_anemia12_excel/', RptS22Anemia12Red.as_view(), name = 'rpt_s22_anemia12_red_xls'),
     
+    
+    
+    # microredes
+    path('get_microredes_s22_anemia12/<int:microredes_id>/', get_microredes_s22_anemia12, name='get_microredes_s22_anemia12'),
+    path('p_microredes_s22_anemia12/', p_microredes_s22_anemia12, name='p_microredes_s22_anemia12'),
+    #-- microredes excel
+    path('rpt_s22_anemia12_microred_excel/', RptS22Anemia12MicroRed.as_view(), name = 'rpt_s22_anemia12_red_xls'),
+    
+    # establecimientos
+    path('get_establecimientos_s22_anemia12/<int:establecimiento_id>/', get_establecimientos_s22_anemia12, name='get_establecimientos_s22_anemia12'),
+    path('p_microredes_establec_s22_anemia12/', p_microredes_establec_s22_anemia12, name='p_microredes_establec_s22_anemia12'),
+    path('p_establecimiento_s22_anemia12/', p_establecimientos_s22_anemia12, name='p_establecimientos_s22_anemia12'),       
+    #-- estableccimiento excel
+    path('rpt_s22_anemia12_establec_excel/', RptS22Anemia12Establec.as_view(), name = 'rpt_s22_anemia12_red_xls'),
+    
+    
+    
     ### COBERTURA
     path('rpt_cobertura_s22_anemia12_excel/', RptCoberturaS22Anemia12.as_view(), name = 'rpt_cobertura_s22_anemia12_xls'),
-    
-    #microredes
-    # path('get_microredes/<int:microredes_id>/', views.get_microredes, name='get_microredes'),
-    # path('p_microredes/', views.p_microredes, name='p_microredes'),
-    # #-- microredes excel
-    # path('rpt_operacional_microred_excel/', RptOperacinalMicroRed.as_view(), name = 'rpt_operacional_microred_xls'),
-    # 
-    #establecimientos
-    # path('get_establecimientos/<int:establecimiento_id>/', views.get_establecimientos, name='get_establecimientos'),
-    # path('p_microredes_establec/', views.p_microredes_establec, name='p_microredes_establec'),
-    # path('p_establecimiento/', views.p_establecimientos, name='p_establecimientos'),    
+
 ]

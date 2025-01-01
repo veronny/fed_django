@@ -7,30 +7,44 @@
                 </div>
                 <form method="GET" enctype="multipart/form-data" action="{% url 'rpt_s21_suplementacion6_red_xls' %}">
                 <!-- cabecera-->   
+                    <!-- cabecera-->   
                     <div class="form row">
-                        <div class="col-md-4 form-group">
+                        <div class="col-md-3 form-group">
                             <div class="form-group">
                                 <label class="text-danger" for="anio" >AÑO:</label>
-                                <input class="form-control form-select-sm" id="anio" name="anio" placeholder='2024'>
+                                <select class="form-control form-select-sm" id="anio" name="anio">
+                                    <option value = '2024'>2024</option>
+                                    <option value = '2025'>2025</option>
+                                </select>
                             </div>
                         </div>
-                        <div class="col-md-4 form-group">
+                        <div class="col-md-3 form-group">
                             <div class="form-group">
                                 <label class="text-danger" for="fecha_inicio">MES INICIO:</label>
-                                <select class="form-control" name="fecha_inicio">
+                                <select class="form-control" id="fecha_inicio" name="fecha_inicio">
                                     {% for m in mes_inicio %}
                                     <option value="{{ m.nro_mes }}">{{ m.Mes }} </option>
                                     {% endfor %}
-                            </select>
+                                </select>
                             </div>
                         </div>
-                        <div class="col-md-4 form-group">
+                        <div class="col-md-3 form-group">
                             <div class="form-group">
                                 <label class="text-danger" for="fecha_fin">MES FIN:</label>
-                                <select class="form-control" name="fecha_fin">
+                                <select class="form-control" id="fecha_fin" name="fecha_fin">
                                     {% for m in mes_fin %}
                                     <option value="{{ m.nro_mes }}">{{ m.Mes }} </option>
                                     {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <div class="form-group">
+                                <label class="text-danger" for="fecha_fin">ESTADO INDICADOR:</label>
+                                <select class="form-control form-select-sm" id="cumple" name="cumple">
+                                    <option value="">Todos</option>
+                                    <option value="1">Cumplen</option>
+                                    <option value="0">NO Cumplen</option>
                                 </select>
                             </div>
                         </div>
@@ -43,7 +57,7 @@
                                 <select class="form-control" name="red">
                                     <option value="">--- SELECCIONAR ---</option>
                                     {% for p in redes %}
-                                    <option value="{{ p.Red }}">{{ p.Red }} </option>
+                                    <option value="{{ p.codigo_red_filtrado}}">{{ p.Red }} </option>
                                     {% endfor %}
                                 </select>
                             </div>
