@@ -1,6 +1,7 @@
 from django.urls import path
-from .views import index_v3_paquete_terapeutico, get_redes_v3_paquete_terapeutico, RptV1CondicionPreviaRed, RptCoberturaV3PaqueteTerapeutico
-
+from .views import index_v3_paquete_terapeutico, get_redes_v3_paquete_terapeutico, RptV3PaqueteTerapeuticoRed, RptCoberturaV3PaqueteTerapeutico
+from .views import get_microredes_v3_paquete_terapeutico, p_microredes_v3_paquete_terapeutico, RptV3PaqueteTerapeuticoMicroRed
+from .views import get_establecimientos_v3_paquete_terapeutico, p_microredes_establec_v3_paquete_terapeutico, p_establecimientos_v3_paquete_terapeutico, RptV3PaqueteTerapeuticoEstablec
 
 urlpatterns = [
 
@@ -10,19 +11,23 @@ urlpatterns = [
     # redes
     path('get_redes_v3_paquete_terapeutico/<int:redes_id>/', get_redes_v3_paquete_terapeutico, name='get_redes_v3_paquete_terapeutico'),
     #-- redes excel
-    path('rpt_v3_paquete_terapeutico_excel/', RptV1CondicionPreviaRed.as_view(), name = 'rpt_v3_paquete_terapeutico_red_xls'),
+    path('rpt_v3_paquete_terapeutico_excel/', RptV3PaqueteTerapeuticoRed.as_view(), name = 'rpt_v3_paquete_terapeutico_red_xls'),
+    
+    # microredes
+    path('get_microredes_v3_paquete_terapeutico/<int:microredes_id>/', get_microredes_v3_paquete_terapeutico, name='get_microredes_v3_paquete_terapeutico'),
+    path('p_microredes_v3_paquete_terapeutico/', p_microredes_v3_paquete_terapeutico, name='p_microredes_v3_paquete_terapeutico'),
+    #-- microredes excel
+    path('rpt_v3_paquete_terapeutico_microred_excel/', RptV3PaqueteTerapeuticoMicroRed.as_view(), name = 'rpt_v3_paquete_terapeutico_red_xls'),
+    
+    # establecimientos
+    path('get_establecimientos_v3_paquete_terapeutico/<int:establecimiento_id>/', get_establecimientos_v3_paquete_terapeutico, name='get_establecimientos_v3_paquete_terapeutico'),
+    path('p_microredes_establec_v3_paquete_terapeutico/', p_microredes_establec_v3_paquete_terapeutico, name='p_microredes_establec_v3_paquete_terapeutico'),
+    path('p_establecimiento_v3_paquete_terapeutico/', p_establecimientos_v3_paquete_terapeutico, name='p_establecimientos_v3_paquete_terapeutico'),       
+    #-- estableccimiento excel
+    path('rpt_v3_paquete_terapeutico_establec_excel/', RptV3PaqueteTerapeuticoEstablec.as_view(), name = 'rpt_v3_paquete_terapeutico_red_xls'),
+    
     
     ### COBERTURA
     path('rpt_cobertura_v3_paquete_terapeutico_excel/', RptCoberturaV3PaqueteTerapeutico.as_view(), name = 'rpt_cobertura_v3_paquete_terapeutico_xls'),
     
-    #microredes
-    # path('get_microredes/<int:microredes_id>/', views.get_microredes, name='get_microredes'),
-    # path('p_microredes/', views.p_microredes, name='p_microredes'),
-    # #-- microredes excel
-    # path('rpt_operacional_microred_excel/', RptOperacinalMicroRed.as_view(), name = 'rpt_operacional_microred_xls'),
-    # 
-    #establecimientos
-    # path('get_establecimientos/<int:establecimiento_id>/', views.get_establecimientos, name='get_establecimientos'),
-    # path('p_microredes_establec/', views.p_microredes_establec, name='p_microredes_establec'),
-    # path('p_establecimiento/', views.p_establecimientos, name='p_establecimientos'),    
 ]

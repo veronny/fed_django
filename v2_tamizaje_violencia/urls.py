@@ -1,6 +1,7 @@
 from django.urls import path
-from .views import index_v2_tamizaje_violencia, get_redes_v2_tamizaje_violencia, RptV1CondicionPreviaRed, RptCoberturaV2TamizajeViolencia
-
+from .views import index_v2_tamizaje_violencia, get_redes_v2_tamizaje_violencia, RptV2TamizajeViolenciaRed, RptCoberturaV2TamizajeViolencia
+from .views import get_microredes_v2_tamizaje_violencia, p_microredes_v2_tamizaje_violencia, RptV2TamizajeViolenciaMicroRed
+from .views import get_establecimientos_v2_tamizaje_violencia, p_microredes_establec_v2_tamizaje_violencia, p_establecimientos_v2_tamizaje_violencia, RptV2TamizajeViolenciaEstablec
 
 urlpatterns = [
 
@@ -10,21 +11,23 @@ urlpatterns = [
     # redes
     path('get_redes_v2_tamizaje_violencia/<int:redes_id>/', get_redes_v2_tamizaje_violencia, name='get_redes_v2_tamizaje_violencia'),
     #-- redes excel
-    path('rpt_v2_tamizaje_violencia_excel/', RptV1CondicionPreviaRed.as_view(), name = 'rpt_v2_tamizaje_violencia_red_xls'),
+    path('rpt_v2_tamizaje_violencia_excel/', RptV2TamizajeViolenciaRed.as_view(), name = 'rpt_v2_tamizaje_violencia_red_xls'),
     
+    # microredes
+    path('get_microredes_v2_tamizaje_violencia/<int:microredes_id>/', get_microredes_v2_tamizaje_violencia, name='get_microredes_v2_tamizaje_violencia'),
+    path('p_microredes_v2_tamizaje_violencia/', p_microredes_v2_tamizaje_violencia, name='p_microredes_v2_tamizaje_violencia'),
+    #-- microredes excel
+    path('rpt_v2_tamizaje_violencia_microred_excel/', RptV2TamizajeViolenciaMicroRed.as_view(), name = 'rpt_v2_tamizaje_violencia_red_xls'),
+    
+    # establecimientos
+    path('get_establecimientos_v2_tamizaje_violencia/<int:establecimiento_id>/', get_establecimientos_v2_tamizaje_violencia, name='get_establecimientos_v2_tamizaje_violencia'),
+    path('p_microredes_establec_v2_tamizaje_violencia/', p_microredes_establec_v2_tamizaje_violencia, name='p_microredes_establec_v2_tamizaje_violencia'),
+    path('p_establecimiento_v2_tamizaje_violencia/', p_establecimientos_v2_tamizaje_violencia, name='p_establecimientos_v2_tamizaje_violencia'),       
+    #-- estableccimiento excel
+    path('rpt_v2_tamizaje_violencia_establec_excel/', RptV2TamizajeViolenciaEstablec.as_view(), name = 'rpt_v2_tamizaje_violencia_red_xls'),
     
     ### COBERTURA
     path('rpt_cobertura_v2_tamizaje_violencia_excel/', RptCoberturaV2TamizajeViolencia.as_view(), name = 'rpt_cobertura_v2_tamizaje_violencia_xls'),
     
-    
-    #microredes
-    # path('get_microredes/<int:microredes_id>/', views.get_microredes, name='get_microredes'),
-    # path('p_microredes/', views.p_microredes, name='p_microredes'),
-    # #-- microredes excel
-    # path('rpt_operacional_microred_excel/', RptOperacinalMicroRed.as_view(), name = 'rpt_operacional_microred_xls'),
-    # 
-    #establecimientos
-    # path('get_establecimientos/<int:establecimiento_id>/', views.get_establecimientos, name='get_establecimientos'),
-    # path('p_microredes_establec/', views.p_microredes_establec, name='p_microredes_establec'),
-    # path('p_establecimiento/', views.p_establecimientos, name='p_establecimientos'),    
+
 ]

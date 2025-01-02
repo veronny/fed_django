@@ -92,7 +92,6 @@ def obtener_avance_regional_v1_condicion_previa():
         print(f"Error al obtener el avance regional: {e}")
         return None
 
-
 ## AVANCE REGIONAL MENSUALIZADO
 def obtener_avance_regional_mensual_v1_condicion_previa():
     """
@@ -427,22 +426,123 @@ def get_redes_v1_condicion_previa(request,redes_id):
     
     return render(request, 'v1_condicion_previa/redes.html', context)
 
-def obtener_seguimiento_redes_v1_condicion_previa(p_red,p_inicio,p_fin):
+## SEGUIMIENTO POR MICRO-REDES
+def get_microredes_v1_condicion_previa(request, microredes_id):
+    redes = (
+            MAESTRO_HIS_ESTABLECIMIENTO
+            .objects.filter(Descripcion_Sector='GOBIERNO REGIONAL',Departamento='JUNIN')
+            .annotate(codigo_red_filtrado=Substr('Codigo_Red', 1, 4))
+            .values('Red','codigo_red_filtrado')
+            .distinct()
+            .order_by('Red')
+    )
+    mes_inicio = (
+                DimPeriodo
+                .objects.filter(Anio='2024')
+                .annotate(nro_mes=Cast('NroMes', IntegerField())) 
+                .values('Mes','nro_mes')
+                .order_by('NroMes')
+                .distinct()
+    ) 
+    mes_fin = (
+                DimPeriodo
+                .objects.filter(Anio='2024')
+                .annotate(nro_mes=Cast('NroMes', IntegerField())) 
+                .values('Mes','nro_mes')
+                .order_by('NroMes')
+                .distinct()
+    ) 
+    context = {
+                'redes': redes,
+                'mes_inicio':mes_inicio,
+                'mes_fin':mes_fin,
+    }
+    
+    return render(request, 'v1_condicion_previa/microredes.html', context)
+
+def p_microredes_v1_condicion_previa(request):
+    redes_param = request.GET.get('red')
+    microredes = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Codigo_Red=redes_param, Descripcion_Sector='GOBIERNO REGIONAL', Disa='JUNIN').values('Codigo_MicroRed','MicroRed').distinct()
+    context = {
+        'redes_param': redes_param,
+        'microredes': microredes
+    }
+    return render(request, 'v1_condicion_previa/partials/p_microredes.html', context)
+
+## REPORTE POR ESTABLECIMIENTO
+def get_establecimientos_v1_condicion_previa(request,establecimiento_id):
+    redes = (
+                MAESTRO_HIS_ESTABLECIMIENTO
+                .objects.filter(Descripcion_Sector='GOBIERNO REGIONAL',Disa='JUNIN')
+                .annotate(codigo_red_filtrado=Substr('Codigo_Red', 1, 4))
+                .values('Red','codigo_red_filtrado')
+                .distinct()
+                .order_by('Red')
+    )
+    mes_inicio = (
+                DimPeriodo
+                .objects.filter(Anio='2024')
+                .annotate(nro_mes=Cast('NroMes', IntegerField())) 
+                .values('Mes','nro_mes')
+                .order_by('NroMes')
+                .distinct()
+    ) 
+    mes_fin = (
+                DimPeriodo
+                .objects.filter(Anio='2024')
+                .annotate(nro_mes=Cast('NroMes', IntegerField())) 
+                .values('Mes','nro_mes')
+                .order_by('NroMes')
+                .distinct()
+    ) 
+    context = {
+                'redes': redes,
+                'mes_inicio':mes_inicio,
+                'mes_fin':mes_fin,
+    }
+    return render(request,'v1_condicion_previa/establecimientos.html', context)
+
+def p_microredes_establec_v1_condicion_previa(request):
+    redes_param = request.GET.get('red') 
+    microredes = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Codigo_Red=redes_param, Descripcion_Sector='GOBIERNO REGIONAL',Disa='JUNIN').values('Codigo_MicroRed','MicroRed').distinct()
+    context = {
+        'microredes': microredes,
+        'is_htmx': True
+    }
+    return render(request, 'v1_condicion_previa/partials/p_microredes_establec.html', context)
+
+def p_establecimientos_v1_condicion_previa(request):
+    microredes = request.GET.get('p_microredes_establec')    
+    codigo_red = request.GET.get('red')
+    establec = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Codigo_MicroRed=microredes,Codigo_Red=codigo_red,Descripcion_Sector='GOBIERNO REGIONAL',Disa='JUNIN').values('Codigo_Unico','Nombre_Establecimiento').distinct()
+
+    context= {
+        'establec': establec
+    }
+    return render(request, 'v1_condicion_previa/partials/p_establecimientos.html', context)
+
+## QUERY
+def obtener_seguimiento_redes_v1_condicion_previa(p_anio,p_red,p_microred,p_establec,p_inicio,p_fin,p_cumple):
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT * FROM public.fn_seguimiento_v1_condicion_previa(%s, %s, %s)",
-            [p_red, p_inicio, p_fin]
+            "SELECT * FROM public.fn_seguimiento_v1_condicion_previa(%s,%s,%s,%s,%s,%s,%s)",
+            [p_anio, p_red, p_microred, p_establec, p_inicio, p_fin, p_cumple]
         )
         return cursor.fetchall()
 
+## TEMPLATES 
 class RptV1CondicionPreviaRed(TemplateView):
     def get(self, request, *args, **kwargs):
         # Variables ingresadas
-        p_red = request.GET.get('red')
-        p_inicio = request.GET.get('fecha_inicio')
-        p_fin = request.GET.get('fecha_fin')
+        p_anio = request.GET.get('anio')
+        p_red = request.GET.get('red','')
+        p_microred = ''
+        p_establec = ''
+        p_inicio = int(request.GET.get('fecha_inicio'))
+        p_fin = int(request.GET.get('fecha_fin'))
+        p_cumple = request.GET.get('cumple', '')     
         # Creación de la consulta
-        resultado_seguimiento = obtener_seguimiento_redes_v1_condicion_previa(p_red, p_inicio, p_fin)
+        resultado_seguimiento = obtener_seguimiento_redes_v1_condicion_previa(p_anio,p_red,p_microred,p_establec,p_inicio,p_fin,p_cumple)
         
         wb = Workbook()
         
@@ -461,6 +561,84 @@ class RptV1CondicionPreviaRed(TemplateView):
         ##########################################################################          
         # Establecer el nombre del archivo
         nombre_archivo = "rpt_v1_condicion_previa.xlsx"
+        # Definir el tipo de respuesta que se va a dar
+        response = HttpResponse(content_type="application/ms-excel")
+        contenido = "attachment; filename={}".format(nombre_archivo)
+        response["Content-Disposition"] = contenido
+        wb.save(response)
+
+        return response
+
+class RptV1CondicionPreviaMicroRed(TemplateView):
+    def get(self, request, *args, **kwargs):
+        # Variables ingresadas
+        p_anio = request.GET.get('anio')
+        p_red = request.GET.get('red','')
+        p_microred = request.GET.get('p_microredes','')
+        p_establec = ''
+        p_inicio = int(request.GET.get('fecha_inicio'))
+        p_fin = int(request.GET.get('fecha_fin'))
+        p_cumple = request.GET.get('cumple', '')     
+        # Creación de la consulta
+        resultado_seguimiento = obtener_seguimiento_redes_v1_condicion_previa(p_anio,p_red,p_microred,p_establec,p_inicio,p_fin,p_cumple)
+                
+        wb = Workbook()
+        
+        consultas = [
+                ('Seguimiento', resultado_seguimiento)
+        ]
+        
+        for index, (sheet_name, results) in enumerate(consultas):
+            if index == 0:
+                ws = wb.active
+                ws.title = sheet_name
+            else:
+                ws = wb.create_sheet(title=sheet_name)
+        
+            fill_worksheet_v1_condicion_previa(ws, results)
+        
+        ##########################################################################          
+        # Establecer el nombre del archivo
+        nombre_archivo = "rpt_v1_condicion_previa_red.xlsx"
+        # Definir el tipo de respuesta que se va a dar
+        response = HttpResponse(content_type="application/ms-excel")
+        contenido = "attachment; filename={}".format(nombre_archivo)
+        response["Content-Disposition"] = contenido
+        wb.save(response)
+
+        return response
+
+class RptV1CondicionPreviaEstablec(TemplateView):
+    def get(self, request, *args, **kwargs):
+        # Variables ingresadas
+        p_anio = request.GET.get('anio')
+        p_red = request.GET.get('red','')
+        p_microred = request.GET.get('p_microredes','')
+        p_establec = request.GET.get('p_establecimiento','')
+        p_inicio = int(request.GET.get('fecha_inicio'))
+        p_fin = int(request.GET.get('fecha_fin'))
+        p_cumple = request.GET.get('cumple', '')     
+        # Creación de la consulta
+        resultado_seguimiento = obtener_seguimiento_redes_v1_condicion_previa(p_anio,p_red,p_microred,p_establec,p_inicio,p_fin,p_cumple)
+                
+        wb = Workbook()
+        
+        consultas = [
+                ('Seguimiento', resultado_seguimiento)
+        ]
+        
+        for index, (sheet_name, results) in enumerate(consultas):
+            if index == 0:
+                ws = wb.active
+                ws.title = sheet_name
+            else:
+                ws = wb.create_sheet(title=sheet_name)
+        
+            fill_worksheet_v1_condicion_previa(ws, results)
+        
+        ##########################################################################          
+        # Establecer el nombre del archivo
+        nombre_archivo = "rpt_v1_condicion_previa_red.xlsx"
         # Definir el tipo de respuesta que se va a dar
         response = HttpResponse(content_type="application/ms-excel")
         contenido = "attachment; filename={}".format(nombre_archivo)
@@ -869,6 +1047,7 @@ def fill_worksheet_v1_condicion_previa(ws, results):
                         
             cell.border = border
 
+
 ###########################################################################################
 # -- COBERTURA PAQUETE NEONATAL
 def obtener_cobertura_v1_condicion_previa():
@@ -911,6 +1090,8 @@ class RptCoberturaV1CondicionPrevia(TemplateView):
 
         return response
 
+
+    
 def fill_worksheet_cobertura_v1_condicion_previa(ws, results): 
     # cambia el alto de la columna
     ws.row_dimensions[1].height = 14

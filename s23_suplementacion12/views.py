@@ -524,7 +524,6 @@ def p_establecimientos_s23_suplementacion12(request):
     }
     return render(request, 's23_suplementacion12/partials/p_establecimientos.html', context)
 
-
 ## QUERY
 def obtener_seguimiento_redes_s23_suplementacion12(p_anio,p_red,p_microred,p_establec,p_inicio,p_fin,p_cumple):
     with connection.cursor() as cursor:
