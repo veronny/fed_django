@@ -53,6 +53,7 @@ def obtener_avance_s1_gestante_anemia(red):
         )
         return cursor.fetchall()
 
+## RANKING REDES
 def obtener_ranking_s1_gestante_anemia(anio, mes):
     with connection.cursor() as cursor:
         cursor.execute(
@@ -577,7 +578,6 @@ class RptS1GestanteAnemiaRed(TemplateView):
 
         return response
 
-
 class RpS1GestanteAnemiaMicroRed(TemplateView):
     def get(self, request, *args, **kwargs):
         # Variables ingresadas
@@ -655,8 +655,6 @@ class RptS1GestanteAnemiaEstablec(TemplateView):
         wb.save(response)
 
         return response
-
-
 
 
 def fill_worksheet_s1_gestante_anemia(ws, results): 

@@ -57,6 +57,7 @@ def obtener_avance_paquete_gestante(red):
         )
         return cursor.fetchall()
 
+# RANKING GESTANTE
 def obtener_ranking_paquete_gestante(anio, mes):
     with connection.cursor() as cursor:
         cursor.execute(
@@ -520,7 +521,7 @@ def p_establecimientos_paquete_gestante(request):
     microredes = request.GET.get('p_microredes_establec')    
     codigo_red = request.GET.get('red')
     establec = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Codigo_MicroRed=microredes,Codigo_Red=codigo_red,Descripcion_Sector='GOBIERNO REGIONAL',Disa='JUNIN').values('Codigo_Unico','Nombre_Establecimiento').distinct()
-    print(establec)
+
     context= {
         'establec': establec
     }

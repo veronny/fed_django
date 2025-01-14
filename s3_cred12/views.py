@@ -53,6 +53,7 @@ def obtener_avance_s3_cred12(red):
         )
         return cursor.fetchall()
 
+## RANKING REGIONAL
 def obtener_ranking_s3_cred12(anio, mes):
     with connection.cursor() as cursor:
         cursor.execute(
