@@ -91,7 +91,14 @@
             <div class="card-header">
                 <h3 class="card-title">AVANCE REGIONAL - MENSUALIZADO</h3>
             </div>
-    
+            
+            <div class="col-md-1">
+                <select id="select-year" class="form-control form-control-sm">
+                    <option value="2024" selected>2024</option>
+                    <option value="2025">2025</option>
+                </select>
+            </div>
+
             <div class="card-body">
                 <div class="container">
                     <div id="chart_regional_mensual"></div>
@@ -349,138 +356,154 @@ document.addEventListener('DOMContentLoaded', function () {
     // Meta (por ejemplo 70%)
     const meta = 80;
     
-    fetch('{% url "index_s3_cred12" %}', {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (!data || data.error) {
-            console.error('Error en los datos recibidos:', data?.error || 'Respuesta vacía');
-            return;
-        }
-
-        const monthlyNum = [
-            data.num_1[0], data.num_2[0], data.num_3[0], data.num_4[0], data.num_5[0],
-            data.num_6[0], data.num_7[0], data.num_8[0], data.num_9[0], data.num_10[0],
-            data.num_11[0], data.num_12[0]
-        ];
-
-        const monthlyDen = [
-            data.den_1[0], data.den_2[0], data.den_3[0], data.den_4[0], data.den_5[0],
-            data.den_6[0], data.den_7[0], data.den_8[0], data.den_9[0], data.den_10[0],
-            data.den_11[0], data.den_12[0]
-        ];
-
-        const monthlyCob = [
-            data.cob_1[0], data.cob_2[0], data.cob_3[0], data.cob_4[0], data.cob_5[0],
-            data.cob_6[0], data.cob_7[0], data.cob_8[0], data.cob_9[0], data.cob_10[0],
-            data.cob_11[0], data.cob_12[0]
-        ];
-
-        const chartContainerMensual = document.getElementById('chart_regional_mensual');
-        if (chartContainerMensual) {
-            const myChartRegionalMensual = echarts.init(chartContainerMensual);
-
-            const months = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DIC'];
-
-            const option = {
-                title: {
-                    text: 'Avance Regional Mensual',
-                    left: 'center'
-                },
-                tooltip: {
-                    trigger: 'axis',
-                    formatter: function (params) {
-                        const idx = params[0].dataIndex;
-                        const monthName = params[0].name;
-                        const num = monthlyNum[idx];
-                        const den = monthlyDen[idx];
-                        const cob = monthlyCob[idx];
-
-                        return `
-                            <strong>${monthName}</strong><br/>
-                            Den: ${den}<br/>
-                            Num: ${num}<br/>
-                            Cob: ${cob.toFixed(1)}%
-                        `;
-                    }
-                },
-                legend: {
-                    data: ['% Avance'],
-                    left: 'left'
-                },
-                grid: {
-                    left: '3%',
-                    right: '4%',
-                    bottom: '3%',
-                    containLabel: true
-                },
-                toolbox: {
-                    feature: {
-                        saveAsImage: {}
-                    }
-                },
-                xAxis: {
-                    type: 'category',
-                    data: months
-                },
-                yAxis: {
-                    type: 'value',
-                    max: maxValue,  // Limitar el eje Y hasta maxValue (por defecto 80%)
-                    axisLabel: {
-                        formatter: '{value}%'
-                    }
-                },
-                series: [
-                    {
-                        name: '% Avance',
-                        type: 'line',
-                        step: 'start',
-                        data: monthlyCob,
-                        areaStyle: {},
-                        label: {
-                            show: true,
-                            position: 'top',
-                            formatter: function(params) {
-                                return params.value.toFixed(1) + '%';
+        // Función para cargar datos AJAX enviando el año
+        function cargarDatosMensual(anio) {
+            fetch(`{% url "index_s3_cred12" %}?anio=${anio}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data || data.error) {
+                    console.error('Error en los datos recibidos:', data?.error || 'Respuesta vacía');
+                    return;
+                }
+    
+                // Extraemos arrays de num, den y cob para cada mes
+                const monthlyNum = [
+                    data.num_1[0], data.num_2[0], data.num_3[0], data.num_4[0], data.num_5[0],
+                    data.num_6[0], data.num_7[0], data.num_8[0], data.num_9[0], data.num_10[0],
+                    data.num_11[0], data.num_12[0]
+                ];
+    
+                const monthlyDen = [
+                    data.den_1[0], data.den_2[0], data.den_3[0], data.den_4[0], data.den_5[0],
+                    data.den_6[0], data.den_7[0], data.den_8[0], data.den_9[0], data.den_10[0],
+                    data.den_11[0], data.den_12[0]
+                ];
+    
+                const monthlyCob = [
+                    data.cob_1[0], data.cob_2[0], data.cob_3[0], data.cob_4[0], data.cob_5[0],
+                    data.cob_6[0], data.cob_7[0], data.cob_8[0], data.cob_9[0], data.cob_10[0],
+                    data.cob_11[0], data.cob_12[0]
+                ];
+    
+                // Referencia al contenedor del gráfico
+                const chartContainerMensual = document.getElementById('chart_regional_mensual');
+                if (chartContainerMensual) {
+                    const myChartRegionalMensual = echarts.init(chartContainerMensual);
+                    const months = ['ENE','FEB','MAR','ABR','MAY','JUN',
+                                    'JUL','AGO','SET','OCT','NOV','DIC'];
+    
+                    const option = {
+                        title: {
+                            text: `Avance Regional Mensual (${anio})`,
+                            left: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'axis',
+                            formatter: function (params) {
+                                const idx = params[0].dataIndex;
+                                const monthName = params[0].name;
+                                const num = monthlyNum[idx] ?? 0;
+                                const den = monthlyDen[idx] ?? 0;
+                                const cob = monthlyCob[idx] ?? 0;
+    
+                                return `
+                                    <strong>${monthName}</strong><br/>
+                                    Den: ${den}<br/>
+                                    Num: ${num}<br/>
+                                    Cob: ${cob.toFixed(1)}%
+                                `;
                             }
                         },
-                        markLine: {
-                            symbol: 'none',
-                            lineStyle: {
-                                type: 'dash',
-                                color: 'red'
-                            },
-                            data: [
-                                { yAxis: meta, name: 'M' }
-                            ],
-                            label: {
-                                show: true,
-                                formatter: `M: ${meta}%`,
-                                position: 'end',
-                                offset: [0, -14]
+                        legend: {
+                            data: ['% Avance'],
+                            left: 'left'
+                        },
+                        grid: {
+                            left: '3%',
+                            right: '4%',
+                            bottom: '3%',
+                            containLabel: true
+                        },
+                        toolbox: {
+                            feature: {
+                                saveAsImage: {}
                             }
-                        }
-                    }
-                ]
-            };
-
-            myChartRegionalMensual.setOption(option);
-        } else {
-            console.error('El contenedor del gráfico (chart_regional_mensual) no existe');
+                        },
+                        xAxis: {
+                            type: 'category',
+                            data: months
+                        },
+                        yAxis: {
+                            type: 'value',
+                            max: maxValue,
+                            axisLabel: {
+                                formatter: '{value}%'
+                            }
+                        },
+                        series: [
+                            {
+                                name: '% Avance',
+                                type: 'line',
+                                step: 'start',
+                                data: monthlyCob,
+                                areaStyle: {},
+                                label: {
+                                    show: true,
+                                    position: 'top',
+                                    formatter: function(params) {
+                                        return params.value.toFixed(1) + '%';
+                                    }
+                                },
+                                markLine: {
+                                    symbol: 'none',
+                                    lineStyle: {
+                                        type: 'dash',
+                                        color: 'red'
+                                    },
+                                    data: [
+                                        { yAxis: meta, name: 'M' }
+                                    ],
+                                    label: {
+                                        show: true,
+                                        formatter: `M: ${meta}%`,
+                                        position: 'end',
+                                        offset: [0, -14]
+                                    }
+                                }
+                            }
+                        ]
+                    };
+    
+                    // Renderizar gráfica
+                    myChartRegionalMensual.setOption(option);
+                } else {
+                    console.error('El contenedor para el gráfico (chart_regional_mensual) no existe');
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener los datos:', error.message);
+            });
         }
-    })
-    .catch(error => {
-        console.error('Error al obtener los datos:', error.message);
+    
+        // TOMAR EL SELECT
+        const selectYear = document.getElementById('select-year');
+    
+        // AL CAMBIAR DE VALOR EN EL SELECT => CARGAR EL GRÁFICO PARA ESE AÑO
+        selectYear.addEventListener('change', (event) => {
+            const selectedYear = event.target.value;  // '2024' o '2025'
+            cargarDatosMensual(selectedYear);
+        });
+    
+        // Cargar por defecto (por ejemplo, año 2024)
+        cargarDatosMensual('2024');
     });
-});
 
 
 document.addEventListener('DOMContentLoaded', function() {

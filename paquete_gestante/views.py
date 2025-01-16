@@ -83,7 +83,7 @@ def obtener_avance_regional_paquete_gestante():
                     SUM(denominador_mes_diciembre) AS den,
                     ROUND((SUM(numerador_mes_diciembre)::NUMERIC / NULLIF(SUM(denominador_mes_diciembre), 0)) * 100, 2) AS cob
                 FROM public."Cobertura_MC01_PaqueteGestante"
-                '''
+                ''',
             )
             resultados = cursor.fetchall()
             
@@ -96,10 +96,10 @@ def obtener_avance_regional_paquete_gestante():
         return datos
     except Exception as e:
         print(f"Error al obtener el avance regional: {e}")
-        return None
+        return []
 
 ## AVANCE REGIONAL MENSUALIZADO
-def obtener_avance_regional_mensual_paquete_gestante():
+def obtener_avance_regional_mensual_paquete_gestante(anio):
     """
     Obtiene el avance regional de gestantes con anemia de manera mensualizada.
     Retorna una lista de diccionarios con las claves 'num', 'den' y 'cob' por meses.
@@ -109,46 +109,167 @@ def obtener_avance_regional_mensual_paquete_gestante():
         with connection.cursor() as cursor:
             cursor.execute(
                 '''
-                    SELECT 
-                    SUM(numerador_mes_enero) AS NUM_1, 
-                    SUM(denominador_mes_enero) AS DEN_1, 
-                    ROUND((SUM(numerador_mes_enero)::NUMERIC / NULLIF(SUM(denominador_mes_enero), 0)) * 100, 2) AS COB_1,
-                    SUM(numerador_mes_febrero) AS NUM_2, 
-                    SUM(denominador_mes_febrero) AS DEN_2, 
-                    ROUND((SUM(numerador_mes_febrero)::NUMERIC / NULLIF(SUM(denominador_mes_febrero), 0)) * 100, 2) AS COB_2,
-                    SUM(numerador_mes_marzo) AS NUM_3, 
-                    SUM(denominador_mes_marzo) AS DEN_3, 
-                    ROUND((SUM(numerador_mes_marzo)::NUMERIC / NULLIF(SUM(denominador_mes_marzo), 0)) * 100, 2) AS COB_3,
-                    SUM(numerador_mes_abril) AS NUM_4, 
-                    SUM(denominador_mes_abril) AS DEN_4, 
-                    ROUND((SUM(numerador_mes_abril)::NUMERIC / NULLIF(SUM(denominador_mes_abril), 0)) * 100, 2) AS COB_4,
-                    SUM(numerador_mes_mayo) AS NUM_5, 
-                    SUM(denominador_mes_mayo) AS DEN_5, 
-                    ROUND((SUM(numerador_mes_mayo)::NUMERIC / NULLIF(SUM(denominador_mes_mayo), 0)) * 100, 2) AS COB_5,
-                    SUM(numerador_mes_junio) AS NUM_6, 
-                    SUM(denominador_mes_junio) AS DEN_6,
-                    ROUND((SUM(numerador_mes_junio)::NUMERIC / NULLIF(SUM(denominador_mes_junio), 0)) * 100, 2) AS COB_6,
-                    SUM(numerador_mes_julio) AS NUM_7, 
-                    SUM(denominador_mes_julio) AS DEN_7,
-                    ROUND((SUM(numerador_mes_julio)::NUMERIC / NULLIF(SUM(denominador_mes_julio), 0)) * 100, 2) AS COB_7,
-                    SUM(numerador_mes_agosto) AS NUM_8, 
-                    SUM(denominador_mes_agosto) AS DEN_8, 
-                    ROUND((SUM(numerador_mes_agosto)::NUMERIC / NULLIF(SUM(denominador_mes_agosto), 0)) * 100, 2) AS COB_8,
-                    SUM(numerador_mes_setiembre) AS NUM_9, 
-                    SUM(denominador_mes_setiembre) AS DEN_9, 
-                    ROUND((SUM(numerador_mes_setiembre)::NUMERIC / NULLIF(SUM(denominador_mes_setiembre), 0)) * 100, 2) AS COB_9,
-                    SUM(numerador_mes_octubre) AS NUM_10, 
-                    SUM(denominador_mes_octubre) AS DEN_10, 
-                    ROUND((SUM(numerador_mes_octubre)::NUMERIC / NULLIF(SUM(denominador_mes_octubre), 0)) * 100, 2) AS COB_10,
-                    SUM(numerador_mes_noviembre) AS NUM_11, 
-                    SUM(denominador_mes_noviembre) AS DEN_11, 
-                    ROUND((SUM(numerador_mes_noviembre)::NUMERIC / NULLIF(SUM(denominador_mes_noviembre), 0)) * 100, 2) AS COB_11,
-                    SUM(numerador_mes_diciembre) AS NUM_12, 
-                    SUM(denominador_mes_diciembre) AS DEN_12, 
-                    ROUND((SUM(numerador_mes_diciembre)::NUMERIC / NULLIF(SUM(denominador_mes_diciembre), 0)) * 100, 2) AS COB_12
-                    FROM 
-                    public."Cobertura_MC01_PaqueteGestante";
-                '''
+                    SELECT
+                    -- ENERO
+                    SUM(CASE WHEN mes = 1 THEN CAST(numerador AS INT) ELSE 0 END) AS NUM_1,
+                    SUM(CASE WHEN mes = 1 THEN CAST(denominador AS INT) ELSE 0 END) AS DEN_1,
+                    CASE 
+                        WHEN SUM(CASE WHEN mes = 1 THEN CAST(denominador AS INT) ELSE 0 END) = 0 
+                        THEN 0 
+                        ELSE ROUND(
+                            (
+                                SUM(CASE WHEN mes = 1 THEN CAST(numerador AS INT) ELSE 0 END) * 1.0 
+                                / NULLIF(SUM(CASE WHEN mes = 1 THEN CAST(denominador AS INT) ELSE 0 END), 0)
+                            ) * 100
+                        , 2) 
+                    END AS COB_1,
+                    -- FEBRERO
+                    SUM(CASE WHEN mes = 2 THEN CAST(numerador AS INT) ELSE 0 END) AS NUM_2,
+                    SUM(CASE WHEN mes = 2 THEN CAST(denominador AS INT) ELSE 0 END) AS DEN_2,
+                    CASE 
+                        WHEN SUM(CASE WHEN mes = 2 THEN CAST(denominador AS INT) ELSE 0 END) = 0 
+                        THEN 0 
+                        ELSE ROUND(
+                            (
+                                SUM(CASE WHEN mes = 2 THEN CAST(numerador AS INT) ELSE 0 END) * 1.0 
+                                / NULLIF(SUM(CASE WHEN mes = 2 THEN CAST(denominador AS INT) ELSE 0 END), 0)
+                            ) * 100
+                        , 2) 
+                    END AS COB_2,
+                    -- MARZO
+                    SUM(CASE WHEN mes = 3 THEN CAST(numerador AS INT) ELSE 0 END) AS NUM_3,
+                    SUM(CASE WHEN mes = 3 THEN CAST(denominador AS INT) ELSE 0 END) AS DEN_3,
+                    CASE 
+                        WHEN SUM(CASE WHEN mes = 3 THEN CAST(denominador AS INT) ELSE 0 END) = 0 
+                        THEN 0 
+                        ELSE ROUND(
+                            (
+                                SUM(CASE WHEN mes = 3 THEN CAST(numerador AS INT) ELSE 0 END) * 1.0 
+                                / NULLIF(SUM(CASE WHEN mes = 3 THEN CAST(denominador AS INT) ELSE 0 END), 0)
+                            ) * 100
+                        , 2) 
+                    END AS COB_3,
+                    -- ABRIL
+                    SUM(CASE WHEN mes = 4 THEN CAST(numerador AS INT) ELSE 0 END) AS NUM_4,
+                    SUM(CASE WHEN mes = 4 THEN CAST(denominador AS INT) ELSE 0 END) AS DEN_4,
+                    CASE 
+                        WHEN SUM(CASE WHEN mes = 4 THEN CAST(denominador AS INT) ELSE 0 END) = 0 
+                        THEN 0 
+                        ELSE ROUND(
+                            (
+                                SUM(CASE WHEN mes = 4 THEN CAST(numerador AS INT) ELSE 0 END) * 1.0 
+                                / NULLIF(SUM(CASE WHEN mes = 4 THEN CAST(denominador AS INT) ELSE 0 END), 0)
+                            ) * 100
+                        , 2) 
+                    END AS COB_4,
+                    -- MAYO
+                    SUM(CASE WHEN mes = 5 THEN CAST(numerador AS INT) ELSE 0 END) AS NUM_5,
+                    SUM(CASE WHEN mes = 5 THEN CAST(denominador AS INT) ELSE 0 END) AS DEN_5,
+                    CASE 
+                        WHEN SUM(CASE WHEN mes = 5 THEN CAST(denominador AS INT) ELSE 0 END) = 0 
+                        THEN 0 
+                        ELSE ROUND(
+                            (
+                                SUM(CASE WHEN mes = 5 THEN CAST(numerador AS INT) ELSE 0 END) * 1.0
+                                / NULLIF(SUM(CASE WHEN mes = 5 THEN CAST(denominador AS INT) ELSE 0 END), 0)
+                            ) * 100
+                        , 2) 
+                    END AS COB_5,
+                    -- JUNIO
+                    SUM(CASE WHEN mes = 6 THEN CAST(numerador AS INT) ELSE 0 END) AS NUM_6,
+                    SUM(CASE WHEN mes = 6 THEN CAST(denominador AS INT) ELSE 0 END) AS DEN_6,
+                    CASE 
+                        WHEN SUM(CASE WHEN mes = 6 THEN CAST(denominador AS INT) ELSE 0 END) = 0 
+                        THEN 0 
+                        ELSE ROUND(
+                            (
+                                SUM(CASE WHEN mes = 6 THEN CAST(numerador AS INT) ELSE 0 END) * 1.0 
+                                / NULLIF(SUM(CASE WHEN mes = 6 THEN CAST(denominador AS INT) ELSE 0 END), 0)
+                            ) * 100
+                        , 2) 
+                    END AS COB_6,
+                    -- JULIO
+                    SUM(CASE WHEN mes = 7 THEN CAST(numerador AS INT) ELSE 0 END) AS NUM_7,
+                    SUM(CASE WHEN mes = 7 THEN CAST(denominador AS INT) ELSE 0 END) AS DEN_7,
+                    CASE 
+                        WHEN SUM(CASE WHEN mes = 7 THEN CAST(denominador AS INT) ELSE 0 END) = 0 
+                        THEN 0 
+                        ELSE ROUND(
+                            (
+                                SUM(CASE WHEN mes = 7 THEN CAST(numerador AS INT) ELSE 0 END) * 1.0 
+                                / NULLIF(SUM(CASE WHEN mes = 7 THEN CAST(denominador AS INT) ELSE 0 END), 0)
+                            ) * 100
+                        , 2) 
+                    END AS COB_7,
+                    -- AGOSTO
+                    SUM(CASE WHEN mes = 8 THEN CAST(numerador AS INT) ELSE 0 END) AS NUM_8,
+                    SUM(CASE WHEN mes = 8 THEN CAST(denominador AS INT) ELSE 0 END) AS DEN_8,
+                    CASE 
+                        WHEN SUM(CASE WHEN mes = 8 THEN CAST(denominador AS INT) ELSE 0 END) = 0 
+                        THEN 0 
+                        ELSE ROUND(
+                            (
+                                SUM(CASE WHEN mes = 8 THEN CAST(numerador AS INT) ELSE 0 END) * 1.0 
+                                / NULLIF(SUM(CASE WHEN mes = 8 THEN CAST(denominador AS INT) ELSE 0 END), 0)
+                            ) * 100
+                        , 2) 
+                    END AS COB_8,
+                    -- SETIEMBRE
+                    SUM(CASE WHEN mes = 9 THEN CAST(numerador AS INT) ELSE 0 END) AS NUM_9,
+                    SUM(CASE WHEN mes = 9 THEN CAST(denominador AS INT) ELSE 0 END) AS DEN_9,
+                    CASE 
+                        WHEN SUM(CASE WHEN mes = 9 THEN CAST(denominador AS INT) ELSE 0 END) = 0 
+                        THEN 0 
+                        ELSE ROUND(
+                            (
+                                SUM(CASE WHEN mes = 9 THEN CAST(numerador AS INT) ELSE 0 END) * 1.0 
+                                / NULLIF(SUM(CASE WHEN mes = 9 THEN CAST(denominador AS INT) ELSE 0 END), 0)
+                            ) * 100
+                        , 2)
+                    END AS COB_9,
+                    -- OCTUBRE
+                    SUM(CASE WHEN mes = 10 THEN CAST(numerador AS INT) ELSE 0 END) AS NUM_10,
+                    SUM(CASE WHEN mes = 10 THEN CAST(denominador AS INT) ELSE 0 END) AS DEN_10,
+                    CASE 
+                        WHEN SUM(CASE WHEN mes = 10 THEN CAST(denominador AS INT) ELSE 0 END) = 0 
+                        THEN 0 
+                        ELSE ROUND(
+                            (
+                                SUM(CASE WHEN mes = 10 THEN CAST(numerador AS INT) ELSE 0 END) * 1.0 
+                                / NULLIF(SUM(CASE WHEN mes = 10 THEN CAST(denominador AS INT) ELSE 0 END), 0)
+                            ) * 100
+                        , 2) 
+                    END AS COB_10,
+                    -- NOVIEMBRE
+                    SUM(CASE WHEN mes = 11 THEN CAST(numerador AS INT) ELSE 0 END) AS NUM_11,
+                    SUM(CASE WHEN mes = 11 THEN CAST(denominador AS INT) ELSE 0 END) AS DEN_11,
+                    CASE 
+                        WHEN SUM(CASE WHEN mes = 11 THEN CAST(denominador AS INT) ELSE 0 END) = 0 
+                        THEN 0 
+                        ELSE ROUND(
+                            (
+                                SUM(CASE WHEN mes = 11 THEN CAST(numerador AS INT) ELSE 0 END) * 1.0 
+                                / NULLIF(SUM(CASE WHEN mes = 11 THEN CAST(denominador AS INT) ELSE 0 END), 0)
+                            ) * 100
+                        , 2) 
+                    END AS COB_11,
+                    -- DICIEMBRE
+                    SUM(CASE WHEN mes = 12 THEN CAST(numerador AS INT) ELSE 0 END) AS NUM_12,
+                    SUM(CASE WHEN mes = 12 THEN CAST(denominador AS INT) ELSE 0 END) AS DEN_12,
+                    CASE 
+                        WHEN SUM(CASE WHEN mes = 12 THEN CAST(denominador AS INT) ELSE 0 END) = 0 
+                        THEN 0 
+                        ELSE ROUND(
+                            (
+                                SUM(CASE WHEN mes = 12 THEN CAST(numerador AS INT) ELSE 0 END) * 1.0 
+                                / NULLIF(SUM(CASE WHEN mes = 12 THEN CAST(denominador AS INT) ELSE 0 END), 0)
+                            ) * 100
+                        , 2) 
+                    END AS COB_12
+                    FROM public."MC01_PaqueteGestante_Combinado"
+                    WHERE año = %s;
+                ''',
+                [anio]  # Filtro por año
             )
             resultados = cursor.fetchall()
             
@@ -161,18 +282,25 @@ def obtener_avance_regional_mensual_paquete_gestante():
         return datos
     except Exception as e:
         print(f"Error al obtener el avance regional: {e}")
-        return None
+        return []
 
 ## PANTALLA PRINCIPAL
 def index_paquete_gestante(request):
     actualizacion = Actualizacion.objects.all()
     # RANKING 
-    anio = request.GET.get('anio')  # Valor predeterminado# Valor predeterminado
+    # Capturamos el año que viene por GET
+    anio = request.GET.get('anio', None)
+    if anio not in ['2024', '2025']:
+        # Si no llega un año válido, puedes fijar uno por defecto (2024, por ejemplo)
+        anio = '2024'
+    
+    
     mes_seleccionado = request.GET.get('mes')
     # GRAFICO
     red_seleccionada = request.GET.get('red')
     red = MAESTRO_HIS_ESTABLECIMIENTO.objects.filter(Disa='JUNIN').values_list('Red', flat=True).distinct().order_by('Red')
-    # Si la solicitud es AJAX
+    
+    # Si la solicitud es AJAX/Validamos si es AJAX
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
             # Obtener datos de RANKING 
@@ -182,7 +310,7 @@ def index_paquete_gestante(request):
             # Obtener datos de AVANCE GRAFICO ANUAL
             resultados_avance_regional_paquete_gestante = obtener_avance_regional_paquete_gestante()
             # Obtener datos de AVANCE GRAFICO ANUAL
-            resultados_avance_regional_mensual_paquete_gestante = obtener_avance_regional_mensual_paquete_gestante()
+            resultados_avance_regional_mensual_paquete_gestante = obtener_avance_regional_mensual_paquete_gestante(anio)
             # Procesar los resultados
             if any(len(row) < 4 for row in resultados_ranking_paquete_gestante):
                 raise ValueError("Algunas filas del ranking no tienen suficientes elementos")
@@ -261,6 +389,9 @@ def index_paquete_gestante(request):
                     logger.error(f"Error procesando la fila {index}: {str(e)}")
 
             # AVANCE GRAFICO MENSUAL
+            # ------------------------------
+            # 1. Procesar DATOS MENSUALIZADOS (filtrados por año)
+            # ------------------------------
             for index, row in enumerate(resultados_avance_regional_mensual_paquete_gestante):
                 try:
                     # Verifica que el diccionario tenga las claves necesarias
@@ -269,6 +400,7 @@ def index_paquete_gestante(request):
                     if not required_keys.issubset(row.keys()):
                         raise ValueError(f"La fila {index} no tiene las claves necesarias: {row}")
 
+                    # Extraer cada valor, convirtiendo a float
                     num_1_value = float(row.get('num_1', 0.0))
                     den_1_value = float(row.get('den_1', 0.0))
                     cob_1_value = float(row.get('cob_1', 0.0))
