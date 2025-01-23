@@ -72,11 +72,22 @@ def obtener_avance_regional_v1_condicion_previa():
         with connection.cursor() as cursor:
             cursor.execute(
                 '''
-                SELECT 
-                    SUM(numerador_mes_diciembre) AS num,
-                    SUM(denominador_mes_diciembre) AS den,
-                    ROUND((SUM(numerador_mes_diciembre)::NUMERIC / NULLIF(SUM(denominador_mes_diciembre), 0)) * 100, 2) AS cob
-                FROM public."Cobertura_VI0101_CondicionPrevia"
+                    SELECT
+                    -- ENERO
+                    SUM(CASE WHEN mes = 1 THEN CAST(numerador AS INT) ELSE 0 END) AS num,
+                    SUM(CASE WHEN mes = 1 THEN CAST(denominador AS INT) ELSE 0 END) AS den,
+                    CASE 
+                        WHEN SUM(CASE WHEN mes = 1 THEN CAST(denominador AS INT) ELSE 0 END) = 0 								
+                        THEN 0 
+                        ELSE ROUND(
+                            (
+                                SUM(CASE WHEN mes = 1 THEN CAST(numerador AS INT) ELSE 0 END) * 1.0 
+                                / NULLIF(SUM(CASE WHEN mes = 1 THEN CAST(denominador AS INT) ELSE 0 END), 0)
+                            ) * 100
+                        , 2) 
+                    END AS cob
+                    FROM public."VI0101_CondicionPrevia_Combinado"
+					WHERE "año" = '2025'
                 '''
             )
             resultados = cursor.fetchall()
@@ -285,7 +296,7 @@ def index_v1_condicion_previa(request):
     anio = request.GET.get('anio', None)
     if anio not in ['2024', '2025']:
         # Si no llega un año válido, puedes fijar uno por defecto (2024, por ejemplo)
-        anio = '2024'
+        anio = '2025'
     
     mes_seleccionado = request.GET.get('mes')
     # GRAFICO

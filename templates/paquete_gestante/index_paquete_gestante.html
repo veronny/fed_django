@@ -76,7 +76,7 @@
     <div class="col-md-3">
         <div class="card card-primary">
             <div class="card-header">
-                <h5 class="card-title">AVANCE REGIONAL -  EVALUACION (DIC - 2024)</h5>
+                <h5 class="card-title">AVANCE REGIONAL -  EVALUACION (ENE - 2025)</h5>
             </div>
 
             <div class="card-body">        <!-- Sección para mostrar la tabla de resultados -->
@@ -96,12 +96,10 @@
 
             <div class="col-md-1">
                 <select id="select-year" class="form-control form-control-sm">
-                    <option value="2024" selected>2024</option>
-                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2025" selected="true">2025</option>
                 </select>
             </div>
-
-
 
             <div class="card-body">
                 <div class="container">
@@ -127,15 +125,15 @@
                         <!-- Sección para seleccionar el mes -->
                         <div class="col-md-3 mb-3">
                             <select class="form-control" id="anio-select">
-                                <option value = '2024' selected="true">2024</option>
-                                <option value = '2025' >2025</option>
+                                <option value = '2024' >2024</option>
+                                <option value = '2025' selected="true">2025</option>
                                 <!-- Agrega más opciones de meses según sea necesario -->
                             </select>
                         </div>
                         <!-- Sección para seleccionar el mes -->
                         <div class="col-md-5 mb-3">
                             <select class="form-control" id="mes-select">
-                                <option value = '1'>ENERO</option>
+                                <option value = '1' selected="true">ENERO</option>
                                 <option value = '2'>FEBRERO</option>
                                 <option value = '3'>MARZO</option>
                                 <option value = '4'>ABRIL</option>
@@ -146,7 +144,7 @@
                                 <option value = '9'>SETIEMBRE</option>
                                 <option value = '10'>OCTUBRE</option>
                                 <option value = '11'>NOVIEMBRE</option>
-                                <option value = '12' selected="true">DICIEMBRE</option>
+                                <option value = '12'>DICIEMBRE</option>
                             </select>
                         </div>
 
@@ -353,6 +351,7 @@ document.addEventListener('DOMContentLoaded', function () {
         console.error('Error al obtener los datos:', error.message);
     });
 });
+
 // AVANCE MENSUAL
 document.addEventListener('DOMContentLoaded', function () {
     // Valor máximo en el eje Y (por ejemplo 80%)
@@ -506,7 +505,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Cargar por defecto (por ejemplo, año 2024)
-    cargarDatosMensual('2024');
+    cargarDatosMensual('2025');
 });
 
 
