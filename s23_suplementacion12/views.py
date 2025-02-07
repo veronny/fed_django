@@ -955,8 +955,8 @@ def fill_worksheet_s23_suplementacion12(ws, results):
     ws['B5'] = 'DENOMINADOR'
     ws['K5'] = 'NUMERADOR'
     
-    ws['K6'] = 'ESQUEMA DE SUPLEMENTACION TRATAMIENTO CON HIERRO'
-    ws['R6'] = 'ESQUEMA DE SUPLEMENTACION TRATAMIENTO CON MULTIMICRONUTIENTES'
+    ws['K6'] = 'ESQUEMA DE SUPLEMENTACION CON HIERRO'
+    ws['R6'] = 'ESQUEMA DE SUPLEMENTACION CON MULTIMICRONUTIENTES'
     ws['AG6'] = 'VALIDADORES DEL INDICADOR'
     
     ws['D7'] = 'Niños que cumplan 12 meses 29 dias (394) dentro del mes de evaluacion'
@@ -1682,15 +1682,15 @@ def fill_worksheet_s23_suplementacion12(ws, results):
                     cell_fill = plomo_claro_fill
                     cell_font = font_normal
 
-            # Apply color to columns H (8) to Q (17) and write "NO APLICA" in column R (18) if BPN is 0
-            if multi_value == 1:
-                if 18 <= col <= 31:
-                    cell_fill = plomo_claro_fill
-                    cell_font = plomo_claro_font
-                elif col == 32:
-                    cell.value = "NO APLICA"
-                    cell_fill = plomo_claro_fill
-                    cell_font = font_normal
+            ## # Apply color to columns H (8) to Q (17) and write "NO APLICA" in column R (18) if BPN is 0
+            ## if multi_value == 1:
+            ##     if 18 <= col <= 31:
+            ##         cell_fill = plomo_claro_fill
+            ##         cell_font = plomo_claro_font
+            ##     elif col == 32:
+            ##         cell.value = "NO APLICA"
+            ##         cell_fill = plomo_claro_fill
+            ##         cell_font = font_normal
             
             
             # Set font and fill
