@@ -1692,7 +1692,7 @@ def fill_worksheet_s23_suplementacion12(ws, results):
             ##         cell_fill = plomo_claro_fill
             ##         cell_font = font_normal
             
-            
+            ## modificacion 
             # Set font and fill
             cell.font = cell_font
             if cell_fill:
