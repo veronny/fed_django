@@ -78,15 +78,15 @@ def obtener_avance_regional_paquete_nino():
                 '''
                     SELECT
                     -- ENERO
-                    SUM(CASE WHEN mes = 1 THEN CAST(numerador AS INT) ELSE 0 END) AS num,
-                    SUM(CASE WHEN mes = 1 THEN CAST(denominador AS INT) ELSE 0 END) AS den,
+                    SUM(CASE WHEN mes = 2 THEN CAST(numerador AS INT) ELSE 0 END) AS num,
+                    SUM(CASE WHEN mes = 2 THEN CAST(denominador AS INT) ELSE 0 END) AS den,
                     CASE 
-                        WHEN SUM(CASE WHEN mes = 1 THEN CAST(denominador AS INT) ELSE 0 END) = 0 								
+                        WHEN SUM(CASE WHEN mes = 2 THEN CAST(denominador AS INT) ELSE 0 END) = 0 								
                         THEN 0 
                         ELSE ROUND(
                             (
-                                SUM(CASE WHEN mes = 1 THEN CAST(numerador AS INT) ELSE 0 END) * 1.0 
-                                / NULLIF(SUM(CASE WHEN mes = 1 THEN CAST(denominador AS INT) ELSE 0 END), 0)
+                                SUM(CASE WHEN mes = 2 THEN CAST(numerador AS INT) ELSE 0 END) * 1.0 
+                                / NULLIF(SUM(CASE WHEN mes = 2 THEN CAST(denominador AS INT) ELSE 0 END), 0)
                             ) * 100
                         , 2) 
                     END AS cob
